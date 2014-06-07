@@ -21,11 +21,14 @@ defmodule Oauth2.Mixfile do
   end
 
   def application do
-    [applications: [],
+    [applications: [:httpoison],
      mod: {OAuth2, []}]
   end
 
   defp deps do
-    []
+    [
+      {:httpoison, github: "edgurgel/httpoison", tag: "0.1.1"},
+      {:ex_conf, "0.1.1"}
+    ]
   end
 end
