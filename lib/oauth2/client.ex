@@ -13,7 +13,7 @@ defmodule OAuth2.Client do
     client_id: nil,
     client_secret: nil,
     strategy: nil,
-    host: "",
+    site: "",
     authorize_url: "/oauth/authorize",
     token_url: "/oauth/token"
   ]
