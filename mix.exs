@@ -9,7 +9,7 @@ defmodule Oauth2.Mixfile do
     [
       app: :oauth2,
       version: "0.0.1",
-      elixir: ">= 0.13.3",
+      elixir: ">= 0.15.0",
       deps: deps,
       description: @description,
       package: [
@@ -27,8 +27,9 @@ defmodule Oauth2.Mixfile do
 
   defp deps do
     [
-      {:httpoison, github: "edgurgel/httpoison", tag: "0.1.1"},
-      {:ex_conf, "0.1.1"}
+      {:hackney, "~> 0.13.1"},
+      {:httpoison, "~> 0.4.1"},
+      {:poison, "~> 1.0.1"}
     ]
   end
 end
