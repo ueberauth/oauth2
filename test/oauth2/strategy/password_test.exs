@@ -6,7 +6,7 @@ defmodule OAuth2.Strategy.PasswordTest do
     opts = [
       client_id: "client_id", client_secret: "secret", site: "https://auth.example.com"
     ]
-    client = Password.init(opts)
+    client = Password.new(opts)
     assert client.__struct__    == OAuth2.Client
     assert client.strategy      == Password
     assert client.client_id     == "client_id"
@@ -14,5 +14,6 @@ defmodule OAuth2.Strategy.PasswordTest do
     assert client.site          == "https://auth.example.com"
     assert client.authorize_url == "/oauth/authorize"
     assert client.token_url     == "/oauth/token"
+    assert client.redirect_uri  == nil
   end
 end
