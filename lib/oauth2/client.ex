@@ -15,7 +15,8 @@ defmodule OAuth2.Client do
     strategy: nil,
     site: "",
     authorize_url: "/oauth/authorize",
-    token_url: "/oauth/token"
+    token_url: "/oauth/token",
+    redirect_uri: nil
   ]
 
   def get_token(client, params \\ %{}, opts \\ %{}) do
