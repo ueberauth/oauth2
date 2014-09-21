@@ -20,5 +20,9 @@ defmodule OAuth2.Client do
   ]
 
   def get_token(client, params \\ %{}, opts \\ %{}) do
+  def authorize_url(client, params \\ %{}) do
+    client.strategy.authorize_url(params)
+  end
+
   end
 end
