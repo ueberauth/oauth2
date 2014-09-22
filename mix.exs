@@ -13,7 +13,7 @@ defmodule OAuth2.Mixfile do
       deps: deps,
       description: @description,
       package: [
-        contributors: ["Sonny Scroggin"],
+        contributors: ["Sonny Scroggin", "Nate West"],
         licence: "MIT",
         links: [github: "https://github.com/scrogson/oauth2"]
       ]
