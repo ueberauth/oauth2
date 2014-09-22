@@ -1,4 +1,4 @@
-defmodule Oauth2.Mixfile do
+defmodule OAuth2.Mixfile do
   use Mix.Project
 
   @description """
@@ -9,7 +9,7 @@ defmodule Oauth2.Mixfile do
     [
       app: :oauth2,
       version: "0.0.1",
-      elixir: ">= 0.15.0",
+      elixir: "~> 1.0",
       deps: deps,
       description: @description,
       package: [
@@ -28,8 +28,8 @@ defmodule Oauth2.Mixfile do
   defp deps do
     [
       {:hackney, "~> 0.13.1"},
-      {:httpoison, "~> 0.4.1"},
-      {:poison, "~> 1.0.1"}
+      {:httpoison, "~> 0.4.2"},
+      {:poison, "~> 1.2.0"}
     ]
   end
 end
