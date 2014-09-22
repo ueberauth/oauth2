@@ -2,10 +2,12 @@ defmodule OAuth2.Strategy.PasswordTest do
   use ExUnit.Case, async: true
 
   alias OAuth2.Strategy.Password
-  test "it works" do
-    opts = [
-      client_id: "client_id", client_secret: "secret", site: "https://auth.example.com"
-    ]
+  test "new" do
+    opts = %{
+      client_id: "client_id",
+      client_secret: "secret",
+      site: "https://auth.example.com"
+    }
     client = Password.new(opts)
     assert client.__struct__    == OAuth2.Client
     assert client.strategy      == Password
