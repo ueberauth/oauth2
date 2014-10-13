@@ -8,10 +8,4 @@ defmodule OAuth2.Client do
   require Logger
 
   alias OAuth2.Client
-  def authorize_url(client, params \\ %{}) do
-    client.strategy.authorize_url(params)
-  end
-
-  def get_token(client, params \\ %{}, opts \\ %{}) do
-  end
 end
