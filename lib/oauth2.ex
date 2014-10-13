@@ -1,5 +1,4 @@
 defmodule OAuth2 do
-  use Application
 
   # See http://elixir-lang.org/docs/stable/Application.html
   # for more information on OTP Applications
