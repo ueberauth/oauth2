@@ -1,19 +1,25 @@
 defmodule OAuth2 do
-  use Application
+  @moduledoc """
+  OAuth2
+  """
 
-  # See http://elixir-lang.org/docs/stable/Application.html
-  # for more information on OTP Applications
-  def start(_type, _args) do
-    import Supervisor.Spec, warn: false
+  @doc """
+  The authorize endpoint URL of the OAuth2 provider
+  """
+  def authorize_url(strategy, params \\ %{}) do
+    strategy.__struct__.authorize_url(strategy, params)
+    |> to_url(:authorize_url)
+  end
 
-    children = [
-      # Define workers and child supervisors to be supervised
-      # worker(OAuth2.Worker, [arg1, arg2, arg3])
-    ]
+  @doc """
+  The token endpoint URL of the OAuth2 provider
+  """
+  def token_url(strategy, params \\ %{}, opts \\ %{}) do
+    strategy.__struct__.token_url(strategy, params, opts)
+    |> to_url(:token_url)
+  end
 
-    # See http://elixir-lang.org/docs/stable/Supervisor.html
-    # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: OAuth2.Supervisor]
-    Supervisor.start_link(children, opts)
+  defp to_url(strategy, endpoint) do
+    strategy.site <> Map.get(strategy, endpoint) <> "?" <> URI.encode_query(strategy.params)
   end
 end
