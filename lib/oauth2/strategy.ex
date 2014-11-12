@@ -12,7 +12,7 @@ defmodule OAuth2.Strategy do
         token_url: "/oauth/token",
         token_method: :post,
         params: %{},
-        headers: []
+        headers: %{}
       ]
 
       def new(opts) do
