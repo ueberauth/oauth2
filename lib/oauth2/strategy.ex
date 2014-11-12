@@ -20,5 +20,12 @@ defmodule OAuth2.Strategy do
       end
     end
   end
+
+  @doc """
+  Builds a url from the strategy struct.
+  """
+  def to_url(strategy, endpoint) do
+    strategy.site <> Map.get(strategy, endpoint) <> "?" <> URI.encode_query(strategy.params)
+  end
 end
 
