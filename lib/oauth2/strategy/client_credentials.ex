@@ -14,16 +14,16 @@ defmodule OAuth2.Strategy.ClientCredentials do
   end
 
   @doc """
-  Retrieve an access token given the specified client.
+  Retrieve an access token given the specified strategy.
   """
-  def get_token(client, params \\ %{}, opts \\ %{}) do
+  def get_token(strategy, params \\ %{}, opts \\ %{}) do
     {auth_scheme, opts} = Map.pop(opts, :auth_scheme, "auth_header")
     params =
       %{grant_type: "client_credentials"}
-      |> Map.merge(auth_scheme(auth_scheme, client))
+      |> Map.merge(auth_scheme(auth_scheme, strategy))
       |> Map.merge(params)
 
-    Client.get_token(client, params, Map.merge(opts, %{refresh_token: nil}))
+    OAuth.get_token(strategy, params, Map.merge(opts, %{refresh_token: nil}))
   end
 
   @doc """
@@ -33,6 +33,6 @@ defmodule OAuth2.Strategy.ClientCredentials do
     %{headers: %{"Authorization" => "Basic " <> Base.encode64(id <> ":" <> secret)}}
   end
 
-  defp auth_scheme("auth_header", client),  do: auth_header(client)
-  defp auth_scheme("request_body", client), do: Map.take(client, [:client_id, :client_secret])
+  defp auth_scheme("auth_header", strategy),  do: auth_header(strategy)
+  defp auth_scheme("request_body", strategy), do: Map.take(strategy, [:client_id, :client_secret])
 end
