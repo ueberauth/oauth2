@@ -25,11 +25,11 @@ defmodule OAuth2.Strategy.AuthCodeTest do
   @redirect_uri "http://localhost:4000/auth/callback"
   @encoded_redirect_uri URI.encode_query(%{redirect_uri: @redirect_uri})
 
-  @opts %{
+  @opts [
     client_id: "client_id",
     client_secret: "secret",
     site: "http://localhost:4000"
-  }
+  ]
 
   test "new" do
     strategy = AuthCode.new(@opts)
