@@ -12,20 +12,32 @@ defmodule OAuth2.Strategy.AuthCode do
   params additional query parameters for the URL
   """
   def authorize_url(strategy, params \\ %{}) do
-    params = %{response_type: "code", client_id: strategy.client_id}
-    |> Map.merge(params)
+    params = Map.merge(%{
+      response_type: "code",
+      client_id: strategy.client_id
+    }, params)
 
-    %__MODULE__{strategy | params: params}
+    OAuth2.authorize_url(strategy, params)
   end
 
   @doc """
   Retrieve an access token given the specified validation code.
   """
-  def token_url(strategy, params \\ %{}, opts \\ %{}) do
-    params = %{grant_type: "authorization_code"}
-    |> Map.merge(%{client_id: strategy.client_id, client_secret: strategy.client_secret})
-    |> Map.merge(params)
+  def get_token(strategy, code, params \\ %{}, opts \\ []) do
+    params = Map.merge(%{
+      code: code,
+      grant_type: "authorization_code",
+      client_id: strategy.client_id,
+      client_secret: strategy.client_secret
+    }, params)
+    OAuth2.get_token(strategy, params, opts)
+  end
 
-    %__MODULE__{strategy | params: params}
+  def get_token!(strategy, code, params \\ %{}, opts \\ []) do
+    case get_token(strategy, code, params, opts) do
+      {:ok, token} -> token
+      {:error, error} -> raise error
+    end
   end
 end
+
