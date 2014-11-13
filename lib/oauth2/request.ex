@@ -22,6 +22,7 @@ defmodule OAuth2.Request do
   defp process_request_headers(headers, content_type), do:
     [{"Accept", content_type} | headers]
 
+  defp process_request_body("", _), do: ""
   defp process_request_body(body, "application/json"), do:
     Poison.encode!(body)
   defp process_request_body(body, "application/x-www-form-urlencoded"), do:
