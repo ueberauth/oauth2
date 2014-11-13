@@ -24,7 +24,7 @@ AuthCode.authorize_url(strategy, %{redirect_uri: "https://example.com/auth/callb
 # => "https://auth.example.com/oauth/authorize?client_id=client_id&redirect_uri=https%3A%2F%2Fexample.com%2Fauth%2Fcallback&response_type=code"
 
 # Use the authorization code returned from the provider to obtain an access token.
-token = AuthCode.get_token!(strategy, %{code: "someauthcode", redirect_uri: "https://example.com/auth/callback"})
+token = AuthCode.get_token!(strategy, "someauthcode", %{redirect_uri: "https://example.com/auth/callback"})
 
 # Use the access token to make a request for resources
 resource = OAuth2.AccessToken.get!(token, "/api/resource")
