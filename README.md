@@ -25,5 +25,5 @@ OAuth2.authorize_url(strategy, %{redirect_uri: "https://example.com/auth/callbac
 token = OAuth2.get_token(strategy, %{code: "someauthcode", redirect_uri: "https://example.com/auth/callback"})
 
 # Use the access token to make a request for resources
-OAuth2.Token.get(token, "/api/resource")
+OAuth2.AccessToken.get(token, "/api/resource")
 ```
