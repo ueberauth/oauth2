@@ -27,7 +27,7 @@ defmodule OAuth2.Request do
   defp process_request_body(body, "application/x-www-form-urlencoded"), do:
     Plug.Conn.Query.encode(body)
 
-  defp do_request({:ok, status_code, headers, client}) when status_code in [205, 304], do:
+  defp do_request({:ok, status_code, headers, client}) when status_code in [204, 304], do:
     {:ok, Response.new(status_code, headers, "")}
   defp do_request({:ok, status_code, headers}), do:
     {:ok, Response.new(status_code, headers, "")}
