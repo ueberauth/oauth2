@@ -19,7 +19,7 @@ defmodule OAuth2.AccessToken do
       access_token:  response["access_token"],
       refresh_token: response["refresh_token"],
       expires_at:    response["expires_at"] |> expires_at,
-      token_type:    process_token_type(response["token_type"]),
+      token_type:    response["token_type"],
       strategy:      strategy]
   end
 
@@ -64,8 +64,6 @@ defmodule OAuth2.AccessToken do
       _ -> token.strategy.site <> url
     end
   end
-
-  defp process_token_type("bearer"), do: "Bearer"
 
   defp req_headers(token, headers) do
     [{"Authorization", "#{token.token_type} #{token.access_token}"} | headers]
