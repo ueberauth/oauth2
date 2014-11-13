@@ -25,7 +25,13 @@ defmodule OAuth2.Strategy do
   Builds a url from the strategy struct.
   """
   def to_url(strategy, endpoint) do
-    strategy.site <> Map.get(strategy, endpoint) <> "?" <> URI.encode_query(strategy.params)
+    endpoint = Map.get(strategy, endpoint)
+    endpoint(strategy, endpoint) <> "?" <> URI.encode_query(strategy.params)
   end
+
+  defp endpoint(strategy, <<"/"::utf8, _::binary>> = endpoint), do:
+    strategy.site <> endpoint
+  defp endpoint(_strategy, endpoint), do:
+    endpoint
 end
 
