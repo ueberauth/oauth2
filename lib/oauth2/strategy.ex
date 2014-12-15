@@ -12,7 +12,8 @@ defmodule OAuth2.Strategy do
         token_url: "/oauth/token",
         token_method: :post,
         params: %{},
-        headers: %{}
+        headers: %{},
+        redirect_uri: ""
       ]
 
       def new(opts) do
