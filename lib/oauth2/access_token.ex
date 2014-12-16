@@ -6,12 +6,12 @@ defmodule OAuth2.AccessToken do
   alias OAuth2.Request
   alias OAuth2.AccessToken
 
-  @standard ["access_token", "refresh_token", "expires_in", "expires_at", "token_type"]
+  @standard ["access_token", "refresh_token", "expires_at", "expires_at", "token_type"]
 
   defstruct [
     access_token: "",
     refresh_token: nil,
-    expires_in: nil,
+    expires_at: nil,
     token_type: "Bearer",
     other_params: %{},
     strategy: nil
@@ -23,7 +23,7 @@ defmodule OAuth2.AccessToken do
     struct __MODULE__, [
       access_token:  std["access_token"],
       refresh_token: std["refresh_token"],
-      expires_in:    std["expires_in"] || std["expires_at"] |> expires_in,
+      expires_at:    std["expires_at"] || std["expires_in"] |> expires_at,
       token_type:    std["token_type"],
       other_params:  other,
       strategy:      strategy]
@@ -45,23 +45,23 @@ defmodule OAuth2.AccessToken do
   @doc """
   Determines if the access token expires or not.
 
-  Returns `true` unless `expires_in` is `nil`.
+  Returns `true` unless `expires_at` is `nil`.
   """
-  def expires?(%AccessToken{expires_in: nil}), do: false
+  def expires?(%AccessToken{expires_at: nil}), do: false
   def expires?(_), do: true
 
   @doc """
   Determines if the access token has expired.
   """
   def expired?(token) do
-    expires?(token) && unix_now > token.expires_in
+    expires?(token) && unix_now > token.expires_at
   end
 
   @doc """
-  Returns a unix timestamp based on now + expires_in (in seconds).
+  Returns a unix timestamp based on now + expires_at (in seconds).
   """
-  def expires_in(nil), do: nil
-  def expires_in(int), do: unix_now + int
+  def expires_at(nil), do: nil
+  def expires_at(int), do: unix_now + int
 
   defp process_url(token, url) do
     case String.downcase(url) do
