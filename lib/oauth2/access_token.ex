@@ -6,7 +6,7 @@ defmodule OAuth2.AccessToken do
   alias OAuth2.Request
   alias OAuth2.AccessToken
 
-  @standard ["access_token", "refresh_token", "expires_at", "expires_at", "token_type"]
+  @standard ["access_token", "refresh_token", "expires_in", "token_type"]
 
   defstruct [
     access_token: "",
