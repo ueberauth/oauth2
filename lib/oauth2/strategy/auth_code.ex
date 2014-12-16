@@ -28,7 +28,8 @@ defmodule OAuth2.Strategy.AuthCode do
       code: code,
       grant_type: "authorization_code",
       client_id: strategy.client_id,
-      client_secret: strategy.client_secret
+      client_secret: strategy.client_secret,
+      redirect_uri: strategy.redirect_uri
     }, params)
     OAuth2.get_token(strategy, params, opts)
   end

@@ -6,20 +6,26 @@ defmodule OAuth2.AccessToken do
   alias OAuth2.Request
   alias OAuth2.AccessToken
 
+  @standard ["access_token", "refresh_token", "expires_in", "token_type"]
+
   defstruct [
     access_token: "",
     refresh_token: nil,
     expires_at: nil,
     token_type: "Bearer",
+    other_params: %{},
     strategy: nil
   ]
 
   def new(response, strategy, _opts \\ []) do
+    {std, other} = Dict.split(response, @standard)
+
     struct __MODULE__, [
-      access_token:  response["access_token"],
-      refresh_token: response["refresh_token"],
-      expires_at:    response["expires_at"] |> expires_at,
-      token_type:    response["token_type"],
+      access_token:  std["access_token"],
+      refresh_token: std["refresh_token"],
+      expires_at:    std["expires_in"] |> expires_at,
+      token_type:    std["token_type"],
+      other_params:  other,
       strategy:      strategy]
   end
 
@@ -52,7 +58,7 @@ defmodule OAuth2.AccessToken do
   end
 
   @doc """
-  Returns a unix timestamp based on now + expires_in (in seconds).
+  Returns a unix timestamp based on now + expires_at (in seconds).
   """
   def expires_at(nil), do: nil
   def expires_at(int), do: unix_now + int
