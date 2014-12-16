@@ -23,7 +23,7 @@ defmodule OAuth2.AccessToken do
     struct __MODULE__, [
       access_token:  std["access_token"],
       refresh_token: std["refresh_token"],
-      expires_at:    std["expires_at"] || std["expires_in"] |> expires_at,
+      expires_at:    std["expires_in"] |> expires_at,
       token_type:    std["token_type"],
       other_params:  other,
       strategy:      strategy]
