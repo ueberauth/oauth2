@@ -5,7 +5,8 @@ OAuth2
 
 ## API
 
-This is still a work in progress. But here's what I'm thinking so far:
+Currently the only strategy that is implemented is the authorization code flow.
+More to come soon!
 
 #### Authorization Code Flow (AuthCode Strategy)
 
@@ -29,3 +30,8 @@ token = AuthCode.get_token!(strategy, "someauthcode", %{redirect_uri: "https://e
 # Use the access token to make a request for resources
 resource = OAuth2.AccessToken.get!(token, "/api/resource")
 ```
+
+## Examples
+
+- [Authenticate with Github (OAuth2/Phoenix)](https://github.com/scrogson/oauth2_example)
+
