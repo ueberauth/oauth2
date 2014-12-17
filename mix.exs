@@ -29,7 +29,7 @@ defmodule OAuth2.Mixfile do
   defp package do
     [
       contributors: ["Sonny Scroggin"],
-      licence: "MIT",
+      licenses: ["MIT"],
       links: %{github: "https://github.com/scrogson/oauth2"}
     ]
   end
