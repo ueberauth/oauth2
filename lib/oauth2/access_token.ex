@@ -24,7 +24,7 @@ defmodule OAuth2.AccessToken do
       access_token:  std["access_token"],
       refresh_token: std["refresh_token"],
       expires_at:    std["expires_in"] |> expires_at,
-      token_type:    std["token_type"],
+      token_type:    response["token_type"] |> normalize_token_type,
       other_params:  other,
       strategy:      strategy]
   end
@@ -70,6 +70,9 @@ defmodule OAuth2.AccessToken do
       _ -> token.strategy.site <> url
     end
   end
+
+  defp normalize_token_type("bearer"), do: "Bearer"
+  defp normalize_token_type(string), do: string
 
   defp req_headers(token, headers) do
     [{"Authorization", "#{token.token_type} #{token.access_token}"} | headers]
