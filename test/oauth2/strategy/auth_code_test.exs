@@ -1,7 +1,5 @@
 defmodule OAuth2.Strategy.AuthCodeTest do
 
-  alias OAuth2.Strategy.AuthCode
-
   use ExUnit.Case, async: true
   use Plug.Test
 
