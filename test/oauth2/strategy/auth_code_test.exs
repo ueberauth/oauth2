@@ -1,38 +1,13 @@
 defmodule OAuth2.Strategy.AuthCodeTest do
 
-  defmodule Router do
-    use Plug.Router
-    import Plug.Conn
+  alias OAuth2.Strategy.AuthCode
 
-    plug Plug.Parsers, parsers: [:urlencoded, :multipart]
-
-    get "/oauth/authorize" do
-      conn
-      |> put_resp_header("Location", "/auth/callback?code=1234")
-      |> send_resp(302, "")
-    end
-
-    get "/auth/callback" do
-      IO.puts inspect conn
-      send self, {:conn, conn}
-    end
-  end
   use ExUnit.Case, async: true
   use Plug.Test
 
-  alias OAuth2.Strategy.AuthCode
-
-  @redirect_uri "http://localhost:4000/auth/callback"
-  @encoded_redirect_uri URI.encode_query(%{redirect_uri: @redirect_uri})
-
-  @opts [
-    client_id: "client_id",
-    client_secret: "secret",
-    site: "http://localhost:4000"
-  ]
-
   test "new" do
-    strategy = AuthCode.new(@opts)
+    conn = call(Client, conn(:get, "/"))
+    strategy = conn.private.oauth2_strategy
     assert strategy.client_id     == "client_id"
     assert strategy.client_secret == "secret"
     assert strategy.site          == "http://localhost:4000"
@@ -44,11 +19,22 @@ defmodule OAuth2.Strategy.AuthCodeTest do
   end
 
   test "authorize_url" do
-    strategy = AuthCode.new(@opts)
-    params = %{redirect_uri: @redirect_uri}
-    url = AuthCode.authorize_url(strategy, params)
-    assert url == "http://localhost:4000/oauth/authorize?client_id=client_id&#{@encoded_redirect_uri}&response_type=code"
+    Plug.Adapters.Cowboy.http Provider, []
+    Plug.Adapters.Cowboy.http Client, [], port: 4001
 
-    conn = Router.call(conn(:get, url), Router.init([]))
+    conn = call(Client, conn(:get, "/auth"))
+    [location] = get_resp_header conn, "Location"
+    conn = call(Provider, conn(:get, location))
+    assert conn.status == 302
+
+    [location] = get_resp_header conn, "Location"
+    conn = call(Client, conn(:get, location))
+    assert conn.params["code"] == "1234"
+
+    assert_receive %OAuth2.AccessToken{access_token: "abc123", token_type: "Bearer"}
+  end
+
+  defp call(mod, conn) do
+    mod.call(conn, [])
   end
 end
