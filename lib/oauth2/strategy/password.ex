@@ -16,12 +16,19 @@ defmodule OAuth2.Strategy.Password do
   @doc """
   Retrieve an access token given the specified End User username and password.
   """
-  def get_token(client, username, password, params \\ %{}, opts \\ %{}) do
+  def get_token(strategy, username, password, params \\ %{}, opts \\ []) do
     params =
       %{grant_type: "password", username: username, password: password}
-      |> Map.merge(Map.take(client, [:client_id, :client_secret]))
+      |> Map.merge(Map.take(strategy, [:client_id, :client_secret]))
       |> Map.merge(params)
 
-    Client.get_token(client, params, opts)
+    OAuth2.get_token(strategy, params, opts)
+  end
+
+  def get_token!(strategy, username, password, params \\ %{}, opts \\ []) do
+    case get_token(strategy, username, password, params, opts) do
+      {:ok, token} -> token
+      {:error, error} -> raise error
+    end
   end
 end
