@@ -5,8 +5,11 @@ OAuth2
 
 ## API
 
-Currently the only strategy that is implemented is the authorization code flow.
-More to come soon!
+Current implemented strategies:
+
+- Authorization Code
+- Password
+- Client Credentials
 
 #### Authorization Code Flow (AuthCode Strategy)
 
