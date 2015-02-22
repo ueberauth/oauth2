@@ -21,7 +21,7 @@ defmodule OAuth2.Mixfile do
       {:hackney, "~> 1.0.6"},
       {:httpoison, "~> 0.6.2"},
       {:poison, "~> 1.3.1"},
-      {:cowboy, "~> 1.0", only: :test},
+      {:cowboy, "~> 1.0"},
       {:plug, "~> 0.10.0"},
     ]
   end
