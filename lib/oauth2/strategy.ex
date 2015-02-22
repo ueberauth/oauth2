@@ -8,6 +8,7 @@ defmodule OAuth2.Strategy do
         client_id: nil,
         client_secret: nil,
         site: "",
+        scope: nil,
         authorize_url: "/oauth/authorize",
         token_url: "/oauth/token",
         token_method: :post,
@@ -35,4 +36,3 @@ defmodule OAuth2.Strategy do
   defp endpoint(_strategy, endpoint), do:
     endpoint
 end
-
