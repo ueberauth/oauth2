@@ -14,7 +14,8 @@ defmodule OAuth2.Strategy.AuthCode do
   def authorize_url(strategy, params \\ %{}) do
     params = Map.merge(%{
       response_type: "code",
-      client_id: strategy.client_id
+      client_id: strategy.client_id,
+      scope: strategy.scope
     }, params)
 
     OAuth2.authorize_url(strategy, params)
