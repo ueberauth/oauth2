@@ -36,10 +36,10 @@ defmodule OAuth2.Strategy.ClientCredentials do
   @doc """
   Returns the Authorization header value for Basic Authentication.
   """
-  def auth_header(%{client_id: id, client_secret: secret, scope: scope}) do
+  def auth_header(%{client_id: id, client_secret: secret}) do
     %{headers: [{"Authorization", "Basic " <> Base.encode64(id <> ":" <> secret)}]}
   end
 
   defp auth_scheme("auth_header", strategy),  do: auth_header(strategy)
-  defp auth_scheme("request_body", strategy), do: Map.take(strategy, [:client_id, :client_secret, :scope])
+  defp auth_scheme("request_body", strategy), do: Map.take(strategy, [:client_id, :client_secret])
 end
