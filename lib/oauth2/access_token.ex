@@ -6,7 +6,7 @@ defmodule OAuth2.AccessToken do
   alias OAuth2.Request
   alias OAuth2.AccessToken
 
-  @standard ["access_token", "refresh_token", "expires_in", "token_type"]
+  @standard ["access_token", "refresh_token", "expires_in", "token_type", "expires"]
 
   defstruct [
     access_token: "",
@@ -18,7 +18,16 @@ defmodule OAuth2.AccessToken do
   ]
 
   def new(response, strategy, _opts \\ []) do
+    unless is_map(response) do
+      response = URI.decode_query(response)
+    end
+
     {std, other} = Dict.split(response, @standard)
+
+    if Dict.has_key?(std, "expires") do
+      expires = elem(Integer.parse(Dict.get(std, "expires")), 0)
+      std = Dict.put_new(std, "expires_in", expires)
+    end
 
     struct __MODULE__, [
       access_token:  std["access_token"],

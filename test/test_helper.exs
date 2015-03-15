@@ -22,6 +22,7 @@ defmodule Provider do
     |> put_resp_content_type("application/json")
     |> send_resp(200, Poison.encode!(token))
   end
+
 end
 
 defmodule Client do
