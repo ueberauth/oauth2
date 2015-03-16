@@ -4,6 +4,8 @@ defmodule OAuth2.Response do
 
   @type t :: %__MODULE__{status_code: integer, body: binary, headers: map}
 
+  @query ["application/x-www-form-urlencoded", "text/plain"]
+
   def new(status_code, headers, body) do
     content_type = OAuth2.Util.content_type(headers)
     %__MODULE__{
@@ -15,7 +17,7 @@ defmodule OAuth2.Response do
 
   defp decode_response_body(body, "application/json"), do:
     Poison.decode!(body)
-  defp decode_response_body(body, "application/x-www-form-urlencoded"), do:
+  defp decode_response_body(body, type) when type in @query, do:
     Plug.Conn.Query.decode(body)
   defp decode_response_body(body, _), do: body
 end
