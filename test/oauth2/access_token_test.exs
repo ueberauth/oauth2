@@ -1,7 +1,19 @@
 defmodule OAuth2.AccessTokenTest do
   use ExUnit.Case, async: true
 
+  alias OAuth2.Response
   alias OAuth2.AccessToken
+  alias OAuth2.Strategy.AuthCode
+
+  test "new with 'expires' param" do
+    response = Response.new(200, [{"Content-Type", "text/plain"}], "access_token=abc123&expires=123")
+    token = AccessToken.new(response.body, %AuthCode{})
+    assert token.strategy == %AuthCode{}
+    assert token.access_token == "abc123"
+    assert token.expires_at == 123
+    assert token.token_type == "Bearer"
+    assert token.other_params == %{"expires" => "123"}
+  end
 
   test "expires?" do
     assert AccessToken.expires?(%AccessToken{expires_at: 0})
