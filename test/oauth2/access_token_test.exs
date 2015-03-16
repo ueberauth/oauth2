@@ -29,4 +29,12 @@ defmodule OAuth2.AccessTokenTest do
     assert AccessToken.expires_at(nil) == nil
     assert AccessToken.expires_at(3600) == OAuth2.Util.unix_now + 3600
   end
+
+  test "new" do
+    token = AccessToken.new(%{"access_token" => "1234", "expires_in" => 5179052}, %AccessToken{})
+    assert AccessToken.expires?(token)
+
+    token = AccessToken.new("access_token=CAAUHkorLHpABAAsErGOrDUZCWt0wjII0k20HyIAliLn9o9WnUMCqXWzocLf91uC6Ml4Mm1ZCemvQ71aaPY8HWciZBLrkpIjQvXtEScKYRAjFQQY8QRwK0ZBkNqIUBPhdZC5ZAGM1LKnmUVOKcIFpdLpPENpKHXMFa2CTfb4CAjR3idqxgr0a04UvTAsnkagcUZD&expires=5168688", %AccessToken{})
+    assert AccessToken.expires?(token)
+  end
 end
