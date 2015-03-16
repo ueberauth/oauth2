@@ -8,7 +8,7 @@ defmodule OAuth2.Strategy.AuthCodeTest do
     strategy = conn.private.oauth2_strategy
     assert strategy.client_id     == "client_id"
     assert strategy.client_secret == "secret"
-    assert strategy.site          == "http://localhost:4000"
+    assert strategy.site          == "http://localhost:4999"
     assert strategy.authorize_url == "/oauth/authorize"
     assert strategy.token_url     == "/oauth/token"
     assert strategy.token_method  == :post
@@ -17,8 +17,8 @@ defmodule OAuth2.Strategy.AuthCodeTest do
   end
 
   test "authorize_url" do
-    Plug.Adapters.Cowboy.http Provider, []
-    Plug.Adapters.Cowboy.http Client, [], port: 4001
+    Plug.Adapters.Cowboy.http Provider, [], port: 4999
+    Plug.Adapters.Cowboy.http Client, [], port: 4998
 
     conn = call(Client, conn(:get, "/auth"))
     [location] = get_resp_header conn, "Location"

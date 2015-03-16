@@ -30,13 +30,13 @@ defmodule Client do
 
   alias OAuth2.Strategy.AuthCode
 
-  @redirect_uri "http://localhost:4001/auth/callback"
+  @redirect_uri "http://localhost:4998/auth/callback"
   @params %{redirect_uri: @redirect_uri}
 
   @opts [
     client_id: "client_id",
     client_secret: "secret",
-    site: "http://localhost:4000"
+    site: "http://localhost:4999"
   ]
 
   plug Plug.Parsers, parsers: [:urlencoded, :multipart]
