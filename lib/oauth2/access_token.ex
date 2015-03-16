@@ -23,8 +23,8 @@ defmodule OAuth2.AccessToken do
     struct __MODULE__, [
       access_token:  std["access_token"],
       refresh_token: std["refresh_token"],
-      token_type:    response["token_type"] |> normalize_token_type,
       expires_at:    (std["expires_in"] || other["expires"]) |> expires_at(),
+      token_type:    response["token_type"] |> normalize_token_type(),
       other_params:  other,
       strategy:      strategy]
   end
@@ -75,6 +75,7 @@ defmodule OAuth2.AccessToken do
     end
   end
 
+  defp normalize_token_type(nil), do: "Bearer"
   defp normalize_token_type("bearer"), do: "Bearer"
   defp normalize_token_type(string), do: string
 
