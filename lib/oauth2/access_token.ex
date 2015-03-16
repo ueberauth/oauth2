@@ -23,8 +23,8 @@ defmodule OAuth2.AccessToken do
     struct __MODULE__, [
       access_token:  std["access_token"],
       refresh_token: std["refresh_token"],
-      expires_at:    std["expires_in"] |> expires_at,
       token_type:    response["token_type"] |> normalize_token_type,
+      expires_at:    (std["expires_in"] || other["expires"]) |> expires_at(),
       other_params:  other,
       strategy:      strategy]
   end
@@ -61,6 +61,10 @@ defmodule OAuth2.AccessToken do
   Returns a unix timestamp based on now + expires_at (in seconds).
   """
   def expires_at(nil), do: nil
+  def expires_at(val) when is_binary(val) do
+    {int, _} = Integer.parse(val)
+    int
+  end
   def expires_at(int), do: unix_now + int
 
   defp process_url(token, url) do
