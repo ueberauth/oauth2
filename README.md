@@ -20,15 +20,16 @@ alias OAuth2.Strategy.AuthCode
 strategy = AuthCode.new([
   client_id: "client_id",
   client_secret: "abc123",
-  site: "https://auth.example.com"
+  site: "https://auth.example.com",
+  redirect_uri: "https://example.com/auth/callback"
 ])
 
 # Generate the authorization URL and redirect the user to the provider.
-AuthCode.authorize_url(strategy, %{redirect_uri: "https://example.com/auth/callback"})
+AuthCode.authorize_url(strategy, %{redirect_uri: strategy.redirect_uri})
 # => "https://auth.example.com/oauth/authorize?client_id=client_id&redirect_uri=https%3A%2F%2Fexample.com%2Fauth%2Fcallback&response_type=code"
 
 # Use the authorization code returned from the provider to obtain an access token.
-token = AuthCode.get_token!(strategy, "someauthcode", %{redirect_uri: "https://example.com/auth/callback"})
+token = AuthCode.get_token!(strategy, "someauthcode", %{redirect_uri: strategy.redirect_uri})
 
 # Use the access token to make a request for resources
 resource = OAuth2.AccessToken.get!(token, "/api/resource")
@@ -42,7 +43,7 @@ resource = OAuth2.AccessToken.get!(token, "/api/resource")
 
 The MIT License (MIT)
 
-Copyright (c) 2014 Sonny Scroggin
+Copyright (c) 2015 Sonny Scroggin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
