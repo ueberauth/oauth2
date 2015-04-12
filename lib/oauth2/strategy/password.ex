@@ -2,33 +2,51 @@ defmodule OAuth2.Strategy.Password do
   @moduledoc """
   The Resource Owner Password Credentials Authorization Strategy.
 
-  http://tools.ietf.org/html/draft-ietf-oauth-v2-15#section-4.3
+  http://tools.ietf.org/html/rfc6749#section-1.3.3
+
+  The resource owner password credentials (i.e., username and password)
+  can be used directly as an authorization grant to obtain an access
+  token. The credentials should only be used when there is a high
+  degree of trust between the resource owner and the client (e.g., the
+  client is part of the device operating system or a highly privileged
+  application), and when other authorization grant types are not
+  available (such as an authorization code).
+
+  Even though this grant type requires direct client access to the
+  resource owner credentials, the resource owner credentials are used
+  for a single request and are exchanged for an access token. This
+  grant type can eliminate the need for the client to store the
+  resource owner credentials for future use, by exchanging the
+  credentials with a long-lived access token or refresh token.
   """
-  use OAuth2.Strategy
+
+  use OAuth2
 
   @doc """
   Not used for this strategy.
   """
-  def authorize_url do
+  def authorize_url(_client, _params) do
     raise "Not implemented."
   end
 
   @doc """
   Retrieve an access token given the specified End User username and password.
   """
-  def get_token(strategy, username, password, params \\ %{}, opts \\ []) do
-    params =
-      %{grant_type: "password", username: username, password: password}
-      |> Map.merge(Map.take(strategy, [:client_id, :client_secret]))
-      |> Map.merge(params)
+  def get_token(client, params, headers) do
+    {username, params} = Dict.pop(params, :username, client.params["username"])
+    {password, params} = Dict.pop(params, :password, client.params["password"])
 
-    OAuth2.get_token(strategy, params, opts)
-  end
-
-  def get_token!(strategy, username, password, params \\ %{}, opts \\ []) do
-    case get_token(strategy, username, password, params, opts) do
-      {:ok, token} -> token
-      {:error, error} -> raise error
+    unless username && password do
+      raise "Missing required keys `username` and `password` for #{inspect __MODULE__}"
     end
+
+    client
+    |> put_param(:username, username)
+    |> put_param(:password, password)
+    |> put_param(:grant_type, "password")
+    |> put_param(:client_id, client.client_id)
+    |> put_param(:client_secret, client.client_secret)
+    |> merge_params(params)
+    |> put_headers(headers)
   end
 end

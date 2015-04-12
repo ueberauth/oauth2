@@ -1,58 +1,39 @@
 defmodule OAuth2 do
   @moduledoc """
-  OAuth2
+  The OAuth2 specification
+
+  http://tools.ietf.org/html/rfc6749
+
+  The OAuth 2.0 authorization framework enables a third-party
+  application to obtain limited access to an HTTP service, either on
+  behalf of a resource owner by orchestrating an approval interaction
+  between the resource owner and the HTTP service, or by allowing the
+  third-party application to obtain access on its own behalf.
   """
 
-  alias OAuth2.Error
-  alias OAuth2.Request
-  alias OAuth2.Strategy
-  alias OAuth2.AccessToken
+  use Behaviour
 
-  @doc """
-  The authorize endpoint URL of the OAuth2 provider
-  """
-  def authorize_url(strategy, params \\ %{}) do
-    struct(strategy, params: Map.merge(strategy.params, params))
-    |> Strategy.to_url(:authorize_url)
-  end
+  alias OAuth2.Client
 
-  @doc """
-  The token endpoint URL of the OAuth2 provider
-  """
-  def token_url(strategy, params \\ %{}) do
-    struct(strategy, params: Map.merge(strategy.params, params))
-    |> Strategy.to_url(:token_url)
-  end
+  @type opts    :: Keyword.t
+  @type param   :: binary | %{binary => param} | [param]
+  @type params  :: %{binary => param}
+  @type headers :: [{binary, binary}]
 
-  @doc """
-  Initializes an AccessToken by making a request to the token endpoint.
+  defcallback authorize_url(Client.t, params) :: binary
+  defcallback get_token(Client.t, params, headers) :: Client.t
 
-  Returns an `AccessToken` struct that can then be used to access the resource API.
+  defdelegate new(opts), to: Client
+  defdelegate authorize_url(client), to: Client
+  defdelegate authorize_url(client, params), to: Client
+  defdelegate authorize_url!(client), to: Client
+  defdelegate authorize_url!(client, params), to: Client
 
-  ## Arguments
-
-  * `strategy` - a struct of the strategy in use.
-  * `params`   - a map of additional request parameters.
-  * `opts`     - a keyword list of opts used for the request and token.
-  """
-  def get_token(strategy, params \\ %{}, opts \\ [])
-
-  def get_token(%{token_method: :post} = strategy, params, opts) do
-    {headers, body} = Map.pop(params, :headers, [])
-    case Request.post(token_url(strategy), body, post_headers(headers), opts) do
-      {:ok, response}  -> {:ok, AccessToken.new(response.body, strategy, opts)}
-      {:error, reason} -> {:error, %Error{reason: reason}}
+  defmacro __using__(_) do
+    quote do
+      @behaviour OAuth2
+      import OAuth2.Client
     end
-  end
-  def get_token(strategy, params, opts) do
-    case Request.get(token_url(strategy, params), opts) do
-      {:ok, response}  -> {:ok, AccessToken.new(response.body, strategy, opts)}
-      {:error, reason} -> {:error, %Error{reason: reason}}
-    end
-  end
-
-  def post_headers(headers) do
-    [{"Content-Type", "application/x-www-form-urlencoded"} | headers]
   end
 end
 

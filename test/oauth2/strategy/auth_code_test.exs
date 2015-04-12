@@ -5,15 +5,15 @@ defmodule OAuth2.Strategy.AuthCodeTest do
 
   test "new" do
     conn = call(Client, conn(:get, "/"))
-    strategy = conn.private.oauth2_strategy
-    assert strategy.client_id     == "client_id"
-    assert strategy.client_secret == "secret"
-    assert strategy.site          == "http://localhost:4999"
-    assert strategy.authorize_url == "/oauth/authorize"
-    assert strategy.token_url     == "/oauth/token"
-    assert strategy.token_method  == :post
-    assert strategy.params        == %{}
-    assert strategy.headers       == %{}
+    client = conn.private.oauth2_client
+    assert client.client_id     == "client_id"
+    assert client.client_secret == "secret"
+    assert client.site          == "http://localhost:4999"
+    assert client.authorize_url == "/oauth/authorize"
+    assert client.token_url     == "/oauth/token"
+    assert client.token_method  == :post
+    assert client.params        == %{}
+    assert client.headers       == []
   end
 
   test "authorize_url" do
