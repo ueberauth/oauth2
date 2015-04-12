@@ -20,7 +20,7 @@ defmodule OAuth2.Strategy.Password do
   credentials with a long-lived access token or refresh token.
   """
 
-  use OAuth2
+  use OAuth2.Strategy
 
   @doc """
   Not used for this strategy.

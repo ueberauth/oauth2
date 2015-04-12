@@ -11,29 +11,15 @@ defmodule OAuth2 do
   third-party application to obtain access on its own behalf.
   """
 
-  use Behaviour
-
-  alias OAuth2.Client
-
   @type opts    :: Keyword.t
   @type param   :: binary | %{binary => param} | [param]
   @type params  :: %{binary => param}
   @type headers :: [{binary, binary}]
-
-  defcallback authorize_url(Client.t, params) :: binary
-  defcallback get_token(Client.t, params, headers) :: Client.t
-
   defdelegate new(opts), to: Client
   defdelegate authorize_url(client), to: Client
   defdelegate authorize_url(client, params), to: Client
   defdelegate authorize_url!(client), to: Client
   defdelegate authorize_url!(client, params), to: Client
 
-  defmacro __using__(_) do
-    quote do
-      @behaviour OAuth2
-      import OAuth2.Client
-    end
-  end
 end
 

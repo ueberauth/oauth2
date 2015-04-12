@@ -24,7 +24,7 @@ defmodule OAuth2.Strategy.AuthCode do
   exposing it to others, including the resource owner.
   """
 
-  use OAuth2
+  use OAuth2.Strategy
 
   @doc """
   The authorization URL endpoint of the provider.

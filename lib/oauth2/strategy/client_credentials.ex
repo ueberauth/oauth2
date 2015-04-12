@@ -15,7 +15,7 @@ defmodule OAuth2.Strategy.ClientCredentials do
   authorization server.
   """
 
-  use OAuth2
+  use OAuth2.Strategy
 
   @doc """
   Not used for this strategy.
