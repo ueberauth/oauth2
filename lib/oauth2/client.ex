@@ -49,7 +49,25 @@ defmodule OAuth2.Client do
   alias OAuth2.AccessToken
 
   @doc """
-  Builds a new
+  Builds a new OAuth2 client struct using the `opts` provided.
+
+  ## Client struct fields
+
+  * `strategy` - a module that implements the appropriate OAuth2 strategy,
+    default `OAuth2.Strategy.AuthCode`
+  * `client_id` - the client_id for the OAuth2 provider
+  * `client_secret` - the client_secret for the OAuth2 provider
+  * `site` - the OAuth2 provider site host
+  * `authorize_url` - absolute or relative URL path to the authorization endpoint,
+    default `"/oauth/authorize"`
+  * `token_url` - absolute or relative URL path to the token endpoint,
+    default `"/oauth/token"`
+  * `token_method` - HTTP method to use to request token (:get or :post),
+    default `:post`
+  * `params`: a map of request parameters
+  * `headers`: a list of request headers
+  * `redirect_uri`: the URI the provider should redirect to after authorization
+     or token requests
   """
   @spec new(Keyword.t) :: t
   def new(opts), do: struct(__MODULE__, opts)
