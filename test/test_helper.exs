@@ -47,7 +47,7 @@ defmodule Client do
 
   get "/auth" do
     conn
-    |> put_resp_header("Location", OAuth2.authorize_url!(client(conn)))
+    |> put_resp_header("Location", OAuth2.Client.authorize_url!(client(conn)))
     |> send_resp(302, "")
   end
 

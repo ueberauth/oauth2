@@ -24,7 +24,7 @@ defmodule OAuth2.Strategy.PasswordTest do
 
   test "authorize_url" do
     assert_raise RuntimeError, "Not implemented.", fn ->
-      OAuth2.new(@opts) |> OAuth2.authorize_url()
+      OAuth2.new(@opts) |> authorize_url()
     end
   end
 
