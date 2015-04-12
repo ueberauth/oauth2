@@ -15,11 +15,7 @@ defmodule OAuth2 do
   @type param   :: binary | %{binary => param} | [param]
   @type params  :: %{binary => param}
   @type headers :: [{binary, binary}]
-  defdelegate new(opts), to: Client
-  defdelegate authorize_url(client), to: Client
-  defdelegate authorize_url(client, params), to: Client
-  defdelegate authorize_url!(client), to: Client
-  defdelegate authorize_url!(client, params), to: Client
 
+  defdelegate new(opts), to: OAuth2.Client
 end
 
