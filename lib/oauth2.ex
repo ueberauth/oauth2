@@ -12,9 +12,6 @@ defmodule OAuth2 do
   """
 
   @type opts    :: Keyword.t
-  @type param   :: binary | %{binary => param} | [param]
-  @type params  :: %{binary => param}
-  @type headers :: [{binary, binary}]
 
   defdelegate new(opts), to: OAuth2.Client
 end

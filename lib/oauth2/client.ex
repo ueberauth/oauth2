@@ -14,6 +14,10 @@ defmodule OAuth2.Client do
   @type token_url     :: binary
   @type token_method  :: :post | :get | atom
   @type redirect_uri  :: binary
+  @type param         :: binary | %{binary => param} | [param]
+  @type params        :: %{binary => param}
+  @type headers       :: [{binary, binary}]
+
 
   @type t :: %__MODULE__{
               strategy:      strategy,
@@ -23,8 +27,8 @@ defmodule OAuth2.Client do
               authorize_url: authorize_url,
               token_url:     token_url,
               token_method:  token_method,
-              params:        OAuth2.params,
-              headers:       OAuth2.headers,
+              params:        params,
+              headers:       headers,
               redirect_uri:  redirect_uri}
 
   defstruct strategy: OAuth2.Strategy.AuthCode,
