@@ -114,6 +114,13 @@ user = OAuth2.AccessToken.get!(token, "/user")
 
 - [Authenticate with Github (OAuth2/Phoenix)](https://github.com/scrogson/oauth2_example)
 
+## TODO
+
+- [ ] Remove Plug dependency (except for tests?)
+- [ ] Remove HTTPoison dependency
+- [ ] Add more HTTP methods for AccessToken
+- [ ] More Tests
+
 ## License
 
 The MIT License (MIT)
