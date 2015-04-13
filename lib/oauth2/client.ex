@@ -45,6 +45,7 @@ defmodule OAuth2.Client do
   alias OAuth2.Error
   alias OAuth2.Client
   alias OAuth2.Request
+  alias OAuth2.Response
   alias OAuth2.Strategy
   alias OAuth2.AccessToken
 
@@ -73,16 +74,6 @@ defmodule OAuth2.Client do
   def new(opts), do: struct(__MODULE__, opts)
 
   @doc """
-  Builds a url from the strategy struct.
-  """
-  @spec to_url(t, atom) :: binary
-  def to_url(client, endpoint) do
-    endpoint = Map.get(client, endpoint)
-    url = endpoint(client, endpoint) <> "?" <> URI.encode_query(client.params)
-    {client, url}
-  end
-
-  @doc """
   Puts the specified `value` in the params for the given `key`.
 
   The key can be a string or an atom, atoms are automatically
@@ -93,6 +84,9 @@ defmodule OAuth2.Client do
     %{client | params: Map.put(params, param_key(key), value)}
   end
 
+  @doc """
+  Set multiple params in the client in one call.
+  """
   @spec merge_params(t, OAuth2.params) :: t
   def merge_params(client, params) do
     params = Enum.reduce(params, %{}, fn {k,v}, acc ->
@@ -111,6 +105,9 @@ defmodule OAuth2.Client do
     %{client | headers: List.keystore(headers, key, 0, {key, value})}
   end
 
+  @doc """
+  Set multiple headers in the client in one call.
+  """
   @spec put_headers(t, list) :: t
   def put_headers(%Client{} = client, []), do: client
   def put_headers(%Client{} = client, [{k,v}|rest]) do
@@ -125,6 +122,9 @@ defmodule OAuth2.Client do
     client.strategy.authorize_url(client, params) |> to_url(:authorize_url)
   end
 
+  @doc """
+  Calls `authorize_url/2` but raises `Error` if an error occurs.
+  """
   @spec authorize_url!(t, list) :: binary
   def authorize_url!(client, params \\ []) do
     {_, url} = authorize_url(client, params)
@@ -138,9 +138,9 @@ defmodule OAuth2.Client do
 
   ## Arguments
 
-  * `strategy` - a struct of the strategy in use, defaults to `OAuth2.Strategy.AuthCode`
-  * `params`   - a keyword list of request parameters
-  * `headers`  - a list of request headers
+  * `client` - a struct of the strategy in use, defaults to `OAuth2.Strategy.AuthCode`
+  * `params` - a keyword list of request parameters
+  * `headers` - a list of request headers
   """
   def get_token(%{token_method: method} = client, params \\ [], headers \\ []) do
     {client, url} = token_url(client, params, headers)
@@ -150,11 +150,21 @@ defmodule OAuth2.Client do
     end
   end
 
+  @doc """
+  Calls `get_token/3` but raises `Error` if there an error occurs.
+  """
+  @spec get_token!(t, params, headers) :: Response.t | Error.t
   def get_token!(client, params \\ [], headers \\ []) do
     case get_token(client, params, headers) do
       {:ok, response} -> response
       {:error, error} -> raise error
     end
+  end
+
+  defp to_url(client, endpoint) do
+    endpoint = Map.get(client, endpoint)
+    url = endpoint(client, endpoint) <> "?" <> URI.encode_query(client.params)
+    {client, url}
   end
 
   defp token_url(client, params, headers) do

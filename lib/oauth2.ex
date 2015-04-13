@@ -53,8 +53,13 @@ defmodule OAuth2 do
       resource = OAuth2.AccessToken.get!(token, "/api/resource")
   """
 
-  @type opts    :: Keyword.t
+  @type opts :: Keyword.t
 
+  @doc """
+  Builds a new `OAuth2.Client` struct.
+
+  See `OAuth2.Client.new/1` for details.
+  """
   defdelegate new(opts), to: OAuth2.Client
 end
 

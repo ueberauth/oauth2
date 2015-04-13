@@ -1,4 +1,6 @@
 defmodule OAuth2.Request do
+  @moduledoc false
+
   use HTTPoison.Base
 
   alias OAuth2.Error

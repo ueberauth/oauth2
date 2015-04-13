@@ -1,4 +1,7 @@
 defmodule OAuth2.AccessToken do
+  @moduledoc """
+  Provides functionality to make authorized requests to an OAuth2 provider.
+  """
 
   import OAuth2.Util
 
@@ -49,12 +52,22 @@ defmodule OAuth2.AccessToken do
       client:        client]
   end
 
+  @doc """
+  Makes a `GET` request the given URL using the AccessToken.
+  """
   def get(token, url, headers \\ [], opts \\ []) do
     case Request.get(process_url(token, url), req_headers(token, headers), opts) do
       {:ok, response} -> {:ok, response.body}
       {:error, reason} -> {:error, %Error{reason: reason}}
     end
   end
+
+  @doc """
+  Makes a `GET` request the given URL using the AccessToken.
+
+  An `OAuth2.Error` exception is raised if the request results in an
+  error tuple (`{:error, reason}`).
+  """
   def get!(token, url, headers \\ [], opts \\ []) do
     case get(token, url, req_headers(token, headers), opts) do
       {:ok, response} -> response
