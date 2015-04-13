@@ -62,11 +62,42 @@ defmodule OAuth2.Strategy do
 
       user = OAuth2.AccessToken.get!(token, "/user")
   """
+
   use Behaviour
 
   alias OAuth2.Client
 
-  defcallback authorize_url(Client.t, OAuth2.params) :: binary
+  @doc """
+  Builds the URL to the authorization endpoint.
+
+  ## Example
+
+      def authorize_url(client, params) do
+        client
+        |> put_param(:response_type, "code")
+        |> put_param(:client_id, client.client_id)
+        |> put_param(:redirect_uri, client.redirect_uri)
+        |> merge_params(params)
+      end
+  """
+  defcallback authorize_url(Client.t, OAuth2.params) :: Client.t
+
+  @doc """
+  Builds the URL to token endpoint.
+
+  ## Example
+
+      def get_token(client, params, headers) do
+        client
+        |> put_param(:code, params[:code])
+        |> put_param(:grant_type, "authorization_code")
+        |> put_param(:client_id, client.client_id)
+        |> put_param(:client_secret, client.client_secret)
+        |> put_param(:redirect_uri, client.redirect_uri)
+        |> merge_params(params)
+        |> put_headers(headers)
+      end
+  """
   defcallback get_token(Client.t, OAuth2.params, OAuth2.headers) :: Client.t
 
   defmacro __using__(_) do

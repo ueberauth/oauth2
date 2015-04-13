@@ -53,7 +53,7 @@ defmodule OAuth2.AccessToken do
   end
 
   @doc """
-  Makes a `GET` request the given URL using the AccessToken.
+  Makes a `GET` request to the given URL using the AccessToken.
   """
   def get(token, url, headers \\ [], opts \\ []) do
     case Request.get(process_url(token, url), req_headers(token, headers), opts) do
@@ -63,7 +63,7 @@ defmodule OAuth2.AccessToken do
   end
 
   @doc """
-  Makes a `GET` request the given URL using the AccessToken.
+  Makes a `GET` request to the given URL using the AccessToken.
 
   An `OAuth2.Error` exception is raised if the request results in an
   error tuple (`{:error, reason}`).
