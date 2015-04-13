@@ -8,7 +8,10 @@ defmodule OAuth2.Mixfile do
       elixir: "~> 1.0",
       deps: deps,
       package: package,
-      description: "An Elixir OAuth 2.0 Client Library"
+      name: "OAuth2",
+      description: "An Elixir OAuth 2.0 Client Library",
+      source_url: "https://github.com/scrogson/oauth2",
+      homepage_url: "https://github.com/scrogson/oauth2"
     ]
   end
 
