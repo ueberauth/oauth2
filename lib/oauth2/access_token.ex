@@ -1,40 +1,73 @@
 defmodule OAuth2.AccessToken do
+  @moduledoc """
+  Provides functionality to make authorized requests to an OAuth2 provider.
+  """
 
   import OAuth2.Util
 
   alias OAuth2.Error
+  alias OAuth2.Client
   alias OAuth2.Request
   alias OAuth2.AccessToken
 
   @standard ["access_token", "refresh_token", "expires_in", "token_type"]
 
-  defstruct [
-    access_token: "",
-    refresh_token: nil,
-    expires_at: nil,
-    token_type: "Bearer",
-    other_params: %{},
-    strategy: nil
-  ]
+  @type access_token  :: binary
+  @type refresh_token :: binary
+  @type expires_at    :: integer
+  @type token_type    :: binary
+  @type other_params  :: %{}
 
-  def new(response, strategy, _opts \\ []) do
+  @type t :: %__MODULE__{
+              access_token:  access_token,
+              refresh_token: refresh_token,
+              expires_at:    expires_at,
+              token_type:    token_type,
+              other_params:  other_params,
+              client:        Client.t}
+
+  defstruct access_token: "",
+            refresh_token: nil,
+            expires_at: nil,
+            token_type: "Bearer",
+            other_params: %{},
+            client: nil
+
+  @doc """
+  Returns a new AccessToken struct.
+  """
+  @spec new(Dict.t | String.t, Client.t) :: t
+  def new(token, client) when is_binary(token) do
+    new(%{"access_token" => token}, client)
+  end
+  def new(response, client) do
     {std, other} = Dict.split(response, @standard)
 
     struct __MODULE__, [
       access_token:  std["access_token"],
       refresh_token: std["refresh_token"],
       expires_at:    (std["expires_in"] || other["expires"]) |> expires_at(),
-      token_type:    response["token_type"] |> normalize_token_type(),
+      token_type:    std["token_type"] |> normalize_token_type(),
       other_params:  other,
-      strategy:      strategy]
+      client:        client]
   end
 
+  @doc """
+  Makes a `GET` request to the given URL using the AccessToken.
+  """
   def get(token, url, headers \\ [], opts \\ []) do
     case Request.get(process_url(token, url), req_headers(token, headers), opts) do
       {:ok, response} -> {:ok, response.body}
       {:error, reason} -> {:error, %Error{reason: reason}}
     end
   end
+
+  @doc """
+  Makes a `GET` request to the given URL using the AccessToken.
+
+  An `OAuth2.Error` exception is raised if the request results in an
+  error tuple (`{:error, reason}`).
+  """
   def get!(token, url, headers \\ [], opts \\ []) do
     case get(token, url, req_headers(token, headers), opts) do
       {:ok, response} -> response
@@ -71,7 +104,7 @@ defmodule OAuth2.AccessToken do
     case String.downcase(url) do
       <<"http://"::utf8, _::binary>> -> url
       <<"https://"::utf8, _::binary>> -> url
-      _ -> token.strategy.site <> url
+      _ -> token.client.site <> url
     end
   end
 

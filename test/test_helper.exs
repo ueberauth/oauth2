@@ -28,20 +28,16 @@ defmodule Client do
   use Plug.Router
   import Plug.Conn
 
-  alias OAuth2.Strategy.AuthCode
-
-  @redirect_uri "http://localhost:4998/auth/callback"
-  @params %{redirect_uri: @redirect_uri}
-
   @opts [
     client_id: "client_id",
     client_secret: "secret",
-    site: "http://localhost:4999"
+    site: "http://localhost:4999",
+    redirect_uri: "http://localhost:4998/auth/callback"
   ]
 
   plug Plug.Parsers, parsers: [:urlencoded, :multipart]
 
-  plug :put_oauth_strategy
+  plug :put_oauth2_client
   plug :match
   plug :dispatch
 
@@ -51,12 +47,12 @@ defmodule Client do
 
   get "/auth" do
     conn
-    |> put_resp_header("Location", AuthCode.authorize_url(strategy(conn), @params))
+    |> put_resp_header("Location", OAuth2.Client.authorize_url!(client(conn)))
     |> send_resp(302, "")
   end
 
   get "/auth/callback" do
-    token = AuthCode.get_token!(strategy(conn), conn.params["code"], @params)
+    token = OAuth2.Client.get_token!(client(conn), code: conn.params["code"])
     send self, token
     conn
   end
@@ -65,10 +61,10 @@ defmodule Client do
     conn
   end
 
-  defp strategy(conn), do: conn.private.oauth2_strategy
+  defp client(conn), do: conn.private.oauth2_client
 
-  def put_oauth_strategy(conn, _) do
-    put_private(conn, :oauth2_strategy, AuthCode.new(@opts))
+  def put_oauth2_client(conn, _) do
+    put_private(conn, :oauth2_client, OAuth2.new(@opts))
   end
 end
 

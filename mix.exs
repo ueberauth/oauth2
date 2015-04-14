@@ -4,11 +4,14 @@ defmodule OAuth2.Mixfile do
   def project do
     [
       app: :oauth2,
-      version: "0.0.5",
+      version: "0.1.0",
       elixir: "~> 1.0",
       deps: deps,
       package: package,
-      description: "An Elixir OAuth 2.0 Client Library"
+      name: "OAuth2",
+      description: "An Elixir OAuth 2.0 Client Library",
+      source_url: "https://github.com/scrogson/oauth2",
+      homepage_url: "https://github.com/scrogson/oauth2"
     ]
   end
 
@@ -23,6 +26,10 @@ defmodule OAuth2.Mixfile do
       {:poison, "~> 1.3"},
       {:cowboy, "~> 1.0", only: :test},
       {:plug, "~> 0.11"},
+
+      # Docs dependencies
+      {:earmark, "~> 0.1", only: :docs},
+      {:ex_doc, "~> 0.7.1", only: :docs}
     ]
   end
 

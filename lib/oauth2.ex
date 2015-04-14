@@ -1,58 +1,65 @@
 defmodule OAuth2 do
   @moduledoc """
-  OAuth2
+  The OAuth2 specification
+
+  http://tools.ietf.org/html/rfc6749
+
+  The OAuth 2.0 authorization framework enables a third-party
+  application to obtain limited access to an HTTP service, either on
+  behalf of a resource owner by orchestrating an approval interaction
+  between the resource owner and the HTTP service, or by allowing the
+  third-party application to obtain access on its own behalf.
+
+  ## API
+
+  Current implemented strategies:
+
+  - Authorization Code
+  - Password
+  - Client Credentials
+
+  #### Authorization Code Flow (AuthCode Strategy)
+
+  Initialize a client with your client_id, client_secret, and site.
+
+      client = OAuth2.new([
+        strategy: OAuth2.Strategy.AuthCode, # default strategy is AuthCode
+        client_id: "client_id",
+        client_secret: "abc123",
+        site: "https://auth.example.com",
+        redirect_uri: "https://example.com/auth/callback"
+      ])
+
+  Generate the authorization URL and redirect the user to the provider.
+
+      OAuth2.Client.authorize_url(client)
+      # => "https://auth.example.com/oauth/authorize?client_id=client_id&redirect_uri=https%3A%2F%2Fexample.com%2Fauth%2Fcallback&response_type=code"
+
+  Use the authorization code returned from the provider to obtain an access token.
+
+      token = OAuth2.Client.get_token!(client, code: "someauthcode")
+
+  You can also use `OAuth2.Client.put_param/3` to update the client's `params` field.
+
+  Example:
+
+      token =
+        client
+        |> OAuth2.Client.put_param(:code, "someauthcode")
+        |> OAuth2.Client.get_token!()
+
+  Use the access token to make a request for resources
+
+      resource = OAuth2.AccessToken.get!(token, "/api/resource")
   """
 
-  alias OAuth2.Error
-  alias OAuth2.Request
-  alias OAuth2.Strategy
-  alias OAuth2.AccessToken
+  @type opts :: Keyword.t
 
   @doc """
-  The authorize endpoint URL of the OAuth2 provider
+  Builds a new `OAuth2.Client` struct.
+
+  See `OAuth2.Client.new/1` for details.
   """
-  def authorize_url(strategy, params \\ %{}) do
-    struct(strategy, params: Map.merge(strategy.params, params))
-    |> Strategy.to_url(:authorize_url)
-  end
-
-  @doc """
-  The token endpoint URL of the OAuth2 provider
-  """
-  def token_url(strategy, params \\ %{}) do
-    struct(strategy, params: Map.merge(strategy.params, params))
-    |> Strategy.to_url(:token_url)
-  end
-
-  @doc """
-  Initializes an AccessToken by making a request to the token endpoint.
-
-  Returns an `AccessToken` struct that can then be used to access the resource API.
-
-  ## Arguments
-
-  * `strategy` - a struct of the strategy in use.
-  * `params`   - a map of additional request parameters.
-  * `opts`     - a keyword list of opts used for the request and token.
-  """
-  def get_token(strategy, params \\ %{}, opts \\ [])
-
-  def get_token(%{token_method: :post} = strategy, params, opts) do
-    {headers, body} = Map.pop(params, :headers, [])
-    case Request.post(token_url(strategy), body, post_headers(headers), opts) do
-      {:ok, response}  -> {:ok, AccessToken.new(response.body, strategy, opts)}
-      {:error, reason} -> {:error, %Error{reason: reason}}
-    end
-  end
-  def get_token(strategy, params, opts) do
-    case Request.get(token_url(strategy, params), opts) do
-      {:ok, response}  -> {:ok, AccessToken.new(response.body, strategy, opts)}
-      {:error, reason} -> {:error, %Error{reason: reason}}
-    end
-  end
-
-  def post_headers(headers) do
-    [{"Content-Type", "application/x-www-form-urlencoded"} | headers]
-  end
+  defdelegate new(opts), to: OAuth2.Client
 end
 
