@@ -46,7 +46,6 @@ defmodule OAuth2.Client do
   alias OAuth2.Client
   alias OAuth2.Request
   alias OAuth2.Response
-  alias OAuth2.Strategy
   alias OAuth2.AccessToken
 
   @doc """
