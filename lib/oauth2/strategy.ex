@@ -102,7 +102,6 @@ defmodule OAuth2.Strategy do
 
   defmacro __using__(_) do
     quote do
-      @behaviour OAuth2
       import OAuth2.Client
     end
   end
