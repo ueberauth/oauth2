@@ -2,7 +2,7 @@ defmodule OAuth2.Util do
   @moduledoc false
 
   def unix_now do
-    {mega, sec, _micro} = :erlang.now
+    {mega, sec, _micro} = :os.timestamp
     (mega * 1_000_000) + sec
   end
 
