@@ -3,6 +3,23 @@ OAuth2
 
 > OAuth2 Library for Elixir
 
+## Install
+
+```elixir
+# mix.exs
+
+def application do
+  # Add the application to your list of applications.
+  # This will ensure that it will be included in a release.
+  [applications: [:logger, :oauth2]]
+end
+
+defp deps do
+  # Add the dependency
+  [{:oauth2, "~> 0.1.1"}]
+end
+```
+
 ## API
 
 Current implemented strategies:
