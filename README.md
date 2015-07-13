@@ -89,8 +89,9 @@ defmodule GitHub do
     |> OAuth2.Client.authorize_url!(params)
   end
 
-  def get_token!(params \\ [], headers \\ []) do
-    OAuth2.Client.get_token!(new(), params, headers)
+  # you can pass options to the underlying http library via `options` parameter
+  def get_token!(params \\ [], headers \\ [], options \\ []) do
+    OAuth2.Client.get_token!(new(), params, headers, options)
   end
 
   # Strategy Callbacks
