@@ -141,9 +141,9 @@ defmodule OAuth2.Client do
   * `params` - a keyword list of request parameters
   * `headers` - a list of request headers
   """
-  def get_token(%{token_method: method} = client, params \\ [], headers \\ []) do
+  def get_token(%{token_method: method} = client, params \\ [], headers \\ [], opts \\ []) do
     {client, url} = token_url(client, params, headers)
-    case apply(Request, method, [url, client.params, client.headers]) do
+    case apply(Request, method, [url, client.params, client.headers, opts]) do
       {:ok, response} -> {:ok, AccessToken.new(response.body, client)}
       {:error, error} -> {:error, %Error{reason: error}}
     end
@@ -153,8 +153,8 @@ defmodule OAuth2.Client do
   Calls `get_token/3` but raises `Error` if there an error occurs.
   """
   @spec get_token!(t, params, headers) :: Response.t | Error.t
-  def get_token!(client, params \\ [], headers \\ []) do
-    case get_token(client, params, headers) do
+  def get_token!(client, params \\ [], headers \\ [], opts \\ []) do
+    case get_token(client, params, headers, opts) do
       {:ok, response} -> response
       {:error, error} -> raise error
     end
