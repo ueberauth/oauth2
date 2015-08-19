@@ -4,7 +4,7 @@ defmodule OAuth2.Mixfile do
   def project do
     [
       app: :oauth2,
-      version: "0.2.0",
+      version: "0.2.1",
       elixir: "~> 1.0",
       deps: deps,
       package: package,
@@ -25,7 +25,7 @@ defmodule OAuth2.Mixfile do
       {:httpoison, "~> 0.6"},
       {:poison, "~> 1.3"},
       {:cowboy, "~> 1.0", only: :test},
-      {:plug, "~> 0.12"},
+      {:plug, "~> 1.0"},
 
       # Docs dependencies
       {:earmark, "~> 0.1", only: :docs},
