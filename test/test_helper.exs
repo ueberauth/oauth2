@@ -12,7 +12,7 @@ defmodule Provider do
   get "/oauth/authorize" do
     redirect_uri = conn.params["redirect_uri"]
     conn
-    |> put_resp_header("Location", redirect_uri <> "?" <> "code=1234")
+    |> put_resp_header("location", redirect_uri <> "?" <> "code=1234")
     |> send_resp(302, "")
   end
 
@@ -47,7 +47,7 @@ defmodule Client do
 
   get "/auth" do
     conn
-    |> put_resp_header("Location", OAuth2.Client.authorize_url!(client(conn)))
+    |> put_resp_header("location", OAuth2.Client.authorize_url!(client(conn)))
     |> send_resp(302, "")
   end
 
