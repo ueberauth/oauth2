@@ -21,11 +21,11 @@ defmodule OAuth2.Strategy.AuthCodeTest do
     Plug.Adapters.Cowboy.http Client, [], port: 4998
 
     conn = call(Client, conn(:get, "/auth"))
-    [location] = get_resp_header conn, "Location"
+    [location] = get_resp_header conn, "location"
     conn = call(Provider, conn(:get, location))
     assert conn.status == 302
 
-    [location] = get_resp_header conn, "Location"
+    [location] = get_resp_header conn, "location"
     conn = call(Client, conn(:get, location))
     assert conn.params["code"] == "1234"
 
