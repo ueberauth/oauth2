@@ -25,7 +25,7 @@ defmodule OAuth2.Mixfile do
       {:httpoison, "~> 0.6"},
       {:poison, "~> 1.3"},
       {:cowboy, "~> 1.0", only: :test},
-      {:plug, "~> 0.12"},
+      {:plug, "~> 1.0"},
 
       # Docs dependencies
       {:earmark, "~> 0.1", only: :docs},
