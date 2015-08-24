@@ -1,6 +1,9 @@
 OAuth2
 ======
 
+[![Build Status](https://travis-ci.org/scrogson/oauth2.svg)](https://travis-ci.org/scrogson/oauth2)
+[![Coverage Status](https://coveralls.io/repos/scrogson/oauth2/badge.svg&service=github)](https://coveralls.io/github/scrogson/oauth2)
+
 > OAuth2 Library for Elixir
 
 ## Install
