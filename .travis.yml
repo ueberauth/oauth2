@@ -3,6 +3,7 @@ elixir:
   - 1.0.5
 otp_release:
   - 17.5
+  - 18.0
 sudo: false
 after_script:
   - MIX_ENV=test mix coveralls.travis
