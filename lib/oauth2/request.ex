@@ -28,7 +28,7 @@ defmodule OAuth2.Request do
   defp process_request_body(body, "application/json"), do:
     Poison.encode!(body)
   defp process_request_body(body, "application/x-www-form-urlencoded"), do:
-    Plug.Conn.Query.encode(body)
+    {:form, Map.to_list(body)}
 
   defp do_request({:ok, status_code, headers, _client}) when status_code in [204, 304], do:
     {:ok, Response.new(status_code, headers, "")}

@@ -22,11 +22,11 @@ defmodule OAuth2.Mixfile do
     [{:hackney, "~> 1.0"},
      {:httpoison, "~> 0.6"},
      {:poison, "~> 1.3"},
-     {:plug, "~> 1.0"},
 
      # Test dependencies
      {:cowboy, "~> 1.0", only: :test},
      {:excoveralls, "~> 0.3", only: :test},
+     {:plug, "~> 1.0", only: :test},
 
      # Docs dependencies
      {:earmark, "~> 0.1", only: :docs},
