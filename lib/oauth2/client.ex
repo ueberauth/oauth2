@@ -172,6 +172,36 @@ defmodule OAuth2.Client do
     end
   end
 
+  @doc """
+  Gets a new `AccessToken` by making a request using the refresh_token
+  
+  Returns an `AccessToken` struct that can then be used to access the resource API.
+
+  ## Arguments
+
+  * `client` - a struct of the strategy in use, defaults to `OAuth2.Strategy.AuthCode`
+  * `params` - a keyword list of request parameters
+  * `headers` - a list of request headers
+  """
+  def refresh_token(%{token_method: method} = client, params \\ [], headers \\ [], opts \\ []) do
+    {client, url} = refresh_token_url(client, params, headers)
+    case apply(Request, method, [url, client.params, client.headers, opts]) do
+      {:ok, response} -> {:ok, AccessToken.new(response.body, client)}
+      {:error, error} -> {:error, %Error{reason: error}}
+    end
+  end
+
+  @doc """
+  Calls `refresh_token/3` but raises `Error` if there an error occurs.
+  """
+  @spec refresh_token!(t, params, headers) :: Response.t | Error.t
+  def refresh_token!(client, params \\ [], headers \\ [], opts \\ []) do
+    case refresh_token(client, params, headers, opts) do
+      {:ok, response} -> response
+      {:error, error} -> raise error
+    end
+  end
+
   defp to_url(client, endpoint) do
     endpoint = Map.get(client, endpoint)
     url = endpoint(client, endpoint) <> "?" <> URI.encode_query(client.params)
@@ -182,6 +212,13 @@ defmodule OAuth2.Client do
     client
     |> token_post_header()
     |> client.strategy.get_token(params, headers)
+    |> to_url(:token_url)
+  end
+
+  defp refresh_token_url(client, params, headers) do
+    client
+    |> token_post_header()
+    |> put_param(:grant_type, "refresh_token")
     |> to_url(:token_url)
   end
 
