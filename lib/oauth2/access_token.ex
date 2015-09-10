@@ -68,7 +68,7 @@ defmodule OAuth2.AccessToken do
   @doc """
   Makes a `PUT` request to the given URL using the AccessToken.
   """
-  def put(token, url, headers \\ [], opts \\ []), do: request(:put, token, url, headers, opts)
+  def put(token, url, body \\ "", headers \\ [], opts \\ []), do: request(:put, token, url, body, headers, opts)
 
   @doc """
   Makes a `PUT` request to the given URL using the AccessToken.
@@ -76,12 +76,12 @@ defmodule OAuth2.AccessToken do
   An `OAuth2.Error` exception is raised if the request results in an
   error tuple (`{:error, reason}`).
   """
-  def put!(token, url, headers \\ [], opts \\ []), do: request!(:put, token, url, headers, opts)
+  def put!(token, url, body \\ "", headers \\ [], opts \\ []), do: request!(:put, token, url, body, headers, opts)
 
   @doc """
   Makes a `POST` request to the given URL using the AccessToken.
   """
-  def post(token, url, headers \\ [], opts \\ []), do: request(:post, token, url, headers, opts)
+  def post(token, url, body \\ "", headers \\ [], opts \\ []), do: request(:post, token, url, body, headers, opts)
 
   @doc """
   Makes a `POST` request to the given URL using the AccessToken.
@@ -89,7 +89,7 @@ defmodule OAuth2.AccessToken do
   An `OAuth2.Error` exception is raised if the request results in an
   error tuple (`{:error, reason}`).
   """
-  def post!(token, url, headers \\ [], opts \\ []), do: request!(:post, token, url, headers, opts)
+  def post!(token, url, body \\ "", headers \\ [], opts \\ []), do: request!(:post, token, url, body, headers, opts)
 
   @doc """
   Makes a request of given type to the given URL using the AccessToken.
