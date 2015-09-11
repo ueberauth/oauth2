@@ -152,6 +152,6 @@ defmodule OAuth2.AccessToken do
   defp normalize_token_type(string), do: string
 
   defp req_headers(token, headers) do
-    [{"Authorization", "#{token.token_type} #{token.access_token}"} | headers]
+    [{"Authorization", "#{token.token_type} #{token.access_token}"} | headers] ++ token.client.headers
   end
 end
