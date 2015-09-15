@@ -172,7 +172,7 @@ defmodule OAuth2.Client do
   * `headers` - a list of request headers
   """
   def refresh_token(%{token_method: method} = client, params \\ [], headers \\ [], opts \\ []) do
-    {client, url} = token_refresh_url(client, params, headers)
+    {client, url} = refresh_token_url(client, params, headers)
     case apply(Request, method, [url, client.params, client.headers, opts]) do
       {:ok, response} -> {:ok, AccessToken.new(response.body, client)}
       {:error, error} -> {:error, %Error{reason: error}}
@@ -203,7 +203,7 @@ defmodule OAuth2.Client do
     |> to_url(:token_url)
   end
 
-  defp token_refresh_url(client, params, headers) do
+  defp refresh_token_url(client, params, headers) do
     client
     |> token_post_header()
     |> put_param(:grant_type, "refresh_token")
