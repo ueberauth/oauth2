@@ -36,6 +36,6 @@ defmodule OAuth2.Response do
   defp decode_response_body(body, "application/json"), do:
     Poison.decode!(body)
   defp decode_response_body(body, type) when type in @query, do:
-    Plug.Conn.Query.decode(body)
+    URI.query_decoder(body) |> Enum.map(&(&1)) |> Enum.into(%{})
   defp decode_response_body(body, _), do: body
 end
