@@ -12,6 +12,7 @@ defmodule OAuth2.Client do
   @type site          :: binary
   @type authorize_url :: binary
   @type token_url     :: binary
+  @type tokeninfo_url :: binary
   @type token_method  :: :post | :get | atom
   @type redirect_uri  :: binary
   @type param         :: binary | %{binary => param} | [param]
@@ -26,6 +27,7 @@ defmodule OAuth2.Client do
               site:          site,
               authorize_url: authorize_url,
               token_url:     token_url,
+              tokeninfo_url: tokeninfo_url,
               token_method:  token_method,
               params:        params,
               headers:       headers,
@@ -37,6 +39,7 @@ defmodule OAuth2.Client do
             site: "",
             authorize_url: "/oauth/authorize",
             token_url: "/oauth/token",
+            tokeninfo_url: "/oauth/tokeninfo",
             token_method: :post,
             params: %{},
             headers: [],
@@ -62,6 +65,8 @@ defmodule OAuth2.Client do
     default `"/oauth/authorize"`
   * `token_url` - absolute or relative URL path to the token endpoint,
     default `"/oauth/token"`
+  * `tokeninfo_url` - absolute or relative URL path to the tokeninfo endpoint,
+    default `"/oauth/tokeninfo"`
   * `token_method` - HTTP method to use to request token (:get or :post),
     default `:post`
   * `params`: a map of request parameters
@@ -160,7 +165,38 @@ defmodule OAuth2.Client do
     end
   end
 
-  defp to_url(client, endpoint) do
+  @doc """
+  Makes a request to the tokeninfo endpoint.
+
+  Returns the response.body from the request.
+
+  ## Arguments
+
+  * `client` - a struct of the strategy in use, defaults to `OAuth2.Strategy.AuthCode`
+  * `params` - a keyword list of request parameters
+  * `headers` - a list of request headers
+  """
+  def get_tokeninfo(%{token_method: method} = client, params \\ [], headers \\ [], opts \\ []) do
+    {client, url} = tokeninfo_url(client, params, headers)
+    inspect method
+    case apply(Request, method, [url, client.params, client.headers, opts]) do
+      {:ok, response} -> {:ok, response.body}
+      {:error, error} -> {:error, %Error{reason: error}}
+    end
+  end
+
+  @doc """
+  Calls `get_tokeninfo/3` but raises `Error` if there an error occurs.
+  """
+  @spec get_tokeninfo!(t, params, headers) :: Response.t | Error.t
+  def get_tokeninfo!(client, params \\ [], headers \\ [], opts \\ []) do
+    case get_tokeninfo(client, params, headers, opts) do
+      {:ok, response} -> response
+      {:error, error} -> raise error
+    end
+  end
+
+  def to_url(client, endpoint) do
     endpoint = Map.get(client, endpoint)
     url = endpoint(client, endpoint) <> "?" <> URI.encode_query(client.params)
     {client, url}
@@ -171,6 +207,14 @@ defmodule OAuth2.Client do
     |> token_post_header()
     |> client.strategy.get_token(params, headers)
     |> to_url(:token_url)
+  end
+
+  defp tokeninfo_url(client, params, headers) do
+    client
+    |> token_post_header()
+    |> merge_params(params)
+    |> put_headers(headers)
+    |> to_url(:tokeninfo_url)
   end
 
   defp token_post_header(%Client{token_method: :post} = client) do
