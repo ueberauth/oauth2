@@ -33,6 +33,7 @@ defmodule OAuth2.Response do
     }
   end
 
+  defp decode_response_body("", _type), do: ""
   defp decode_response_body(body, "application/json"), do:
     Poison.decode!(body)
   defp decode_response_body(body, type) when type in @query, do:
