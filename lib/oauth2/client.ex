@@ -174,7 +174,7 @@ defmodule OAuth2.Client do
 
   @doc """
   Gets a new `AccessToken` by making a request using the refresh_token
-  
+
   Returns an `AccessToken` struct that can then be used to access the resource API.
 
   ## Arguments
@@ -200,6 +200,9 @@ defmodule OAuth2.Client do
       {:ok, response} -> response
       {:error, error} -> raise error
     end
+
+  defp to_url(client, :token_url) do
+    {client, endpoint(client, client.token_url)}
   end
 
   defp to_url(client, endpoint) do
