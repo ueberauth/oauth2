@@ -160,6 +160,10 @@ defmodule OAuth2.Client do
     end
   end
 
+  defp to_url(client, :token_url) do
+    {client, endpoint(client, client.token_url)}
+  end
+
   defp to_url(client, endpoint) do
     endpoint = Map.get(client, endpoint)
     url = endpoint(client, endpoint) <> "?" <> URI.encode_query(client.params)
