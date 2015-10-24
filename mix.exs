@@ -1,17 +1,18 @@
 defmodule OAuth2.Mixfile do
   use Mix.Project
 
+  @version "0.4.0"
+
   def project do
     [app: :oauth2,
-     version: "0.4.0",
+     name: "OAuth2",
+     version: @version,
      elixir: "~> 1.0",
      deps: deps,
      package: package,
+     description: description,
+     docs: docs,
      elixirc_paths: elixirc_paths(Mix.env),
-     name: "OAuth2",
-     description: "An Elixir OAuth 2.0 Client Library",
-     source_url: "https://github.com/scrogson/oauth2",
-     homepage_url: "https://github.com/scrogson/oauth2",
      test_coverage: [tool: ExCoveralls]]
   end
 
@@ -33,8 +34,20 @@ defmodule OAuth2.Mixfile do
      {:ex_doc, "~> 0.10", only: :docs}]
   end
 
+  defp description do
+    "An Elixir OAuth 2.0 Client Library"
+  end
+
+  defp docs do
+    [extras: ["README.md"],
+     main: "extra-readme",
+     source_ref: "v#{@version}",
+     source_url: "https://github.com/scrogson/oauth2"]
+  end
+
   defp package do
-    [contributors: ["Sonny Scroggin"],
+    [files: ["lib", "priv", "mix.exs", "README.md", "LICENSE"],
+     maintainers: ["Sonny Scroggin"],
      licenses: ["MIT"],
      links: %{github: "https://github.com/scrogson/oauth2"}]
   end
