@@ -9,7 +9,10 @@ defmodule OAuth2.Request do
   alias OAuth2.Response
 
   def request(method, url, body \\ "", headers \\ [], opts \\ []) do
-    body = process_request_body(body, content_type(headers))
+    content_type = content_type(headers)
+    body = process_request_body(body, content_type)
+    headers = process_request_headers(headers, content_type)
+
     case super(method, url, body, headers, opts) do
       {:ok, %HTTPoison.Response{status_code: status, headers: headers, body: body}} ->
         {:ok, Response.new(status, headers, body)}
