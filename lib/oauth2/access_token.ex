@@ -5,7 +5,6 @@ defmodule OAuth2.AccessToken do
 
   import OAuth2.Util
 
-  alias OAuth2.Error
   alias OAuth2.Client
   alias OAuth2.Request
   alias OAuth2.AccessToken
