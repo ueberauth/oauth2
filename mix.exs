@@ -16,17 +16,16 @@ defmodule OAuth2.Mixfile do
   end
 
   def application do
-    [applications: [:httpoison]]
+    [applications: [:httpoison, :poison, :plug]]
   end
 
   defp deps do
-    [{:hackney, "~> 1.0"},
-     {:httpoison, "~> 0.6"},
+    [{:httpoison, "~> 0.7"},
      {:poison, "~> 1.3"},
      {:plug, "~> 1.0"},
 
      # Test dependencies
-     {:cowboy, "~> 1.0", only: :test},
+     {:cowboy, "~> 1.0"},
      {:excoveralls, "~> 0.3", only: :test},
 
      # Docs dependencies
