@@ -30,7 +30,7 @@ defmodule OAuth2.Mixfile do
 
      # Docs dependencies
      {:earmark, "~> 0.1", only: :docs},
-     {:ex_doc, "~> 0.8", only: :docs}]
+     {:ex_doc, "~> 0.10", only: :docs}]
   end
 
   defp package do
