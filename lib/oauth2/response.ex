@@ -6,14 +6,18 @@ defmodule OAuth2.Response do
 
   * `status_code` - HTTP response status code
   * `headers` - HTTP response headers
-  * `body` - HTTP response body (parsed based on "Content-Type" header)
+  * `body` - Parsed HTTP response body (based on "Content-Type" header)
   """
 
-  @type t :: %__MODULE__{status_code: integer, body: binary, headers: map}
+  import OAuth2.Util
 
-  defstruct status_code: nil, body: nil, headers: %{}
+  alias OAuth2.Response
 
-  @query ["application/x-www-form-urlencoded", "text/plain"]
+  @type t :: %Response{status_code: integer,
+                       headers: map,
+                       body: binary}
+
+  defstruct status_code: nil, headers: %{}, body: nil
 
   @doc """
   Builds a new response struct from the HTTP response.
@@ -25,18 +29,30 @@ defmodule OAuth2.Response do
   * application/json
   """
   def new(status_code, headers, body) do
-    content_type = OAuth2.Util.content_type(headers)
-    %__MODULE__{
+    %Response{
       status_code: status_code,
       headers: headers,
-      body: decode_response_body(body, content_type)
+      body: decode_response_body(body, content_type(headers))
     }
   end
 
+  def parsers do
+    %{json:  &Poison.decode!(&1),
+      query: &Plug.Conn.Query.decode(&1),
+      text:  &(&1)}
+  end
+
+  def content_types do
+    %{"application/json" => :json,
+      "text/javascript" => :json,
+      "application/x-www-form-urlencoded" => :query,
+      "text/plain" => :query}
+  end
+
   defp decode_response_body("", _type), do: ""
-  defp decode_response_body(body, "application/json"), do:
-    Poison.decode!(body)
-  defp decode_response_body(body, type) when type in @query, do:
-    Plug.Conn.Query.decode(body)
-  defp decode_response_body(body, _), do: body
+  defp decode_response_body(body, content_type) do
+    content_type = content_types[content_type]
+    parser = parsers[content_type]
+    parser.(body)
+  end
 end

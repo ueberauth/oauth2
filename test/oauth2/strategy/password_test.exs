@@ -3,33 +3,28 @@ defmodule OAuth2.Strategy.PasswordTest do
 
   alias OAuth2.Strategy.Password
   import OAuth2.Client
+  import OAuth2.TestHelpers
 
-  @opts [
-    strategy: Password,
-    client_id: "client_id",
-    client_secret: "secret",
-    site: "https://auth.example.com",
-    redirect_uri: "http://localhost/auth/callback"
-  ]
+  @client build_client(strategy: Password)
 
   test "new" do
-    client = OAuth2.new(@opts)
+    client = @client
     assert client.client_id     == "client_id"
-    assert client.client_secret == "secret"
-    assert client.site          == "https://auth.example.com"
+    assert client.client_secret == "client_secret"
+    assert client.site          == "http://localhost:4999"
     assert client.authorize_url == "/oauth/authorize"
     assert client.token_url     == "/oauth/token"
-    assert client.redirect_uri  == "http://localhost/auth/callback"
+    assert client.redirect_uri  == "http://localhost:4998/auth/callback"
   end
 
   test "authorize_url" do
     assert_raise RuntimeError, "Not implemented.", fn ->
-      OAuth2.new(@opts) |> authorize_url()
+      authorize_url(@client)
     end
   end
 
   test "get_token when username and password given in params" do
-    client = OAuth2.new(@opts)
+    client = @client
     client = Password.get_token(client, [username: "scrogson", password: "password"], [])
     assert client.params["username"] == "scrogson"
     assert client.params["password"] == "password"
@@ -40,7 +35,7 @@ defmodule OAuth2.Strategy.PasswordTest do
 
   test "get_token when username and password updated via put_param" do
     client =
-      OAuth2.new(@opts)
+      @client
       |> put_param(:username, "scrogson")
       |> put_param(:password, "password")
       |> Password.get_token([], [])
@@ -51,7 +46,7 @@ defmodule OAuth2.Strategy.PasswordTest do
 
   test "get_token when username and password are not provided" do
     assert_raise RuntimeError, "Missing required keys `username` and `password` for OAuth2.Strategy.Password", fn ->
-      OAuth2.new(@opts) |> Password.get_token([], [])
+      Password.get_token(@client, [], [])
     end
   end
 end

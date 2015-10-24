@@ -7,6 +7,7 @@ defmodule OAuth2.Mixfile do
      elixir: "~> 1.0",
      deps: deps,
      package: package,
+     elixirc_paths: elixirc_paths(Mix.env),
      name: "OAuth2",
      description: "An Elixir OAuth 2.0 Client Library",
      source_url: "https://github.com/scrogson/oauth2",
@@ -15,17 +16,16 @@ defmodule OAuth2.Mixfile do
   end
 
   def application do
-    [applications: [:httpoison]]
+    [applications: [:httpoison, :poison, :plug]]
   end
 
   defp deps do
-    [{:hackney, "~> 1.0"},
-     {:httpoison, "~> 0.6"},
+    [{:httpoison, "~> 0.7"},
      {:poison, "~> 1.3"},
      {:plug, "~> 1.0"},
 
      # Test dependencies
-     {:cowboy, "~> 1.0", only: :test},
+     {:cowboy, "~> 1.0", optional: true},
      {:excoveralls, "~> 0.3", only: :test},
 
      # Docs dependencies
@@ -38,4 +38,7 @@ defmodule OAuth2.Mixfile do
      licenses: ["MIT"],
      links: %{github: "https://github.com/scrogson/oauth2"}]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end
