@@ -60,7 +60,7 @@ token = OAuth2.Client.get_token!(client, code: "someauthcode")
 #   |> OAuth2.Client.get_token!()
 
 # Use the access token to make a request for resources
-resource = OAuth2.AccessToken.get!(token, "/api/resource")
+resource = OAuth2.AccessToken.get!(token, "/api/resource").body
 ```
 
 ### Write Your Own Strategy
@@ -128,7 +128,7 @@ token = GitHub.get_token!(code: code)
 Use the access token to access desired resources.
 
 ```elixir
-user = OAuth2.AccessToken.get!(token, "/user")
+user = OAuth2.AccessToken.get!(token, "/user").body
 ```
 
 ## Examples
