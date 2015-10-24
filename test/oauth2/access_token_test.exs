@@ -1,10 +1,18 @@
 defmodule OAuth2.AccessTokenTest do
   use ExUnit.Case, async: true
+  use Plug.Test
+
+  import OAuth2.TestHelpers
 
   alias OAuth2.Client
   alias OAuth2.Response
   alias OAuth2.AccessToken
   alias OAuth2.Strategy.AuthCode
+
+  test "new from binary token" do
+    token = AccessToken.new("abc123", %Client{})
+    assert token.access_token == "abc123"
+  end
 
   test "new with 'expires' param" do
     response = Response.new(200, [{"Content-Type", "text/plain"}], "access_token=abc123&expires=123")

@@ -3,11 +3,15 @@ defmodule OAuth2.Strategy.AuthCodeTest do
   use ExUnit.Case, async: true
   use Plug.Test
 
+  import OAuth2.TestHelpers
+
+  alias OAuth2.Strategy.AuthCode
+
   test "new" do
-    conn = call(Client, conn(:get, "/"))
+    conn = call(ConsumerRouter, conn(:get, "/"))
     client = conn.private.oauth2_client
     assert client.client_id     == "client_id"
-    assert client.client_secret == "secret"
+    assert client.client_secret == "client_secret"
     assert client.site          == "http://localhost:4999"
     assert client.authorize_url == "/oauth/authorize"
     assert client.token_url     == "/oauth/token"
@@ -17,22 +21,21 @@ defmodule OAuth2.Strategy.AuthCodeTest do
   end
 
   test "authorize_url" do
-    Plug.Adapters.Cowboy.http Provider, [], port: 4999
-    Plug.Adapters.Cowboy.http Client, [], port: 4998
-
-    conn = call(Client, conn(:get, "/auth"))
+    conn = call(ConsumerRouter, conn(:get, "/auth"))
     [location] = get_resp_header conn, "location"
-    conn = call(Provider, conn(:get, location))
+    conn = call(ProviderRouter, conn(:get, location))
     assert conn.status == 302
 
     [location] = get_resp_header conn, "location"
-    conn = call(Client, conn(:get, location))
+    conn = call(ConsumerRouter, conn(:get, location))
     assert conn.params["code"] == "1234"
 
     assert_receive %OAuth2.AccessToken{access_token: "abc123", token_type: "Bearer"}
   end
 
-  defp call(mod, conn) do
-    mod.call(conn, [])
+  test "get_token throws and error if there is no 'code' param" do
+    assert_raise RuntimeError, "Missing required key `code` for `OAuth2.Strategy.AuthCode`", fn ->
+      AuthCode.get_token(build_client(), [], [])
+    end
   end
 end
