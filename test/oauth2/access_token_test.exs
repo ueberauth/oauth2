@@ -16,6 +16,18 @@ defmodule OAuth2.AccessTokenTest do
     assert token.other_params == %{"expires" => "123"}
   end
 
+  test "get success" do
+    token = build_client() |> build_token()
+    {:ok, result} = AccessToken.get(token, "/api/success.json")
+    assert result.body["data"] == "success!"
+  end
+
+  test "get error" do
+    token = build_client() |> build_token()
+    {:ok, result} = AccessToken.get(token, "/api/error.json")
+    assert result.body["error"] == "oh noes!"
+  end
+
   test "expires?" do
     assert AccessToken.expires?(%AccessToken{expires_at: 0})
     refute AccessToken.expires?(%AccessToken{expires_at: nil})

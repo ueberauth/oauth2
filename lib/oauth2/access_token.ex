@@ -101,9 +101,12 @@ defmodule OAuth2.AccessToken do
   Makes a request of given type to the given URL using the AccessToken.
   """
   def request(method, token, url, body \\ "", headers \\ [], opts \\ []) do
-    case Request.request(method, process_url(token, url), body, req_headers(token, headers), opts) do
-      {:ok, response} -> {:ok, response.body}
-      {:error, reason} -> {:error, %Error{reason: reason}}
+    url = process_url(token, url)
+    headers = req_headers(token, headers)
+
+    case Request.request(method, url, body, headers, opts) do
+      {:ok, response} -> {:ok, response}
+      {:error, error} -> {:error, error}
     end
   end
 
@@ -114,7 +117,7 @@ defmodule OAuth2.AccessToken do
   error tuple (`{:error, reason}`).
   """
   def request!(method, token, url, body \\ "", headers \\ [], opts \\ []) do
-    case Request.request(method, process_url(token, url), body, req_headers(token, headers), opts) do
+    case request(method, token, url, body, headers, opts) do
       {:ok, response} -> response
       {:error, error} -> raise error
     end
