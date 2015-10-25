@@ -19,7 +19,7 @@ end
 
 defp deps do
   # Add the dependency
-  [{:oauth2, "~> 0.3"}]
+  [{:oauth2, "~> 0.4"}]
 end
 ```
 
@@ -129,11 +129,27 @@ Use the access token to access desired resources.
 
 ```elixir
 user = OAuth2.AccessToken.get!(token, "/user").body
+
+# Or
+case OAuth2.AccessToken.get!(token, "/user") do
+  {:ok, %OAuth2.Response{status_code: 401, body: body}} ->
+    Logger.error("Unauthorized token")
+  {:ok, %OAuth2.Response{status_code: status_code, body: user}} when status_code in [200..399] ->
+    user
+  {:error, error} ->
+    Logger.error("OAuth2 error: #{error}")
+end
+
 ```
 
 ## Examples
 
 - [Authenticate with Github (OAuth2/Phoenix)](https://github.com/scrogson/oauth2_example)
+
+
+## Todo List
+
+* Make strategies for Github, Facebook, Twitter, etc.
 
 ## License
 

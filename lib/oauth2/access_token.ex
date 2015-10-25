@@ -1,6 +1,42 @@
 defmodule OAuth2.AccessToken do
   @moduledoc """
-  Provides functionality to make authorized requests to an OAuth2 provider.
+  This module defines the `OAuth2.AccessToken` struct and provides functionality
+  to make authorized requests to an OAuth2 provider using the AccessToken
+  returned by the provider.
+
+  The `OAuth2.AccessToken` struct is created for you when you use the
+  `OAuth2.Client.get_token`
+
+  ### Notes
+
+  * If a full url is given (e.g. "http://www.example.com/api/resource") then it
+  will use that otherwise you can specify an endpoint (e.g. "/api/resource") and
+  it will append it to the `Client.site`.
+
+  * The headers from the `Client.headers` are appended to the request headers.
+
+  ### Examples
+
+  ```
+  token = "abc123"
+    |> OAuth2.AccessToken.new(%OAuth2.Client{site: "www.example.com"})
+
+  case OAuth2.AccessToken.get(token, "/some/resource") do
+    {:ok, %OAuth2.Response{status_code: 401}} ->
+      "Not Good"
+    {:ok, %OAuth2.Response{status_code: status_code, body: body}} when status_code in [200..299] ->
+      "Yay!!"
+    {:error, %OAuth2.Error{reason: reason}} ->
+      reason
+  end
+
+  response = token
+    |> OAuth2.AccessToken.get!("/some/resource")
+
+  response = token
+    |> OAuth2.AccessToken.post!("/some/other/resources", %{foo: "bar"})
+```
+
   """
 
   import OAuth2.Util
@@ -16,6 +52,7 @@ defmodule OAuth2.AccessToken do
   @type expires_at    :: integer
   @type token_type    :: binary
   @type other_params  :: %{}
+  @type body          :: binary | %{}
 
   @type t :: %__MODULE__{
               access_token:  access_token,
@@ -33,12 +70,45 @@ defmodule OAuth2.AccessToken do
             client: nil
 
   @doc """
-  Returns a new AccessToken struct.
+  Returns a new `OAuth2.AccessToken` struct given the access token `string`.
+
+  ### Example
+
+  ```
+  iex(1)> OAuth2.AccessToken.new("abc123", %OAuth2.Client{})
+  %OAuth2.AccessToken{access_token: "abc123",
+   client: %OAuth2.Client{authorize_url: "/oauth/authorize", client_id: "",
+    client_secret: "", headers: [], params: %{}, redirect_uri: "", site: "",
+    strategy: OAuth2.Strategy.AuthCode, token_method: :post,
+    token_url: "/oauth/token"}, expires_at: nil, other_params: %{},
+   refresh_token: nil, token_type: "Bearer"}
+  ```
+
   """
-  @spec new(Dict.t | String.t, Client.t) :: t
+  @spec new(String.t, Client.t) :: t
   def new(token, client) when is_binary(token) do
     new(%{"access_token" => token}, client)
   end
+
+  @doc """
+  Same as `new/2` except that the first arg is a `map`.
+
+  Note if giving a map, please be sure to make the key a `string` no an `atom`.
+
+  This is used by `OAuth2.Client.get_token/4` to create the `OAuth2.AccessToken` struct.
+
+  ### Example
+
+  ```
+  iex(1)> OAuth2.AccessToken.new(%{"access_token" => "abc123"}, %OAuth2.Client{})
+   %OAuth2.AccessToken{access_token: "abc123",
+    client: %OAuth2.Client{authorize_url: "/oauth/authorize", client_id: "",
+     client_secret: "", headers: [], params: %{}, redirect_uri: "", site: "",
+     strategy: OAuth2.Strategy.AuthCode, token_method: :post,
+     token_url: "/oauth/token"}, expires_at: nil, other_params: %{},
+    refresh_token: nil, token_type: "Bearer"}
+  ```
+  """
   def new(response, client) do
     {std, other} = Dict.split(response, @standard)
 
@@ -52,53 +122,62 @@ defmodule OAuth2.AccessToken do
   end
 
   @doc """
-  Makes a `GET` request to the given URL using the AccessToken.
+  Makes a `GET` request to the given `url` using the `OAuth2.AccessToken`
+  struct.
   """
+  @spec get(t, Request.url, Client.headers, Keyword.t) :: {:ok, OAuth2.Response.t} | {:error, OAuth2.Error.t}
   def get(token, url, headers \\ [], opts \\ []),
     do: request(:get, token, url, headers, opts)
 
   @doc """
-  Makes a `GET` request to the given URL using the AccessToken.
-
-  An `OAuth2.Error` exception is raised if the request results in an
-  error tuple (`{:error, reason}`).
+  Same as `get/4` but returns a `OAuth2.Response` or `OAuth2.Error` exception if
+  the request results in an error.
   """
+  @spec get!(t, Request.url, Client.headers, Keyword.t) :: OAuth2.Response.t | OAuth2.Error.t
   def get!(token, url, headers \\ [], opts \\ []),
     do: request!(:get, token, url, headers, opts)
 
   @doc """
-  Makes a `PUT` request to the given URL using the AccessToken.
+  Makes a `PUT` request to the given `url` using the `OAuth2.AccessToken`
+  struct.
   """
+  @spec put(t, Request.url, body, Client.headers, Keyword.t) :: {:ok, OAuth2.Response.t} | {:error, OAuth2.Error.t}
   def put(token, url, body \\ "", headers \\ [], opts \\ []),
     do: request(:put, token, url, body, headers, opts)
 
   @doc """
-  Makes a `PUT` request to the given URL using the AccessToken.
+  Same as `put/5` but returns a `OAuth2.Response` or `OAuth2.Error` exception if
+  the request results in an error.
 
   An `OAuth2.Error` exception is raised if the request results in an
   error tuple (`{:error, reason}`).
   """
+  @spec put!(t, Request.url, body, Client.headers, Keyword.t) :: OAuth2.Response.t | OAuth2.Error.t
   def put!(token, url, body \\ "", headers \\ [], opts \\ []),
     do: request!(:put, token, url, body, headers, opts)
 
   @doc """
-  Makes a `POST` request to the given URL using the AccessToken.
+  Makes a `POST` request to the given URL using the `OAuth2.AccessToken`.
   """
+  @spec post(t, Request.url, body, Client.headers, Keyword.t) :: {:ok, OAuth2.Response.t} | {:error, OAuth2.Error.t}
   def post(token, url, body \\ "", headers \\ [], opts \\ []),
     do: request(:post, token, url, body, headers, opts)
 
   @doc """
-  Makes a `POST` request to the given URL using the AccessToken.
+  Same as `post/5` but returns a `OAuth2.Response` or `OAuth2.Error` exception
+  if the request results in an error.
 
   An `OAuth2.Error` exception is raised if the request results in an
   error tuple (`{:error, reason}`).
   """
+  @spec post!(t, Request.url, body, Client.headers, Keyword.t) :: OAuth2.Response.t | OAuth2.Error.t
   def post!(token, url, body \\ "", headers \\ [], opts \\ []),
     do: request!(:post, token, url, body, headers, opts)
 
   @doc """
-  Makes a request of given type to the given URL using the AccessToken.
+  Makes a request of given type to the given URL using the `OAuth2.AccessToken`.
   """
+  @spec request(Request.method, t, Request.url, body, Client.headers, Keyword.t) :: {:ok, OAuth2.Response.t} | {:error, OAuth2.Error.t}
   def request(method, token, url, body \\ "", headers \\ [], opts \\ []) do
     url = process_url(token, url)
     headers = req_headers(token, headers)
@@ -110,11 +189,13 @@ defmodule OAuth2.AccessToken do
   end
 
   @doc """
-  Makes a request of given type to the given URL using the AccessToken.
+  Same as `request/6` but returns `OAuth2.Response` or raises an error if an
+  error occurs during the request.
 
   An `OAuth2.Error` exception is raised if the request results in an
   error tuple (`{:error, reason}`).
   """
+  @spec request!(Request.method, t, Request.url, body, Client.headers, Keyword.t) :: OAuth2.Response.t | OAuth2.Error.t
   def request!(method, token, url, body \\ "", headers \\ [], opts \\ []) do
     case request(method, token, url, body, headers, opts) do
       {:ok, response} -> response
@@ -123,11 +204,12 @@ defmodule OAuth2.AccessToken do
   end
 
   @doc """
-  Determines if the access token expires or not.
+  Determines if the access token will expire or not.
 
   Returns `true` unless `expires_at` is `nil`.
   """
-  def expires?(%AccessToken{expires_at: nil}), do: false
+  @spec expires?(OAuth2.AccessToken.t) :: boolean
+  def expires?(%AccessToken{expires_at: nil} = _token), do: false
   def expires?(_), do: true
 
   @doc """
