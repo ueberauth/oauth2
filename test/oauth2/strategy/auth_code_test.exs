@@ -33,6 +33,16 @@ defmodule OAuth2.Strategy.AuthCodeTest do
     assert_receive %OAuth2.AccessToken{access_token: "abc123", token_type: "Bearer"}
   end
 
+  test "get_token returns new client with needed params and headers for auth code strategy" do
+    assert AuthCode.get_token(build_client(), [code: "cdd"], []).params == %{
+      "client_id" => "client_id",
+      "client_secret" => "client_secret",
+      "code" => "cdd",
+      "grant_type" => "authorization_code",
+      "redirect_uri" => "http://localhost:4998/auth/callback"
+    }
+  end
+  
   test "get_token throws and error if there is no 'code' param" do
     assert_raise RuntimeError, "Missing required key `code` for `OAuth2.Strategy.AuthCode`", fn ->
       AuthCode.get_token(build_client(), [], [])
