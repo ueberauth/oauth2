@@ -46,7 +46,7 @@ client = OAuth2.new([
 ])
 
 # Generate the authorization URL and redirect the user to the provider.
-OAuth2.Client.authorize_url(client)
+OAuth2.Client.authorize_url!(client)
 # => "https://auth.example.com/oauth/authorize?client_id=client_id&redirect_uri=https%3A%2F%2Fexample.com%2Fauth%2Fcallback&response_type=code"
 
 # Use the authorization code returned from the provider to obtain an access token.
@@ -131,7 +131,7 @@ Use the access token to access desired resources.
 user = OAuth2.AccessToken.get!(token, "/user").body
 
 # Or
-case OAuth2.AccessToken.get!(token, "/user") do
+case OAuth2.AccessToken.get(token, "/user") do
   {:ok, %OAuth2.Response{status_code: 401, body: body}} ->
     Logger.error("Unauthorized token")
   {:ok, %OAuth2.Response{status_code: status_code, body: user}} when status_code in [200..399] ->
