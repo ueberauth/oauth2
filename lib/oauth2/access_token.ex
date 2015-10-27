@@ -18,8 +18,7 @@ defmodule OAuth2.AccessToken do
   ### Examples
 
   ```
-  token = "abc123"
-    |> OAuth2.AccessToken.new(%OAuth2.Client{site: "www.example.com"})
+  token =  OAuth2.AccessToken.new("abc123", %OAuth2.Client{site: "www.example.com"})
 
   case OAuth2.AccessToken.get(token, "/some/resource") do
     {:ok, %OAuth2.Response{status_code: 401}} ->
@@ -30,11 +29,9 @@ defmodule OAuth2.AccessToken do
       reason
   end
 
-  response = token
-    |> OAuth2.AccessToken.get!("/some/resource")
+  response = OAuth2.AccessToken.get!(token, "/some/resource")
 
-  response = token
-    |> OAuth2.AccessToken.post!("/some/other/resources", %{foo: "bar"})
+  response = OAuth2.AccessToken.post!(token, "/some/other/resources", %{foo: "bar"})
 ```
 
   """

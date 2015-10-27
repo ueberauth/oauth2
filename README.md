@@ -136,8 +136,8 @@ case OAuth2.AccessToken.get!(token, "/user") do
     Logger.error("Unauthorized token")
   {:ok, %OAuth2.Response{status_code: status_code, body: user}} when status_code in [200..399] ->
     user
-  {:error, error} ->
-    Logger.error("OAuth2 error: #{error}")
+  {:error, %OAuth2.Error{reason: reason}} ->
+    Logger.error("Error: #{inspect reason}")
 end
 
 ```
@@ -145,11 +145,6 @@ end
 ## Examples
 
 - [Authenticate with Github (OAuth2/Phoenix)](https://github.com/scrogson/oauth2_example)
-
-
-## Todo List
-
-* Make strategies for Github, Facebook, Twitter, etc.
 
 ## License
 
