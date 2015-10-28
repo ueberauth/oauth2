@@ -154,6 +154,25 @@ defmodule OAuth2.AccessToken do
     do: request!(:put, token, url, body, headers, opts)
 
   @doc """
+  Makes a `PATCH` request to the given `url` using the `OAuth2.AccessToken`
+  struct.
+  """
+  @spec patch(t, binary, body, Client.headers, Keyword.t) :: {:ok, OAuth2.Response.t} | {:error, OAuth2.Error.t}
+  def put(token, url, body \\ "", headers \\ [], opts \\ []),
+    do: request(:patch, token, url, body, headers, opts)
+
+  @doc """
+  Same as `patch/5` but returns a `OAuth2.Response` or `OAuth2.Error` exception if
+  the request results in an error.
+
+  An `OAuth2.Error` exception is raised if the request results in an
+  error tuple (`{:error, reason}`).
+  """
+  @spec patch(t, binary, body, Client.headers, Keyword.t) :: OAuth2.Response.t | OAuth2.Error.t
+  def put!(token, url, body \\ "", headers \\ [], opts \\ []),
+    do: request!(:patch, token, url, body, headers, opts)
+
+  @doc """
   Makes a `POST` request to the given URL using the `OAuth2.AccessToken`.
   """
   @spec post(t, binary, body, Client.headers, Keyword.t) :: {:ok, OAuth2.Response.t} | {:error, OAuth2.Error.t}
