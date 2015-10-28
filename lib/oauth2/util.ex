@@ -7,16 +7,21 @@ defmodule OAuth2.Util do
   end
 
   def content_type(headers) do
-    case List.keyfind(headers, "Content-Type", 0) do
-      {"Content-Type", content_type} ->
-        case Plug.Conn.Utils.content_type(content_type) do
-          {:ok, type, subtype, _headers} ->
+    case get_content_type(headers) do
+      {_, content_type} ->
+        case :mimetype_parser.parse(content_type) do
+          {:ok, [{type, subtype, _}]} ->
             type <> "/" <> subtype
-          :error ->
-            "application/json"
+          error ->
+            raise OAuth2.Error, reason: error
         end
       nil ->
         "application/json"
     end
+  end
+
+  defp get_content_type(headers) do
+    List.keyfind(headers, "Content-Type", 0) ||
+    List.keyfind(headers, "content-type", 0)
   end
 end
