@@ -26,6 +26,7 @@ defmodule OAuth2.Mixfile do
      {:plug, "~> 1.0"},
 
      # Test dependencies
+     {:bypass, "~> 0.1", only: :test},
      {:cowboy, "~> 1.0", optional: true},
      {:excoveralls, "~> 0.3", only: :test},
 
