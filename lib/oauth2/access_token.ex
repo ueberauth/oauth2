@@ -82,7 +82,7 @@ defmodule OAuth2.AccessToken do
   ```
 
   """
-  @spec new(String.t, Client.t) :: t
+  @spec new(binary, Client.t) :: t
   def new(token, client) when is_binary(token) do
     new(%{"access_token" => token}, client)
   end
@@ -122,7 +122,7 @@ defmodule OAuth2.AccessToken do
   Makes a `GET` request to the given `url` using the `OAuth2.AccessToken`
   struct.
   """
-  @spec get(t, Request.url, Client.headers, Keyword.t) :: {:ok, OAuth2.Response.t} | {:error, OAuth2.Error.t}
+  @spec get(t, binary, Client.headers, Keyword.t) :: {:ok, OAuth2.Response.t} | {:error, OAuth2.Error.t}
   def get(token, url, headers \\ [], opts \\ []),
     do: request(:get, token, url, headers, opts)
 
@@ -130,7 +130,7 @@ defmodule OAuth2.AccessToken do
   Same as `get/4` but returns a `OAuth2.Response` or `OAuth2.Error` exception if
   the request results in an error.
   """
-  @spec get!(t, Request.url, Client.headers, Keyword.t) :: OAuth2.Response.t | OAuth2.Error.t
+  @spec get!(t, binary, Client.headers, Keyword.t) :: OAuth2.Response.t | OAuth2.Error.t
   def get!(token, url, headers \\ [], opts \\ []),
     do: request!(:get, token, url, headers, opts)
 
@@ -138,7 +138,7 @@ defmodule OAuth2.AccessToken do
   Makes a `PUT` request to the given `url` using the `OAuth2.AccessToken`
   struct.
   """
-  @spec put(t, Request.url, body, Client.headers, Keyword.t) :: {:ok, OAuth2.Response.t} | {:error, OAuth2.Error.t}
+  @spec put(t, binary, body, Client.headers, Keyword.t) :: {:ok, OAuth2.Response.t} | {:error, OAuth2.Error.t}
   def put(token, url, body \\ "", headers \\ [], opts \\ []),
     do: request(:put, token, url, body, headers, opts)
 
@@ -149,14 +149,14 @@ defmodule OAuth2.AccessToken do
   An `OAuth2.Error` exception is raised if the request results in an
   error tuple (`{:error, reason}`).
   """
-  @spec put!(t, Request.url, body, Client.headers, Keyword.t) :: OAuth2.Response.t | OAuth2.Error.t
+  @spec put!(t, binary, body, Client.headers, Keyword.t) :: OAuth2.Response.t | OAuth2.Error.t
   def put!(token, url, body \\ "", headers \\ [], opts \\ []),
     do: request!(:put, token, url, body, headers, opts)
 
   @doc """
   Makes a `POST` request to the given URL using the `OAuth2.AccessToken`.
   """
-  @spec post(t, Request.url, body, Client.headers, Keyword.t) :: {:ok, OAuth2.Response.t} | {:error, OAuth2.Error.t}
+  @spec post(t, binary, body, Client.headers, Keyword.t) :: {:ok, OAuth2.Response.t} | {:error, OAuth2.Error.t}
   def post(token, url, body \\ "", headers \\ [], opts \\ []),
     do: request(:post, token, url, body, headers, opts)
 
@@ -167,14 +167,14 @@ defmodule OAuth2.AccessToken do
   An `OAuth2.Error` exception is raised if the request results in an
   error tuple (`{:error, reason}`).
   """
-  @spec post!(t, Request.url, body, Client.headers, Keyword.t) :: OAuth2.Response.t | OAuth2.Error.t
+  @spec post!(t, binary, body, Client.headers, Keyword.t) :: OAuth2.Response.t | OAuth2.Error.t
   def post!(token, url, body \\ "", headers \\ [], opts \\ []),
     do: request!(:post, token, url, body, headers, opts)
 
   @doc """
   Makes a request of given type to the given URL using the `OAuth2.AccessToken`.
   """
-  @spec request(Request.method, t, Request.url, body, Client.headers, Keyword.t) :: {:ok, OAuth2.Response.t} | {:error, OAuth2.Error.t}
+  @spec request(atom, t, binary, body, Client.headers, Keyword.t) :: {:ok, OAuth2.Response.t} | {:error, OAuth2.Error.t}
   def request(method, token, url, body \\ "", headers \\ [], opts \\ []) do
     url = process_url(token, url)
     headers = req_headers(token, headers)
@@ -192,7 +192,7 @@ defmodule OAuth2.AccessToken do
   An `OAuth2.Error` exception is raised if the request results in an
   error tuple (`{:error, reason}`).
   """
-  @spec request!(Request.method, t, Request.url, body, Client.headers, Keyword.t) :: OAuth2.Response.t | OAuth2.Error.t
+  @spec request!(atom, t, binary, body, Client.headers, Keyword.t) :: OAuth2.Response.t | OAuth2.Error.t
   def request!(method, token, url, body \\ "", headers \\ [], opts \\ []) do
     case request(method, token, url, body, headers, opts) do
       {:ok, response} -> response
