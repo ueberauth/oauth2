@@ -156,7 +156,7 @@ defmodule OAuth2.Client do
     {client, url} = token_url(client, params, headers)
     case Request.request(method, url, client.params, client.headers, opts) do
       {:ok, response} -> {:ok, AccessToken.new(response.body, client)}
-      {:error, error} -> {:error, %Error{reason: error}}
+      {:error, error} -> {:error, error}
     end
   end
 
@@ -167,7 +167,7 @@ defmodule OAuth2.Client do
   @spec get_token!(t, params, headers, Keyword.t) :: OAuth2.AccessToken.t | OAuth2.Error.t
   def get_token!(client, params \\ [], headers \\ [], opts \\ []) do
     case get_token(client, params, headers, opts) do
-      {:ok, response} -> response
+      {:ok, token} -> token
       {:error, error} -> raise error
     end
   end

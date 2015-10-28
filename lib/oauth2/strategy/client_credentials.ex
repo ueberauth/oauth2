@@ -21,7 +21,7 @@ defmodule OAuth2.Strategy.ClientCredentials do
   Not used for this strategy.
   """
   def authorize_url(_client, _params) do
-    raise "Not implemented."
+    raise OAuth2.Error, reason: "Not implemented."
   end
 
   @doc """

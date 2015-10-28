@@ -26,7 +26,7 @@ defmodule OAuth2.Strategy.Password do
   Not used for this strategy.
   """
   def authorize_url(_client, _params) do
-    raise "Not implemented."
+    raise OAuth2.Error, reason: "Not implemented."
   end
 
   @doc """
@@ -37,7 +37,7 @@ defmodule OAuth2.Strategy.Password do
     {password, params} = Dict.pop(params, :password, client.params["password"])
 
     unless username && password do
-      raise "Missing required keys `username` and `password` for #{inspect __MODULE__}"
+      raise OAuth2.Error, reason: "Missing required keys `username` and `password` for #{inspect __MODULE__}"
     end
 
     client

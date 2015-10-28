@@ -228,7 +228,7 @@ defmodule OAuth2.AccessToken do
   @spec refresh(t, Client.params, Client.headers, Keyword.t) :: {:ok, AccessToken.t} | {:error, Error.t}
   def refresh(token, params \\ [], headers \\ [], opts \\ [])
   def refresh(%{refresh_token: nil}, _params, _headers, _opts) do
-    {:error, Error.new("Refresh token not available.")}
+    {:error, %Error{reason: "Refresh token not available."}}
   end
   def refresh(%{refresh_token: refresh_token, client: client}, params, headers, opts) do
     client =
@@ -238,7 +238,7 @@ defmodule OAuth2.AccessToken do
 
     case Client.get_token(client, params, headers, opts) do
       {:ok, response} -> {:ok, AccessToken.new(response.body, client)}
-      {:error, error} -> {:error, %Error{reason: error}}
+      {:error, error} -> {:error, error}
     end
   end
 

@@ -17,7 +17,7 @@ defmodule OAuth2.Request do
       {:ok, %HTTPoison.Response{status_code: status, headers: headers, body: body}} ->
         {:ok, Response.new(status, headers, body)}
       {:error, %HTTPoison.Error{reason: reason}} ->
-        {:ok, %Error{reason: reason}}
+        {:error, %Error{reason: reason}}
     end
   end
 
