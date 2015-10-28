@@ -158,7 +158,7 @@ defmodule OAuth2.AccessToken do
   struct.
   """
   @spec patch(t, binary, body, Client.headers, Keyword.t) :: {:ok, OAuth2.Response.t} | {:error, OAuth2.Error.t}
-  def put(token, url, body \\ "", headers \\ [], opts \\ []),
+  def patch(token, url, body \\ "", headers \\ [], opts \\ []),
     do: request(:patch, token, url, body, headers, opts)
 
   @doc """
@@ -168,8 +168,8 @@ defmodule OAuth2.AccessToken do
   An `OAuth2.Error` exception is raised if the request results in an
   error tuple (`{:error, reason}`).
   """
-  @spec patch(t, binary, body, Client.headers, Keyword.t) :: OAuth2.Response.t | OAuth2.Error.t
-  def put!(token, url, body \\ "", headers \\ [], opts \\ []),
+  @spec patch!(t, binary, body, Client.headers, Keyword.t) :: OAuth2.Response.t | OAuth2.Error.t
+  def patch!(token, url, body \\ "", headers \\ [], opts \\ []),
     do: request!(:patch, token, url, body, headers, opts)
 
   @doc """
