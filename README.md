@@ -31,7 +31,7 @@ Current implemented strategies:
 - Password
 - Client Credentials
 
-### Authorization Code Flow (AuthCode Strategy)
+## Authorization Code Flow (AuthCode Strategy)
 
 ```elixir
 # Initialize a client with client_id, client_secret, site, and redirect_uri.
@@ -63,7 +63,7 @@ token = OAuth2.Client.get_token!(client, code: "someauthcode")
 resource = OAuth2.AccessToken.get!(token, "/api/resource").body
 ```
 
-### Write Your Own Strategy
+## Write Your Own Strategy
 
 Here's an example strategy for GitHub:
 
