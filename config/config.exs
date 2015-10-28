@@ -1,16 +1,6 @@
 use Mix.Config
 
-provider_router_port = 4999
-consumer_router_port = 4998
-
 config :oauth2,
-  client_id: "client_id",
-  client_secret: "client_secret",
-  site: "http://localhost:#{provider_router_port}",
-  redirect_uri: "http://localhost:#{consumer_router_port}/auth/callback"
-
-config :oauth2, ProviderRouter,
-  port: provider_router_port
-
-config :oauth2, ConsumerRouter,
-  port: consumer_router_port
+  client_id: "0bee1126b1a1381d9cab60bcd52349484451808a", # first commit sha of this library
+  client_secret: "f715d64092fe81c396ac383e97f8a7eca40e7c89", #second commit sha
+  redirect_uri: "http://example.com/auth/callback"

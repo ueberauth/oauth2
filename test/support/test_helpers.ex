@@ -1,7 +1,7 @@
 defmodule OAuth2.TestHelpers do
 
-  def call(mod, conn) do
-    mod.call(conn, [])
+  def bypass_server(%Bypass{port: port}) do
+    "http://localhost:#{port}"
   end
 
   def build_client(opts \\ []) do
@@ -18,16 +18,12 @@ defmodule OAuth2.TestHelpers do
   end
 
   defp get_config(key) do
-    case Application.get_env(:oauth2, key) do
-      {:system, val} -> System.get_env(val)
-      val -> val
-    end
+    Application.get_env(:oauth2, key)
   end
 
   defp default_client_opts do
     [client_id: get_config(:client_id),
      client_secret: get_config(:client_secret),
-     site: get_config(:site),
      redirect_uri: get_config(:redirect_uri)]
   end
 
