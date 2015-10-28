@@ -28,7 +28,7 @@ defmodule OAuth2.Strategy.ClientCredentials do
   Retrieve an access token given the specified strategy.
   """
   def get_token(client, params, headers) do
-    {auth_scheme, params} = Dict.pop(params, :auth_scheme, "auth_header")
+    {auth_scheme, params} = Keyword.pop(params, :auth_scheme, "auth_header")
 
     client
     |> put_param(:grant_type, "client_credentials")

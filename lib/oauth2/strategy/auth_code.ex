@@ -42,7 +42,7 @@ defmodule OAuth2.Strategy.AuthCode do
   Retrieve an access token given the specified validation code.
   """
   def get_token(client, params, headers) do
-    {code, params} = Dict.pop(params, :code, client.params["code"])
+    {code, params} = Keyword.pop(params, :code, client.params["code"])
 
     unless code do
       raise OAuth2.Error, reason: "Missing required key `code` for `#{inspect __MODULE__}`"

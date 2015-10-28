@@ -33,8 +33,8 @@ defmodule OAuth2.Strategy.Password do
   Retrieve an access token given the specified End User username and password.
   """
   def get_token(client, params, headers) do
-    {username, params} = Dict.pop(params, :username, client.params["username"])
-    {password, params} = Dict.pop(params, :password, client.params["password"])
+    {username, params} = Keyword.pop(params, :username, client.params["username"])
+    {password, params} = Keyword.pop(params, :password, client.params["password"])
 
     unless username && password do
       raise OAuth2.Error, reason: "Missing required keys `username` and `password` for #{inspect __MODULE__}"
