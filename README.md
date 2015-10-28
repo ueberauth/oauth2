@@ -23,7 +23,7 @@ defp deps do
 end
 ```
 
-## API
+## Usage
 
 Current implemented strategies:
 
@@ -31,7 +31,7 @@ Current implemented strategies:
 - Password
 - Client Credentials
 
-## Authorization Code Flow (AuthCode Strategy)
+### Authorization Code Flow (AuthCode Strategy)
 
 ```elixir
 # Initialize a client with client_id, client_secret, site, and redirect_uri.
