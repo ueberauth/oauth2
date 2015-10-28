@@ -22,17 +22,7 @@ defmodule OAuth2.Response do
 
   defstruct status_code: nil, headers: %{}, body: nil
 
-  @doc """
-  Builds a new `OAuth2.Response` struct from the HTTP response.
-
-  The response body is automatically parsed if the "Content-Type" is either:
-  
-  * application/x-www-form-urlencoded - parsed using `Plug.Conn.Query.decode/1`
-  * text/plain - parsed using `Plug.Conn.Query.decode/1`
-  * application/json - parsed using `Poison.decode!/1`
-  * text/javascript - parsed using `Poison.decode!/1`
-  """
-  @spec new(status_code, headers, body) :: t
+  @doc false
   def new(status_code, headers, body) do
     %__MODULE__{
       status_code: status_code,
@@ -41,15 +31,13 @@ defmodule OAuth2.Response do
     }
   end
 
-  @spec parsers() :: %{key: (binary -> any)}
-  def parsers do
+  defp parsers do
     %{json:  &Poison.decode!(&1),
       query: &Plug.Conn.Query.decode(&1),
       text:  &(&1)}
   end
 
-  @spec content_types() :: %{binary => atom}
-  def content_types do
+  defp content_types do
     %{"application/json" => :json,
       "text/javascript" => :json,
       "application/x-www-form-urlencoded" => :query,
