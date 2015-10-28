@@ -1,18 +1,62 @@
 defmodule OAuth2.ClientTest do
   use ExUnit.Case, async: true
+  use Plug.Test
 
   import OAuth2.Client
+  import OAuth2.TestHelpers
 
-  @opts [site: "http://localhost", redirect_uri: "http://localhost/auth/callback"]
-
-  test "authorize_url" do
-    client = OAuth2.new(@opts)
-    {_client, url} = authorize_url(client)
-    assert url == "http://localhost/oauth/authorize?client_id=&redirect_uri=http%3A%2F%2Flocalhost%2Fauth%2Fcallback&response_type=code"
+  setup do
+    server = Bypass.open
+    client = build_client(site: bypass_server(server))
+    {:ok, client: client, server: server}
   end
 
-  test "put_param, merge_params" do
-    client = OAuth2.new(@opts)
+  test "authorize_url!", %{client: client, server: server} do
+    uri = URI.parse(authorize_url!(client))
+    assert "#{uri.scheme}://#{uri.host}:#{uri.port}" == client.site
+    assert uri.port == server.port
+    assert uri.path == "/oauth/authorize"
+
+    query = URI.decode_query(uri.query)
+    assert query["client_id"] == client.client_id
+    assert query["redirect_uri"] == client.redirect_uri
+    assert query["response_type"] == "code"
+  end
+
+  test "get_token, get_token!", %{client: client, server: server} do
+    Bypass.expect server, fn conn ->
+      assert conn.request_path == "/oauth/token"
+      assert conn.query_string == ""
+      assert conn.method == "POST"
+      send_resp(conn, 200, ~s({"access_token":"test1234"}))
+    end
+
+    assert {:ok, token} = OAuth2.Client.get_token(client, code: "code1234")
+    assert token.access_token == "test1234"
+    assert %OAuth2.AccessToken{} = OAuth2.Client.get_token!(client, code: "code1234")
+  end
+
+  test "get_token, get_token! when `:token_method` is `:get`", %{client: client, server: server} do
+    client = %{client | token_method: :get}
+
+    Bypass.expect server, fn conn ->
+      conn = fetch_query_params(conn)
+      assert conn.request_path == "/oauth/token"
+      assert conn.method == "GET"
+      refute conn.query_string == ""
+      assert conn.query_params["code"] == "code1234"
+      assert conn.query_params["redirect_uri"]
+      assert conn.query_params["client_secret"]
+      send_resp(conn, 200, ~s({"access_token":"test1234"}))
+    end
+
+    assert {:ok, token} = OAuth2.Client.get_token(client, code: "code1234")
+    assert token.access_token == "test1234"
+    assert %OAuth2.AccessToken{} = token = OAuth2.Client.get_token!(client, code: "code1234")
+    assert token.access_token == "test1234"
+  end
+
+  test "put_param, merge_params", %{client: client} do
     assert Map.size(client.params) == 0
 
     client = put_param(client, :scope, "user,email")
@@ -20,10 +64,12 @@ defmodule OAuth2.ClientTest do
 
     client = merge_params(client, scope: "overridden")
     assert client.params["scope"] == "overridden"
+
+    client = put_param(client, "scope", "binary keys work too")
+    assert client.params["scope"] == "binary keys work too"
   end
 
-  test "put_header, put_headers" do
-    client = OAuth2.new(@opts)
+  test "put_header, put_headers", %{client: client} do
     client = put_header(client, "Accepts", "application/json")
     assert {"Accepts", "application/json"} = List.keyfind(client.headers, "Accepts", 0)
     client = put_headers(client, [{"Accepts", "application/xml"},{"Content-Type", "application/xml"}])
@@ -31,4 +77,3 @@ defmodule OAuth2.ClientTest do
     assert {"Content-Type", "application/xml"} = List.keyfind(client.headers, "Content-Type", 0)
   end
 end
-

@@ -5,26 +5,18 @@ defmodule OAuth2.Strategy.PasswordTest do
   import OAuth2.Client
   import OAuth2.TestHelpers
 
-  @client build_client(strategy: Password)
-
-  test "new" do
-    client = @client
-    assert client.client_id     == "client_id"
-    assert client.client_secret == "client_secret"
-    assert client.site          == "http://localhost:4999"
-    assert client.authorize_url == "/oauth/authorize"
-    assert client.token_url     == "/oauth/token"
-    assert client.redirect_uri  == "http://localhost:4998/auth/callback"
+  setup do
+    client = build_client(strategy: Password, site: "http://example.com")
+    {:ok, client: client}
   end
 
-  test "authorize_url" do
-    assert_raise RuntimeError, "Not implemented.", fn ->
-      authorize_url(@client)
+  test "authorize_url", %{client: client} do
+    assert_raise OAuth2.Error, "Not implemented.", fn ->
+      authorize_url(client)
     end
   end
 
-  test "get_token when username and password given in params" do
-    client = @client
+  test "get_token when username and password given in params", %{client: client} do
     client = Password.get_token(client, [username: "scrogson", password: "password"], [])
     assert client.params["username"] == "scrogson"
     assert client.params["password"] == "password"
@@ -33,9 +25,9 @@ defmodule OAuth2.Strategy.PasswordTest do
     assert client.params["client_secret"] == client.client_secret
   end
 
-  test "get_token when username and password updated via put_param" do
+  test "get_token when username and password updated via put_param", %{client: client} do
     client =
-      @client
+      client
       |> put_param(:username, "scrogson")
       |> put_param(:password, "password")
       |> Password.get_token([], [])
@@ -44,10 +36,9 @@ defmodule OAuth2.Strategy.PasswordTest do
     assert client.params["password"] == "password"
   end
 
-  test "get_token when username and password are not provided" do
-    assert_raise RuntimeError, "Missing required keys `username` and `password` for OAuth2.Strategy.Password", fn ->
-      Password.get_token(@client, [], [])
+  test "get_token when username and password are not provided", %{client: client} do
+    assert_raise OAuth2.Error, ~r/Missing required/, fn ->
+      Password.get_token(client, [], [])
     end
   end
 end
-

@@ -5,36 +5,52 @@ defmodule OAuth2.Strategy.AuthCodeTest do
 
   import OAuth2.TestHelpers
 
+  alias OAuth2.Client
+  alias OAuth2.AccessToken
   alias OAuth2.Strategy.AuthCode
 
-  test "new" do
-    conn = call(ConsumerRouter, conn(:get, "/"))
-    client = conn.private.oauth2_client
-    assert client.client_id     == "client_id"
-    assert client.client_secret == "client_secret"
-    assert client.site          == "http://localhost:4999"
-    assert client.authorize_url == "/oauth/authorize"
-    assert client.token_url     == "/oauth/token"
-    assert client.token_method  == :post
-    assert client.params        == %{}
-    assert client.headers       == []
+  setup do
+    server = Bypass.open
+    client = build_client(strategy: AuthCode, site: bypass_server(server))
+    {:ok, client: client, server: server}
   end
 
-  test "authorize_url" do
-    conn = call(ConsumerRouter, conn(:get, "/auth"))
-    [location] = get_resp_header conn, "location"
-    conn = call(ProviderRouter, conn(:get, location))
-    assert conn.status == 302
+  test "authorize_url", %{client: client, server: server} do
+    client = AuthCode.authorize_url(client, [])
+    assert "http://localhost:#{server.port}" == client.site
 
-    [location] = get_resp_header conn, "location"
-    conn = call(ConsumerRouter, conn(:get, location))
-    assert conn.params["code"] == "1234"
+    assert client.params["client_id"] == client.client_id
+    assert client.params["redirect_uri"] == client.redirect_uri
+    assert client.params["response_type"] == "code"
+  end
 
-    assert_receive %OAuth2.AccessToken{access_token: "abc123", token_type: "Bearer"}
+  test "get_token", %{client: client, server: server} do
+    code = "abc1234"
+    access_token = "access-token-1234"
+
+    Bypass.expect server, fn conn ->
+      assert conn.request_path == "/oauth/token"
+      assert get_req_header(conn, "content-type") == ["application/x-www-form-urlencoded"]
+      assert conn.method == "POST"
+
+      {:ok, body, conn} = read_body(conn)
+      body = URI.decode_query(body)
+
+      assert body["grant_type"] == "authorization_code"
+      assert body["code"] == code
+      assert body["client_id"] == client.client_id
+      assert body["client_secret"] == client.client_secret
+      assert body["redirect_uri"] == client.redirect_uri
+
+      send_resp(conn, 302, ~s({"access_token":"#{access_token}"}))
+    end
+
+    assert {:ok, %AccessToken{} = token} = Client.get_token(client, [code: code])
+    assert token.access_token == access_token
   end
 
   test "get_token throws and error if there is no 'code' param" do
-    assert_raise RuntimeError, "Missing required key `code` for `OAuth2.Strategy.AuthCode`", fn ->
+    assert_raise OAuth2.Error, ~r/Missing required key/, fn ->
       AuthCode.get_token(build_client(), [], [])
     end
   end
