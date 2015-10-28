@@ -202,7 +202,7 @@ defmodule OAuth2.Client do
     end
   end
 
-  defp to_url(client, :token_url) do
+  defp to_url(%Client{token_method: :post} = client, :token_url) do
     {client, endpoint(client, client.token_url)}
   end
 
