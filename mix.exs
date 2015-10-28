@@ -17,17 +17,16 @@ defmodule OAuth2.Mixfile do
   end
 
   def application do
-    [applications: [:httpoison, :poison, :plug]]
+    [applications: [:httpoison, :poison, :mimetype_parser]]
   end
 
   defp deps do
     [{:httpoison, "~> 0.7"},
      {:poison, "~> 1.3"},
-     {:plug, "~> 1.0"},
+     {:mimetype_parser, "~> 0.1"},
 
      # Test dependencies
      {:bypass, "~> 0.1", only: :test},
-     {:cowboy, "~> 1.0", optional: true},
      {:excoveralls, "~> 0.3", only: :test},
 
      # Docs dependencies
