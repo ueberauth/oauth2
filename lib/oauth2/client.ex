@@ -200,6 +200,7 @@ defmodule OAuth2.Client do
       {:ok, response} -> response
       {:error, error} -> raise error
     end
+  end
 
   defp to_url(client, :token_url) do
     {client, endpoint(client, client.token_url)}
