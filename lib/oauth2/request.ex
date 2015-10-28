@@ -34,5 +34,5 @@ defmodule OAuth2.Request do
   defp process_request_body("", _), do: ""
   defp process_request_body(body, "application/json"), do: Poison.encode!(body)
   defp process_request_body(body, "application/x-www-form-urlencoded"), do:
-    Plug.Conn.Query.encode(body)
+    URI.encode_query(body)
 end
