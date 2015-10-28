@@ -38,6 +38,7 @@ defmodule OAuth2.AccessToken do
 
   import OAuth2.Util
 
+  alias OAuth2.Error
   alias OAuth2.Client
   alias OAuth2.Request
   alias OAuth2.AccessToken
@@ -218,6 +219,40 @@ defmodule OAuth2.AccessToken do
       {:error, error} -> raise error
     end
   end
+
+  @doc """
+  Gets a new `AccessToken` by making a request using the refresh_token
+
+  Returns an `AccessToken` struct that can then be used to access the resource API.
+  """
+  @spec refresh(t, Client.params, Client.headers, Keyword.t) :: {:ok, AccessToken.t} | {:error, Error.t}
+  def refresh(token, params \\ [], headers \\ [], opts \\ [])
+  def refresh(%{refresh_token: nil}, _params, _headers, _opts) do
+    {:error, Error.new("Refresh token not available.")}
+  end
+  def refresh(%{refresh_token: refresh_token, client: client}, params, headers, opts) do
+    client =
+      client
+      |> Client.put_param(:grant_type, "refresh_token")
+      |> Client.put_param(:refresh_token, refresh_token)
+
+    case Client.get_token(client, params, headers, opts) do
+      {:ok, response} -> {:ok, AccessToken.new(response.body, client)}
+      {:error, error} -> {:error, %Error{reason: error}}
+    end
+  end
+
+  @doc """
+  Calls `refresh/3` but raises `Error` if there an error occurs.
+  """
+  @spec refresh!(t, Client.params, Client.headers, Keyword.t) :: AccessToken.t | Error.t
+  def refresh!(token, params \\ [], headers \\ [], opts \\ []) do
+    case refresh(token, params, headers, opts) do
+      {:ok, token} -> token
+      {:error, error} -> raise error
+    end
+  end
+
 
   @doc """
   Determines if the access token will expire or not.
