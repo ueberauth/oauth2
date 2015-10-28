@@ -112,39 +112,18 @@ defmodule OAuth2.Client do
     client |> put_header(k,v) |> put_headers(rest)
   end
 
-  @doc """
-  Creates an authorize endpoint URL of the OAuth2 provider.
-
-  This is used for creating an authorize endpoint URL to direct the client to.
-
-  ## Example
-  ```
-  #Phoenix controller action
-  def index(conn, _params) do
-    {client, redirect_url} = OAuth2.Client
-      |> OAuth2.Client.authorize_url
-    redirect conn, external: redirect_url
-  end
-  ```
-
-  """
+  @doc false
   @spec authorize_url(t, list) :: {t, binary}
   def authorize_url(client, params \\ []) do
     client.strategy.authorize_url(client, params) |> to_url(:authorize_url)
   end
 
   @doc """
-  Calls `authorize_url/2` and returns only the authorized url.
+  Returns the authorize url based on the client configuration.
 
   ## Example
-  ```
-  #Phoenix controller action
-  def index(conn, _params) do
-    redirect_url = OAuth2.Client
-      |> OAuth2.Client.authorize_url!
-    redirect conn, external: redirect_url
-  end
-  ```
+
+      redirect_url = OAuth2.Client.authorize_url!(%OAuth2.Client{})
   """
   @spec authorize_url!(t, list) :: binary
   def authorize_url!(client, params \\ []) do
