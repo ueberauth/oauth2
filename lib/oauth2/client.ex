@@ -154,7 +154,7 @@ defmodule OAuth2.Client do
   @spec get_token(t, params, headers, Keyword.t) :: {:ok, OAuth2.AccessToken.t} | {:error, OAuth2.Error.t}
   def get_token(%{token_method: method} = client, params \\ [], headers \\ [], opts \\ []) do
     {client, url} = token_url(client, params, headers)
-    case apply(Request, method, [url, client.params, client.headers, opts]) do
+    case Request.request(method, url, client.params, client.headers, opts) do
       {:ok, response} -> {:ok, AccessToken.new(response.body, client)}
       {:error, error} -> {:error, %Error{reason: error}}
     end
@@ -185,7 +185,7 @@ defmodule OAuth2.Client do
   """
   def refresh_token(%{token_method: method} = client, params \\ [], headers \\ [], opts \\ []) do
     {client, url} = refresh_token_url(client, params, headers)
-    case apply(Request, method, [url, client.params, client.headers, opts]) do
+    case Request.request(method, url, client.params, client.headers, opts) do
       {:ok, response} -> {:ok, AccessToken.new(response.body, client)}
       {:error, error} -> {:error, %Error{reason: error}}
     end
