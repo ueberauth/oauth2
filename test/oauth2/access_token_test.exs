@@ -59,6 +59,21 @@ defmodule OAuth2.AccessTokenTest do
     assert result.body["data"] == "oh noes!"
   end
 
+  test "get returning 401 with no content-type", %{client: client, server: server, token: token} do
+    Bypass.expect server, fn conn ->
+      assert conn.request_path == "/api/user"
+      assert get_req_header(conn, "authorization") == ["Bearer #{token.access_token}"]
+
+      conn
+      |> put_resp_header("content-type", "text/html")
+      |> send_resp(401, " ")
+    end
+
+    {:ok, result} = AccessToken.get(token, "/api/user")
+    assert result.status_code == 401
+    assert result.body == " "
+  end
+
   test "connection error", %{server: server, token: token} do
     Bypass.down(server)
 
