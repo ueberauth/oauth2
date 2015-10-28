@@ -33,7 +33,7 @@ defmodule OAuth2.Response do
 
   defp parsers do
     %{json:  &Poison.decode!(&1),
-      query: &Plug.Conn.Query.decode(&1),
+      query: &URI.decode_query(&1),
       text:  &(&1)}
   end
 
@@ -47,7 +47,7 @@ defmodule OAuth2.Response do
   defp decode_response_body("", _type), do: ""
   defp decode_response_body(body, content_type) do
     content_type = content_types[content_type]
-    parser = parsers[content_type]
+    parser = parsers[content_type] || &(&1)
     parser.(body)
   end
 end
