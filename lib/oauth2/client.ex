@@ -151,7 +151,7 @@ defmodule OAuth2.Client do
   * `:proxy` - a proxy to be used for the request; it can be a regular url or a
    `{Host, Proxy}` tuple
   """
-  @spec get_token(t, params, headers, Keyword.t) :: {:ok, OAuth2.AccessToken.t} | {:error, OAuth2.Error.t}
+  @spec get_token(t, params, headers, Keyword.t) :: {:ok, AccessToken.t} | {:error, Error.t}
   def get_token(%{token_method: method} = client, params \\ [], headers \\ [], opts \\ []) do
     {client, url} = token_url(client, params, headers)
     case Request.request(method, url, client.params, client.headers, opts) do
@@ -164,7 +164,7 @@ defmodule OAuth2.Client do
   Same as `get_token/4` but raises `OAuth2.Error` if an error occurs during the
   request.
   """
-  @spec get_token!(t, params, headers, Keyword.t) :: OAuth2.AccessToken.t | OAuth2.Error.t
+  @spec get_token!(t, params, headers, Keyword.t) :: AccessToken.t | Error.t
   def get_token!(client, params \\ [], headers \\ [], opts \\ []) do
     case get_token(client, params, headers, opts) do
       {:ok, token} -> token

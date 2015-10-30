@@ -4,7 +4,6 @@ defmodule OAuth2.AccessTokenTest do
 
   import OAuth2.TestHelpers
 
-  alias OAuth2.Client
   alias OAuth2.Response
   alias OAuth2.AccessToken
   alias OAuth2.Strategy.AuthCode
@@ -31,7 +30,7 @@ defmodule OAuth2.AccessTokenTest do
     assert token.other_params == %{"expires" => "123"}
   end
 
-  test "get success", %{client: client, server: server, token: token} do
+  test "get success", %{server: server, token: token} do
     Bypass.expect server, fn conn ->
       assert conn.request_path == "/api/success"
       assert get_req_header(conn, "authorization") == ["Bearer #{token.access_token}"]
@@ -45,7 +44,7 @@ defmodule OAuth2.AccessTokenTest do
     assert result.body["data"] == "success!"
   end
 
-  test "get error", %{client: client, server: server, token: token} do
+  test "get error", %{server: server, token: token} do
     Bypass.expect server, fn conn ->
       assert conn.request_path == "/api/error"
       assert get_req_header(conn, "authorization") == ["Bearer #{token.access_token}"]
@@ -59,7 +58,7 @@ defmodule OAuth2.AccessTokenTest do
     assert result.body["data"] == "oh noes!"
   end
 
-  test "get returning 401 with no content-type", %{client: client, server: server, token: token} do
+  test "get returning 401 with no content-type", %{server: server, token: token} do
     Bypass.expect server, fn conn ->
       assert conn.request_path == "/api/user"
       assert get_req_header(conn, "authorization") == ["Bearer #{token.access_token}"]
@@ -84,7 +83,7 @@ defmodule OAuth2.AccessTokenTest do
     Bypass.up(server)
   end
 
-  test "refresh, refresh!", %{client: client, server: server, token: token} do
+  test "refresh, refresh!", %{server: server, token: token} do
     Bypass.expect server, fn conn ->
       assert conn.request_path == "/oauth/token"
       assert conn.method == "POST"
