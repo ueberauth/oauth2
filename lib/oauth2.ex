@@ -22,7 +22,7 @@ defmodule OAuth2 do
 
   Initialize a client with your client_id, client_secret, and site.
 
-      client = OAuth2.new([
+      client = OAuth2.Client.new([
         strategy: OAuth2.Strategy.AuthCode, # default strategy is AuthCode
         client_id: "client_id",
         client_secret: "abc123",
@@ -54,12 +54,4 @@ defmodule OAuth2 do
   """
 
   @type opts :: Keyword.t
-
-  @doc """
-  Builds a new `OAuth2.Client` struct.
-
-  See `OAuth2.Client.new/1` for details.
-  """
-  defdelegate new(opts), to: OAuth2.Client
 end
-

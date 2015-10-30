@@ -14,7 +14,7 @@ defmodule OAuth2.Strategy do
         # Public API
 
         def new do
-          OAuth2.new([
+          OAuth2.Client.new([
             strategy: __MODULE__,
             client_id: "abc123",
             client_secret: "abcdefg",
@@ -106,4 +106,3 @@ defmodule OAuth2.Strategy do
     end
   end
 end
-

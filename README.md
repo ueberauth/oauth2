@@ -37,7 +37,7 @@ Current implemented strategies:
 # Initialize a client with client_id, client_secret, site, and redirect_uri.
 # The strategy option is optional as it defaults to `OAuth2.Strategy.AuthCode`.
 
-client = OAuth2.new([
+client = OAuth2.Client.new([
   strategy: OAuth2.Strategy.AuthCode, #default
   client_id: "client_id",
   client_secret: "abc123",
@@ -68,14 +68,13 @@ resource = OAuth2.AccessToken.get!(token, "/api/resource").body
 Here's an example strategy for GitHub:
 
 ```elixir
-
 defmodule GitHub do
   use OAuth2.Strategy
 
   # Public API
 
   def new do
-    OAuth2.new([
+    OAuth2.Client.new([
       strategy: __MODULE__,
       client_id: "abc123",
       client_secret: "abcdefg",
