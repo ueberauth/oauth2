@@ -58,6 +58,15 @@ defmodule OAuth2.AccessTokenTest do
     assert result.body["data"] == "oh noes!"
   end
 
+  test "params in opts turn into a query string", %{server: server, token: token} do
+    Bypass.expect server, fn conn ->
+      assert conn.query_string == "access_token=#{token.access_token}"
+      send_resp(conn, 200, "")
+    end
+
+    assert {:ok, _} = AccessToken.get(token, "/me", [], params: [access_token: token.access_token])
+  end
+
   test "get returning 401 with no content-type", %{server: server, token: token} do
     Bypass.expect server, fn conn ->
       assert conn.request_path == "/api/user"

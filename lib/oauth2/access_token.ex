@@ -126,7 +126,7 @@ defmodule OAuth2.AccessToken do
   """
   @spec get(t, binary, Client.headers, Keyword.t) :: {:ok, Response.t} | {:error, Error.t}
   def get(token, url, headers \\ [], opts \\ []),
-    do: request(:get, token, url, headers, opts)
+    do: request(:get, token, url, "", headers, opts)
 
   @doc """
   Same as `get/4` but returns a `OAuth2.Response` or `OAuth2.Error` exception if
@@ -134,7 +134,7 @@ defmodule OAuth2.AccessToken do
   """
   @spec get!(t, binary, Client.headers, Keyword.t) :: Response.t | Error.t
   def get!(token, url, headers \\ [], opts \\ []),
-    do: request!(:get, token, url, headers, opts)
+    do: request!(:get, token, url, "", headers, opts)
 
   @doc """
   Makes a `PUT` request to the given `url` using the `OAuth2.AccessToken`
