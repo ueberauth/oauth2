@@ -84,6 +84,26 @@ defmodule OAuth2.AccessTokenTest do
     Bypass.up(server)
   end
 
+  test "refresh, refresh!", %{client: client, server: server, token: token} do
+    Bypass.expect server, fn conn ->
+      assert conn.request_path == "/oauth/token"
+      assert conn.method == "POST"
+      send_resp conn, 200, ~s({"access_token":"new-access-token","refresh_token":"new-refresh-token"})
+    end
+
+    {:error, error} = AccessToken.refresh(token)
+    assert error.reason =~ ~r/token not available/
+
+    assert_raise OAuth2.Error, ~r/token not available/, fn ->
+      AccessToken.refresh!(token)
+    end
+
+    token = %{token | refresh_token: "abcdefg"}
+    assert {:ok, token} = AccessToken.refresh(token)
+    assert token.access_token == "new-access-token"
+    assert token.refresh_token == "new-refresh-token"
+  end
+
   test "expires?" do
     assert AccessToken.expires?(%AccessToken{expires_at: 0})
     refute AccessToken.expires?(%AccessToken{expires_at: nil})

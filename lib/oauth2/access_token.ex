@@ -232,13 +232,12 @@ defmodule OAuth2.AccessToken do
     {:error, %Error{reason: "Refresh token not available."}}
   end
   def refresh(%{refresh_token: refresh_token, client: client}, params, headers, opts) do
-    client =
-      client
-      |> Client.put_param(:grant_type, "refresh_token")
+    refresh =
+      %{client | strategy: OAuth2.Strategy.Refresh}
       |> Client.put_param(:refresh_token, refresh_token)
 
-    case Client.get_token(client, params, headers, opts) do
-      {:ok, response} -> {:ok, AccessToken.new(response.body, client)}
+    case Client.get_token(refresh, params, headers, opts) do
+      {:ok, token}    -> {:ok, %{token | client: client}}
       {:error, error} -> {:error, error}
     end
   end
