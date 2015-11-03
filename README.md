@@ -73,7 +73,7 @@ defmodule GitHub do
 
   # Public API
 
-  def new do
+  def client do
     OAuth2.Client.new([
       strategy: __MODULE__,
       client_id: "abc123",
@@ -86,14 +86,14 @@ defmodule GitHub do
   end
 
   def authorize_url!(params \\ []) do
-    new()
+    client()
     |> put_param(:scope, "user,public_repo")
     |> OAuth2.Client.authorize_url!(params)
   end
 
   # you can pass options to the underlying http library via `options` parameter
   def get_token!(params \\ [], headers \\ [], options \\ []) do
-    OAuth2.Client.get_token!(new(), params, headers, options)
+    OAuth2.Client.get_token!(client(), params, headers, options)
   end
 
   # Strategy Callbacks
@@ -138,7 +138,6 @@ case OAuth2.AccessToken.get(token, "/user") do
   {:error, %OAuth2.Error{reason: reason}} ->
     Logger.error("Error: #{inspect reason}")
 end
-
 ```
 
 ## Examples
