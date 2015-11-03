@@ -30,32 +30,96 @@ defmodule OAuth2.AccessTokenTest do
     assert token.other_params == %{"expires" => "123"}
   end
 
-  test "get success", %{server: server, token: token} do
-    Bypass.expect server, fn conn ->
-      assert conn.request_path == "/api/success"
-      assert get_req_header(conn, "authorization") == ["Bearer #{token.access_token}"]
-      assert get_req_header(conn, "accept") == ["application/json"]
+  ## GET
 
-      send_resp(conn, 200, ~s({"data": "success!"}))
-    end
+  test "GET", %{server: server, token: token} do
+    bypass(server, "GET", "/api/user/1", [token: token], fn conn ->
+      json(conn, 200, %{id: 1})
+    end)
 
-    {:ok, result} = AccessToken.get(token, "/api/success")
+    {:ok, result} = AccessToken.get(token, "/api/user/1")
     assert result.status_code == 200
-    assert result.body["data"] == "success!"
+    assert result.body["id"] == 1
+
+    result = AccessToken.get!(token, "/api/user/1")
+    assert result.status_code == 200
+    assert result.body["id"] == 1
   end
 
-  test "get error", %{server: server, token: token} do
-    Bypass.expect server, fn conn ->
-      assert conn.request_path == "/api/error"
-      assert get_req_header(conn, "authorization") == ["Bearer #{token.access_token}"]
-      assert get_req_header(conn, "accept") == ["application/json"]
+  ## POST
 
-      send_resp(conn, 400, ~s({"data": "oh noes!"}))
+  test "POST", %{server: server, token: token} do
+    title = "Totally awesome blog post"
+
+    bypass server, "POST", "/api/posts", [token: token], fn conn ->
+      json(conn, 200, %{id: 1, title: title})
     end
 
-    {:ok, result} = AccessToken.get(token, "/api/error")
-    assert result.status_code == 400
-    assert result.body["data"] == "oh noes!"
+    {:ok, result} = AccessToken.post(token, "/api/posts", %{title: title})
+    assert result.status_code == 200
+    assert result.body["id"] == 1
+    assert result.body["title"] == title
+
+    result = AccessToken.post!(token, "/api/posts", %{title: title})
+    assert result.status_code == 200
+    assert result.body["id"] == 1
+    assert result.body["title"] == title
+  end
+
+  ## PUT
+
+  test "PUT", %{server: server, token: token} do
+    title = "Totally awesome blog post!"
+
+    bypass server, "PUT", "/api/posts/1", [token: token], fn conn ->
+      json(conn, 200, %{id: 1, title: title})
+    end
+
+    {:ok, result} = AccessToken.put(token, "/api/posts/1", %{id: 1, title: title})
+    assert result.status_code == 200
+    assert result.body["id"] == 1
+    assert result.body["title"] == title
+
+    result = AccessToken.put!(token, "/api/posts/1", %{id: 1, title: title})
+    assert result.status_code == 200
+    assert result.body["id"] == 1
+    assert result.body["title"] == title
+  end
+
+  ## PATCH
+
+  test "PATCH", %{server: server, token: token} do
+    title = "Totally awesome blog post!"
+
+    bypass server, "PATCH", "/api/posts/1", [token: token], fn conn ->
+      json(conn, 200, %{id: 1, title: title})
+    end
+
+    {:ok, result} = AccessToken.patch(token, "/api/posts/1", %{id: 1, title: title})
+    assert result.status_code == 200
+    assert result.body["id"] == 1
+    assert result.body["title"] == title
+
+    result = AccessToken.patch!(token, "/api/posts/1", %{id: 1, title: title})
+    assert result.status_code == 200
+    assert result.body["id"] == 1
+    assert result.body["title"] == title
+  end
+
+  ## DELETE
+
+  test "DELETE", %{server: server, token: token} do
+    bypass server, "DELETE", "/api/posts/1", [token: token], fn conn ->
+      json(conn, 204, "")
+    end
+
+    {:ok, result} = AccessToken.delete(token, "/api/posts/1")
+    assert result.status_code == 204
+    assert result.body == ""
+
+    result = AccessToken.delete!(token, "/api/posts/1")
+    assert result.status_code == 204
+    assert result.body == ""
   end
 
   test "params in opts turn into a query string", %{server: server, token: token} do
@@ -68,10 +132,7 @@ defmodule OAuth2.AccessTokenTest do
   end
 
   test "get returning 401 with no content-type", %{server: server, token: token} do
-    Bypass.expect server, fn conn ->
-      assert conn.request_path == "/api/user"
-      assert get_req_header(conn, "authorization") == ["Bearer #{token.access_token}"]
-
+    bypass server, "GET", "/api/user", [token: token], fn conn ->
       conn
       |> put_resp_header("content-type", "text/html")
       |> send_resp(401, " ")
@@ -85,18 +146,18 @@ defmodule OAuth2.AccessTokenTest do
   test "connection error", %{server: server, token: token} do
     Bypass.down(server)
 
-    assert_raise OAuth2.Error, ":econnrefused", fn ->
+    assert_raise OAuth2.Error, "Connection refused", fn ->
       AccessToken.get!(token, "/api/error")
     end
 
     Bypass.up(server)
   end
 
-  test "refresh, refresh!", %{server: server, token: token} do
-    Bypass.expect server, fn conn ->
-      assert conn.request_path == "/oauth/token"
-      assert conn.method == "POST"
-      send_resp conn, 200, ~s({"access_token":"new-access-token","refresh_token":"new-refresh-token"})
+  test "refresh and refresh! with a POST", %{server: server, token: token} do
+    bypass server, "POST", "/oauth/token", fn conn ->
+      conn
+      |> put_resp_header("content-type", "application/json")
+      |> send_resp(200, ~s({"access_token":"new-access-token","refresh_token":"new-refresh-token"}))
     end
 
     {:error, error} = AccessToken.refresh(token)
@@ -107,7 +168,7 @@ defmodule OAuth2.AccessTokenTest do
     end
 
     token = %{token | refresh_token: "abcdefg"}
-    assert {:ok, token} = AccessToken.refresh(token)
+    assert {:ok, token} = AccessToken.refresh(token, [], [{"accept", "application/json"}])
     assert token.access_token == "new-access-token"
     assert token.refresh_token == "new-refresh-token"
   end

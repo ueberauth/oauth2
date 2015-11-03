@@ -24,25 +24,20 @@ defmodule OAuth2.ClientTest do
   end
 
   test "get_token, get_token!", %{client: client, server: server} do
-    Bypass.expect server, fn conn ->
-      assert conn.request_path == "/oauth/token"
+    bypass server, "POST", "/oauth/token", fn conn ->
       assert conn.query_string == ""
-      assert conn.method == "POST"
       send_resp(conn, 200, ~s({"access_token":"test1234"}))
     end
 
-    assert {:ok, token} = OAuth2.Client.get_token(client, code: "code1234")
+    assert {:ok, token} = OAuth2.Client.get_token(client, [code: "code1234"], [{"Accept", "application/json"}])
     assert token.access_token == "test1234"
-    assert %OAuth2.AccessToken{} = OAuth2.Client.get_token!(client, code: "code1234")
+    assert %OAuth2.AccessToken{} = OAuth2.Client.get_token!(client, [code: "code1234"], [{"Accept", "application/json"}])
   end
 
   test "get_token, get_token! when `:token_method` is `:get`", %{client: client, server: server} do
     client = %{client | token_method: :get}
 
-    Bypass.expect server, fn conn ->
-      conn = fetch_query_params(conn)
-      assert conn.request_path == "/oauth/token"
-      assert conn.method == "GET"
+    bypass server, "GET", "/oauth/token", fn conn ->
       refute conn.query_string == ""
       assert conn.query_params["code"] == "code1234"
       assert conn.query_params["redirect_uri"]
