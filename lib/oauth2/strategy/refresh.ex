@@ -28,7 +28,7 @@ defmodule OAuth2.Strategy.Refresh do
   Not used for this strategy.
   """
   def authorize_url(_client, _params) do
-    raise OAuth2.Error, reason: "Not implemented."
+    raise OAuth2.Error, reason: "This strategy does not implement `authorize_url`."
   end
 
   @doc """

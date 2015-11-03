@@ -11,7 +11,7 @@ defmodule OAuth2.Strategy.PasswordTest do
   end
 
   test "authorize_url", %{client: client} do
-    assert_raise OAuth2.Error, "Not implemented.", fn ->
+    assert_raise OAuth2.Error, ~r/This strategy does not implement/, fn ->
       authorize_url(client)
     end
   end
