@@ -11,8 +11,8 @@ defmodule OAuth2.TestHelpers do
     bypass(server, method, path, [], fun)
   end
   def bypass(server, method, path, opts, fun) do
-    {token, opts}  = Keyword.pop(opts, :token, nil)
-    {accept, opts} = Keyword.pop(opts, :accept, "json")
+    {token, opts}   = Keyword.pop(opts, :token, nil)
+    {accept, _opts} = Keyword.pop(opts, :accept, "json")
 
     Bypass.expect server, fn conn ->
       conn = parse_req_body(conn)
@@ -42,7 +42,7 @@ defmodule OAuth2.TestHelpers do
     assert get_req_header(conn, "accept") == [mime]
   end
 
-  defp assert_token(conn, nil), do: :ok
+  defp assert_token(_conn, nil), do: :ok
   defp assert_token(conn, token) do
     assert get_req_header(conn, "authorization") == ["Bearer #{token.access_token}"]
   end
