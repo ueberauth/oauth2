@@ -193,6 +193,24 @@ defmodule OAuth2.AccessToken do
     do: request!(:post, token, url, body, headers, opts)
 
   @doc """
+  Makes a `DELETE` request to the given URL using the `OAuth2.AccessToken`.
+  """
+  @spec delete(t, binary, body, Client.headers, Keyword.t) :: {:ok, Response.t} | {:error, Error.t}
+  def delete(token, url, body \\ "", headers \\ [], opts \\ []),
+    do: request(:delete, token, url, body, headers, opts)
+
+  @doc """
+  Same as `delete/5` but returns a `OAuth2.Response` or `OAuth2.Error` exception
+  if the request results in an error.
+
+  An `OAuth2.Error` exception is raised if the request results in an
+  error tuple (`{:error, reason}`).
+  """
+  @spec delete!(t, binary, body, Client.headers, Keyword.t) :: Response.t | Error.t
+  def delete!(token, url, body \\ "", headers \\ [], opts \\ []),
+    do: request!(:delete, token, url, body, headers, opts)
+
+  @doc """
   Makes a request of given type to the given URL using the `OAuth2.AccessToken`.
   """
   @spec request(atom, t, binary, body, Client.headers, Keyword.t) :: {:ok, Response.t} | {:error, Error.t}
