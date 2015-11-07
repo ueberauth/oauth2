@@ -1,10 +1,9 @@
-OAuth2
-======
+# OAuth2 (Client)
 
 [![Build Status](https://travis-ci.org/scrogson/oauth2.svg?branch=master)](https://travis-ci.org/scrogson/oauth2)
 [![Coverage Status](https://coveralls.io/repos/scrogson/oauth2/badge.svg?branch=master&service=github)](https://coveralls.io/github/scrogson/oauth2?branch=master)
 
-> OAuth2 Library for Elixir
+> An Elixir OAuth2 Client
 
 ## Install
 
