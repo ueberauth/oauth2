@@ -117,7 +117,7 @@ defmodule OAuth2.AccessToken do
       expires_at:    (std["expires_in"] || other["expires"]) |> expires_at(),
       token_type:    std["token_type"] |> normalize_token_type(),
       other_params:  other,
-      client:        client]
+      client:        remove_headers(client)]
   end
 
   @doc """
@@ -312,5 +312,9 @@ defmodule OAuth2.AccessToken do
 
   defp req_headers(token, headers) do
     [{"Authorization", "#{token.token_type} #{token.access_token}"} | headers] ++ token.client.headers
+  end
+
+  defp remove_headers(client) do
+    %{ client | headers: []}
   end
 end
