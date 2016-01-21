@@ -18,22 +18,24 @@ defmodule OAuth2.Strategy.ClientCredentialsTest do
     end
   end
 
-  test "get_token: auth_scheme defaults to 'auth_header'", %{client: client, server: server} do
+  test "get_token: auth_scheme defaults to 'auth_header'", %{client: client} do
+    client = ClientCredentials.get_token(client, [], [])
     base64 = Base.encode64(client.client_id <> ":" <> client.client_secret)
-    token_bearer = "123456=="
+    assert client.headers == [{"Authorization", "Basic #{base64}"}]
+    assert client.params["grant_type"] == "client_credentials"
+  end
+
+  test "get_token: Duplicated auth_header ", %{client: client, server: server} do
     Bypass.expect server, fn conn ->
+      base64 = Base.encode64(client.client_id <> ":" <> client.client_secret)
       assert get_req_header(conn, "Authorization"), "Basic #{base64}"
 
-      send_resp conn, 200, ~s({"access_token": "#{token_bearer}", "token_type": "bearer", "expires_in": "999" })
+      send_resp conn, 200, ~s({"access_token": "123456==", "token_type": "bearer", "expires_in": "999" })
     end
-
     token = Client.get_token!(client)
     client = token.client
 
-    # should not include on client response header
     assert List.keyfind(client.headers, "Authorization", 0) == nil
-    assert token.access_token == token_bearer
-    assert client.params["grant_type"] == "client_credentials"
   end
 
   test "get_token: with auth_scheme set to 'request_body'", %{client: client} do
