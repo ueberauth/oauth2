@@ -13,6 +13,6 @@
   "mimerl": {:hex, :mimerl, "1.0.2"},
   "mimetype_parser": {:hex, :mimetype_parser, "0.1.0"},
   "plug": {:hex, :plug, "1.0.2"},
-  "poison": {:hex, :poison, "1.5.0"},
+  "poison": {:hex, :poison, "2.1.0"},
   "ranch": {:hex, :ranch, "1.1.0"},
   "ssl_verify_hostname": {:hex, :ssl_verify_hostname, "1.0.5"}}
