@@ -21,8 +21,8 @@ defmodule OAuth2.Mixfile do
   end
 
   defp deps do
-    [{:httpoison, "~> 0.7"},
-     {:poison, "~> 1.3"},
+    [{:httpoison, "~> 0.8"},
+     {:poison, "~> 2.1"},
      {:mimetype_parser, "~> 0.1"},
 
      # Test dependencies
