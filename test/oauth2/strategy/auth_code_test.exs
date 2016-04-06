@@ -39,7 +39,7 @@ defmodule OAuth2.Strategy.AuthCodeTest do
       assert body["grant_type"] == "authorization_code"
       assert body["code"] == code
       assert body["client_id"] == client.client_id
-      assert body["client_secret"] == client.client_secret
+      assert body["response_type"] == "code"
       assert body["redirect_uri"] == client.redirect_uri
 
       send_resp(conn, 302, ~s({"access_token":"#{access_token}"}))

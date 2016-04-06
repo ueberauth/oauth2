@@ -41,7 +41,7 @@ defmodule OAuth2.ClientTest do
       refute conn.query_string == ""
       assert conn.query_params["code"] == "code1234"
       assert conn.query_params["redirect_uri"]
-      assert conn.query_params["client_secret"]
+      assert conn.query_params["response_type"] == "code"
       send_resp(conn, 200, ~s({"access_token":"test1234"}))
     end
 
