@@ -4,71 +4,81 @@ defmodule OAuth2.Client do
   and establishing a request for an access token.
   """
 
-  @type strategy      :: module
+  alias OAuth2.{AccessToken, Client, Error, Request}
+
+  @type authorize_url :: binary
+  @type body          :: any
   @type client_id     :: binary
   @type client_secret :: binary
-  @type site          :: binary
-  @type authorize_url :: binary
-  @type token_url     :: binary
-  @type token_method  :: :post | :get | atom
-  @type redirect_uri  :: binary
+  @type headers       :: [{binary, binary}]
   @type param         :: binary | %{binary => param} | [param]
   @type params        :: %{binary => param}
-  @type headers       :: [{binary, binary}]
+  @type redirect_uri  :: binary
+  @type site          :: binary
+  @type strategy      :: module
+  @type token         :: AccessToken.t | nil
+  @type token_method  :: :post | :get | atom
+  @type token_url     :: binary
 
+  @type t :: %Client{
+    authorize_url: authorize_url,
+    client_id:     client_id,
+    client_secret: client_secret,
+    headers:       headers,
+    params:        params,
+    redirect_uri:  redirect_uri,
+    site:          site,
+    strategy:      strategy,
+    token:         token,
+    token_method:  token_method,
+    token_url:     token_url
+  }
 
-
-  @type t :: %__MODULE__{
-              strategy:      strategy,
-              client_id:     client_id,
-              client_secret: client_secret,
-              site:          site,
-              authorize_url: authorize_url,
-              token_url:     token_url,
-              token_method:  token_method,
-              params:        params,
-              headers:       headers,
-              redirect_uri:  redirect_uri}
-
-  defstruct strategy: OAuth2.Strategy.AuthCode,
+  defstruct authorize_url: "/oauth/authorize",
             client_id: "",
             client_secret: "",
-            site: "",
-            authorize_url: "/oauth/authorize",
-            token_url: "/oauth/token",
-            token_method: :post,
-            params: %{},
             headers: [],
-            redirect_uri: ""
-
-  alias OAuth2.Error
-  alias OAuth2.Client
-  alias OAuth2.Request
-  alias OAuth2.AccessToken
+            params: %{},
+            redirect_uri: "",
+            site: "",
+            strategy: OAuth2.Strategy.AuthCode,
+            token: nil,
+            token_method: :post,
+            token_url: "/oauth/token"
 
   @doc """
   Builds a new OAuth2 client struct using the `opts` provided.
 
   ## Client struct fields
 
-  * `strategy` - a module that implements the appropriate OAuth2 strategy,
-    default `OAuth2.Strategy.AuthCode`
-  * `client_id` - the client_id for the OAuth2 provider
-  * `client_secret` - the client_secret for the OAuth2 provider
-  * `site` - the OAuth2 provider site host
   * `authorize_url` - absolute or relative URL path to the authorization
     endpoint. Defaults to `"/oauth/authorize"`
-  * `token_url` - absolute or relative URL path to the token endpoint.
-    Defaults to `"/oauth/token"`
-  * `token_method` - HTTP method to use to request token (`:get` or `:post`).
-    Defaults to `:post`
-  * `params` - a map of request parameters
+  * `client_id` - the client_id for the OAuth2 provider
+  * `client_secret` - the client_secret for the OAuth2 provider
   * `headers` - a list of request headers
+  * `params` - a map of request parameters
   * `redirect_uri` - the URI the provider should redirect to after authorization
      or token requests
+  * `site` - the OAuth2 provider site host
+  * `strategy` - a module that implements the appropriate OAuth2 strategy,
+    default `OAuth2.Strategy.AuthCode`
+  * `token` - `%OAuth2.AccessToken{}` struct holding the token for requests.
+  * `token_method` - HTTP method to use to request token (`:get` or `:post`).
+    Defaults to `:post`
+  * `token_url` - absolute or relative URL path to the token endpoint.
+    Defaults to `"/oauth/token"`
   """
-  @spec new(Keyword.t) :: t
-  def new(opts), do: struct(__MODULE__, opts)
+  @spec new(t, Keyword.t) :: t
+  def new(client \\ %Client{}, opts) do
+    {token, opts} = Keyword.pop(opts, :token)
+    opts = Keyword.put(opts, :token, process_token(token))
+
+    struct(client, opts)
+  end
+
+  defp process_token(nil), do: nil
+  defp process_token(val) when is_binary(val), do: AccessToken.new(val)
+  defp process_token(%AccessToken{} = token), do: token
 
   @doc """
   Puts the specified `value` in the params for the given `key`.
@@ -84,7 +94,7 @@ defmodule OAuth2.Client do
   @doc """
   Set multiple params in the client in one call.
   """
-  @spec merge_params(t, OAuth2.params) :: t
+  @spec merge_params(t, params) :: t
   def merge_params(client, params) do
     params = Enum.reduce(params, %{}, fn {k,v}, acc ->
       Map.put(acc, param_key(k), v)
@@ -97,8 +107,9 @@ defmodule OAuth2.Client do
   previous value of that header with `value`.
   """
   @spec put_header(t, binary, binary) :: t
-  def put_header(%Client{headers: headers} = client, key, value) when
-    is_binary(key) and is_binary(value) do
+  def put_header(%Client{headers: headers} = client, key, value)
+    when is_binary(key) and is_binary(value) do
+    key = String.downcase(key)
     %{client | headers: List.keystore(headers, key, 0, {key, value})}
   end
 
@@ -113,7 +124,7 @@ defmodule OAuth2.Client do
 
   @doc false
   @spec authorize_url(t, list) :: {t, binary}
-  def authorize_url(client, params \\ []) do
+  def authorize_url(%Client{} = client, params \\ []) do
     client.strategy.authorize_url(client, params) |> to_url(:authorize_url)
   end
 
@@ -125,17 +136,16 @@ defmodule OAuth2.Client do
       redirect_url = OAuth2.Client.authorize_url!(%OAuth2.Client{})
   """
   @spec authorize_url!(t, list) :: binary
-  def authorize_url!(client, params \\ []) do
+  def authorize_url!(%Client{} = client, params \\ []) do
     {_, url} = authorize_url(client, params)
     url
   end
 
   @doc """
-  Initializes an `OAuth2.AccessToken` struct by making a request to the token
-  endpoint.
+  Fetches an `OAuth2.AccessToken` struct by making a request to the token endpoint.
 
-  Returns an `OAuth2.AccessToken` struct that can then be used to access the
-  provider's RESTful API.
+  Returns the `OAuth2.Client` struct loaded with the access token which can then
+  be used to make authenticated requests to an OAuth2 provider's API.
 
   ## Arguments
 
@@ -151,12 +161,16 @@ defmodule OAuth2.Client do
   * `:proxy` - a proxy to be used for the request; it can be a regular url or a
    `{Host, Proxy}` tuple
   """
-  @spec get_token(t, params, headers, Keyword.t) :: {:ok, AccessToken.t} | {:error, Error.t}
+  @spec get_token(t, params, headers, Keyword.t) :: {:ok, Client.t} | {:error, Error.t}
   def get_token(%{token_method: method} = client, params \\ [], headers \\ [], opts \\ []) do
     {client, url} = token_url(client, params, headers)
-    case Request.request(method, url, client.params, client.headers, opts) do
-      {:ok, response} -> {:ok, AccessToken.new(response.body, client)}
-      {:error, error} -> {:error, error}
+
+    case Request.request(method, client, url, client.params, client.headers, opts) do
+      {:ok, response} ->
+        token = AccessToken.new(response.body)
+        {:ok, %{client | headers: [], params: %{}, token: token}}
+      {:error, error} ->
+        {:error, error}
     end
   end
 
@@ -164,13 +178,133 @@ defmodule OAuth2.Client do
   Same as `get_token/4` but raises `OAuth2.Error` if an error occurs during the
   request.
   """
-  @spec get_token!(t, params, headers, Keyword.t) :: AccessToken.t | Error.t
+  @spec get_token!(t, params, headers, Keyword.t) :: Client.t | Error.t
   def get_token!(client, params \\ [], headers \\ [], opts \\ []) do
     case get_token(client, params, headers, opts) do
-      {:ok, token} -> token
+      {:ok, client} -> client
       {:error, error} -> raise error
     end
   end
+
+  @doc """
+  Refreshes an existing access token using a refresh token.
+  """
+  @spec refresh_token(t, params, headers, Keyword.t) :: {:ok, Client.t} | {:error, Error.t}
+  def refresh_token(token, params \\ [], headers \\ [], opts \\ [])
+  def refresh_token(%Client{token: %{refresh_token: nil}}, _params, _headers, _opts) do
+    {:error, %Error{reason: "Refresh token not available."}}
+  end
+  def refresh_token(%Client{token: %{refresh_token: refresh}} = client, params, headers, opts) do
+    refresh =
+      %{client | strategy: OAuth2.Strategy.Refresh}
+      |> Client.put_param(:refresh_token, refresh)
+
+    case Client.get_token(refresh, params, headers, opts) do
+      {:ok, %Client{} = client} -> {:ok, client}
+      {:error, error} -> {:error, error}
+    end
+  end
+
+  @doc """
+  Calls `refresh_token/4` but raises `Error` if there an error occurs.
+  """
+  @spec refresh_token!(t, params, headers, Keyword.t) :: Client.t | Error.t
+  def refresh_token!(%Client{} = client, params \\ [], headers \\ [], opts \\ []) do
+    case refresh_token(client, params, headers, opts) do
+      {:ok, %Client{} = client} -> client
+      {:error, error} -> raise error
+    end
+  end
+
+  @doc """
+  Makes a `GET` request to the given `url` using the `OAuth2.AccessToken`
+  struct.
+  """
+  @spec get(t, binary, headers, Keyword.t) :: {:ok, Response.t} | {:error, Error.t}
+  def get(%Client{} = client, url, headers \\ [], opts \\ []),
+    do: Request.request(:get, client, url, "", headers, opts)
+
+  @doc """
+  Same as `get/4` but returns a `OAuth2.Response` or `OAuth2.Error` exception if
+  the request results in an error.
+  """
+  @spec get!(t, binary, headers, Keyword.t) :: Response.t | Error.t
+  def get!(%Client{} = client, url, headers \\ [], opts \\ []),
+    do: Request.request!(:get, client, url, "", headers, opts)
+
+  @doc """
+  Makes a `PUT` request to the given `url` using the `OAuth2.AccessToken`
+  struct.
+  """
+  @spec put(t, binary, body, headers, Keyword.t) :: {:ok, Response.t} | {:error, Error.t}
+  def put(%Client{} = client, url, body \\ "", headers \\ [], opts \\ []),
+    do: Request.request(:put, client, url, body, headers, opts)
+
+  @doc """
+  Same as `put/5` but returns a `OAuth2.Response` or `OAuth2.Error` exception if
+  the request results in an error.
+
+  An `OAuth2.Error` exception is raised if the request results in an
+  error tuple (`{:error, reason}`).
+  """
+  @spec put!(t, binary, body, headers, Keyword.t) :: Response.t | Error.t
+  def put!(%Client{} = client, url, body \\ "", headers \\ [], opts \\ []),
+    do: Request.request!(:put, client, url, body, headers, opts)
+
+  @doc """
+  Makes a `PATCH` request to the given `url` using the `OAuth2.AccessToken`
+  struct.
+  """
+  @spec patch(t, binary, body, headers, Keyword.t) :: {:ok, Response.t} | {:error, Error.t}
+  def patch(%Client{} = client, url, body \\ "", headers \\ [], opts \\ []),
+    do: Request.request(:patch, client, url, body, headers, opts)
+
+  @doc """
+  Same as `patch/5` but returns a `OAuth2.Response` or `OAuth2.Error` exception if
+  the request results in an error.
+
+  An `OAuth2.Error` exception is raised if the request results in an
+  error tuple (`{:error, reason}`).
+  """
+  @spec patch!(t, binary, body, headers, Keyword.t) :: Response.t | Error.t
+  def patch!(%Client{} = client, url, body \\ "", headers \\ [], opts \\ []),
+    do: Request.request!(:patch, client, url, body, headers, opts)
+
+  @doc """
+  Makes a `POST` request to the given URL using the `OAuth2.AccessToken`.
+  """
+  @spec post(t, binary, body, headers, Keyword.t) :: {:ok, Response.t} | {:error, Error.t}
+  def post(%Client{} = client, url, body \\ "", headers \\ [], opts \\ []),
+    do: Request.request(:post, client, url, body, headers, opts)
+
+  @doc """
+  Same as `post/5` but returns a `OAuth2.Response` or `OAuth2.Error` exception
+  if the request results in an error.
+
+  An `OAuth2.Error` exception is raised if the request results in an
+  error tuple (`{:error, reason}`).
+  """
+  @spec post!(t, binary, body, headers, Keyword.t) :: Response.t | Error.t
+  def post!(%Client{} = client, url, body \\ "", headers \\ [], opts \\ []),
+    do: Request.request!(:post, client, url, body, headers, opts)
+
+  @doc """
+  Makes a `DELETE` request to the given URL using the `OAuth2.AccessToken`.
+  """
+  @spec delete(t, binary, body, headers, Keyword.t) :: {:ok, Response.t} | {:error, Error.t}
+  def delete(%Client{} = client, url, body \\ "", headers \\ [], opts \\ []),
+    do: Request.request(:delete, client, url, body, headers, opts)
+
+  @doc """
+  Same as `delete/5` but returns a `OAuth2.Response` or `OAuth2.Error` exception
+  if the request results in an error.
+
+  An `OAuth2.Error` exception is raised if the request results in an
+  error tuple (`{:error, reason}`).
+  """
+  @spec delete!(t, binary, body, headers, Keyword.t) :: Response.t | Error.t
+  def delete!(%Client{} = client, url, body \\ "", headers \\ [], opts \\ []),
+    do: Request.request!(:delete, client, url, body, headers, opts)
 
   defp to_url(%Client{token_method: :post} = client, :token_url) do
     {client, endpoint(client, client.token_url)}
@@ -189,9 +323,8 @@ defmodule OAuth2.Client do
     |> to_url(:token_url)
   end
 
-  defp token_post_header(%Client{token_method: :post} = client) do
-    put_header(client, "Content-Type", "application/x-www-form-urlencoded")
-  end
+  defp token_post_header(%Client{token_method: :post} = client), do:
+    put_header(client, "content-type", "application/x-www-form-urlencoded")
   defp token_post_header(%Client{} = client), do: client
 
   defp param_key(binary) when is_binary(binary), do: binary
