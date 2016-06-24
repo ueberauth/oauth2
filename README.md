@@ -18,7 +18,7 @@ end
 
 defp deps do
   # Add the dependency
-  [{:oauth2, "~> 0.5"}]
+  [{:oauth2, "~> 0.6"}]
 end
 ```
 
