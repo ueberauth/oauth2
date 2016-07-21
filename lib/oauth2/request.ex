@@ -3,9 +3,7 @@ defmodule OAuth2.Request do
 
   import OAuth2.Util
 
-  alias OAuth2.Client
-  alias OAuth2.Error
-  alias OAuth2.Response
+  alias OAuth2.{Client, Error, Response}
 
   @type body :: any
 
@@ -14,15 +12,11 @@ defmodule OAuth2.Request do
   """
   @spec request(atom, Client.t, binary, body, Client.headers, Keyword.t) :: {:ok, Response.t} | {:error, Error.t}
   def request(method, %Client{} = client, url, body, headers, opts) do
-    url = process_url(client, url)
+    url = client |> process_url(url) |> process_params(opts[:params])
     headers = req_headers(client, headers)
     content_type = content_type(headers)
     body = encode_request_body(body, content_type)
     headers = process_request_headers(headers, content_type)
-
-    if Keyword.has_key?(opts, :params) do
-      url = url <> "?" <> URI.encode_query(opts[:params])
-    end
 
     case :hackney.request(method, url, headers, body, opts ++ [with_body: true]) do
       {:ok, status, headers, body} ->
@@ -54,6 +48,11 @@ defmodule OAuth2.Request do
       _ -> client.site <> url
     end
   end
+
+  defp process_params(url, nil),
+    do: url
+  defp process_params(url, params),
+    do: url <> "?" <> URI.encode_query(params)
 
   defp req_headers(%Client{token: nil} = client, headers),
     do: headers ++ client.headers
