@@ -17,11 +17,11 @@ defmodule OAuth2.Mixfile do
   end
 
   def application do
-    [applications: [:httpoison, :poison, :mimetype_parser]]
+    [applications: [:hackney, :poison, :mimetype_parser]]
   end
 
   defp deps do
-    [{:httpoison, "~> 0.7"},
+    [{:hackney, "~> 1.4"},
      {:poison, "~> 1.3 or ~> 2.0"},
      {:mimetype_parser, "~> 0.1"},
 
