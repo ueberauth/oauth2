@@ -7,47 +7,47 @@ defmodule OAuth2.Response do
 
   * `status_code` - HTTP response status code
   * `headers` - HTTP response headers
-  * `body` - Parsed HTTP response body (based on "Content-Type" header)
+  * `body` - Parsed HTTP response body (based on "content-type" header)
   """
 
   import OAuth2.Util
 
   @type status_code :: integer
-  @type headers     :: map
-  @type body        :: binary
+  @type headers     :: list
+  @type body        :: binary | map
 
-  @type t :: %__MODULE__{status_code: integer,
-                       headers: map,
-                       body: binary}
+  @type t :: %__MODULE__{
+    status_code: status_code,
+    headers: headers,
+    body: body
+  }
 
-  defstruct status_code: nil, headers: %{}, body: nil
+  defstruct status_code: nil, headers: [], body: nil
 
   @doc false
   def new(status_code, headers, body) do
     %__MODULE__{
       status_code: status_code,
-      headers: headers,
+      headers: process_headers(headers),
       body: decode_response_body(body, content_type(headers))
     }
   end
 
-  defp parsers do
-    %{json:  &Poison.decode!(&1),
-      query: &URI.decode_query(&1),
-      text:  &(&1)}
-  end
-
-  defp content_types do
-    %{"application/json" => :json,
-      "text/javascript" => :json,
-      "application/x-www-form-urlencoded" => :query,
-      "text/plain" => :query}
+  defp process_headers(headers) do
+    Enum.map(headers, fn {k, v} -> {String.downcase(k), v} end)
   end
 
   defp decode_response_body("", _type), do: ""
-  defp decode_response_body(body, content_type) do
-    content_type = content_types[content_type]
-    parser = parsers[content_type] || &(&1)
-    parser.(body)
+  defp decode_response_body(" ", _type), do: ""
+  defp decode_response_body(body, "application/x-www-form-urlencoded"),
+    do: URI.decode_query(body)
+  defp decode_response_body(body, "text/plain"),
+    do: URI.decode_query(body)
+  defp decode_response_body(body, type) do
+    if serializer = Application.get_env(:oauth2, :serializers)[type] do
+      serializer.decode!(body)
+    else
+      body
+    end
   end
 end

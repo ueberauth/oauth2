@@ -1,9 +1,9 @@
 # OAuth2 (Client)
 
+> An Elixir OAuth2 Client
+
 [![Build Status](https://travis-ci.org/scrogson/oauth2.svg?branch=master)](https://travis-ci.org/scrogson/oauth2)
 [![Coverage Status](https://coveralls.io/repos/scrogson/oauth2/badge.svg?branch=master&service=github)](https://coveralls.io/github/scrogson/oauth2?branch=master)
-
-> An Elixir OAuth2 Client
 
 ## Install
 
@@ -18,7 +18,39 @@ end
 
 defp deps do
   # Add the dependency
-  [{:oauth2, "~> 0.6"}]
+  [{:oauth2, "~> 0.7"}]
+end
+```
+
+## Configure a serializer
+
+This library can be configured to handle encoding and decoding requests and 
+responses automatically.
+
+If you're using [Poison](https://hex.pm/packages/poison) for JSON in your
+application, this library is already pre-configured to use it for `"application/json"`
+request and response bodies. You will still need to include it as a dependency though.
+
+If you need to handle different MIME types, you can simply configure it like so:
+
+```elixir
+# config/config.exs
+config :oauth2,
+  serializers: %{
+    "application/vnd.api+json" => Poison,
+    "application/xml" => MyApp.XmlParser,
+  }
+```
+
+The `serializers` option is a map where the keys are MIME types and the values
+are modules.
+
+The modules are expected to export `encode!/1` and `decode!/1`.
+
+```elixir
+defmodule MyApp.XmlParser do
+  def encode!(data), do: # ...
+  def decode!(binary), do: # ...
 end
 ```
 
@@ -49,17 +81,10 @@ OAuth2.Client.authorize_url!(client)
 # => "https://auth.example.com/oauth/authorize?client_id=client_id&redirect_uri=https%3A%2F%2Fexample.com%2Fauth%2Fcallback&response_type=code"
 
 # Use the authorization code returned from the provider to obtain an access token.
-token = OAuth2.Client.get_token!(client, code: "someauthcode")
-
-# You can also use `OAuth2.Client.put_param/3` to update the client's `params`
-# field. Example:
-# token =
-#   client
-#   |> OAuth2.Client.put_param(:code, "someauthcode")
-#   |> OAuth2.Client.get_token!()
+client = OAuth2.Client.get_token!(client, code: "someauthcode")
 
 # Use the access token to make a request for resources
-resource = OAuth2.AccessToken.get!(token, "/api/resource").body
+resource = OAuth2.Client.get!(client, "/api/resource").body
 ```
 
 ## Write Your Own Strategy
@@ -75,8 +100,8 @@ defmodule GitHub do
   def client do
     OAuth2.Client.new([
       strategy: __MODULE__,
-      client_id: "abc123",
-      client_secret: "abcdefg",
+      client_id: System.get_env("GITHUB_CLIENT_ID"),
+      client_secret: System.get_env("GITHUB_CLIENT_SECRET"),
       redirect_uri: "http://myapp.com/auth/callback",
       site: "https://api.github.com",
       authorize_url: "https://github.com/login/oauth/authorize",
@@ -84,15 +109,13 @@ defmodule GitHub do
     ])
   end
 
-  def authorize_url!(params \\ []) do
-    client()
-    |> put_param(:scope, "user,public_repo")
-    |> OAuth2.Client.authorize_url!(params)
+  def authorize_url! do
+    OAuth2.Client.authorize_url!(client(), scope: "user,public_repo")
   end
 
-  # you can pass options to the underlying http library via `options` parameter
-  def get_token!(params \\ [], headers \\ [], options \\ []) do
-    OAuth2.Client.get_token!(client(), params, headers, options)
+  # you can pass options to the underlying http library via `opts` parameter
+  def get_token!(params \\ [], headers \\ [], opts \\ []) do
+    OAuth2.Client.get_token!(client(), params, headers, opts)
   end
 
   # Strategy Callbacks
@@ -103,7 +126,7 @@ defmodule GitHub do
 
   def get_token(client, params, headers) do
     client
-    |> put_header("Accept", "application/json")
+    |> put_header("accept", "application/json")
     |> OAuth2.Strategy.AuthCode.get_token(params, headers)
   end
 end
@@ -120,16 +143,16 @@ GitHub.authorize_url!
 Capture the `code` in your callback route on your server and use it to obtain an access token.
 
 ```elixir
-token = GitHub.get_token!(code: code)
+client = GitHub.get_token!(code: code)
 ```
 
 Use the access token to access desired resources.
 
 ```elixir
-user = OAuth2.AccessToken.get!(token, "/user").body
+user = OAuth2.Client.get!(client, "/user").body
 
 # Or
-case OAuth2.AccessToken.get(token, "/user") do
+case OAuth2.Client(client, "/user") do
   {:ok, %OAuth2.Response{status_code: 401, body: body}} ->
     Logger.error("Unauthorized token")
   {:ok, %OAuth2.Response{status_code: status_code, body: user}} when status_code in [200..399] ->

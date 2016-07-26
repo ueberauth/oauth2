@@ -6,7 +6,6 @@ defmodule OAuth2.Strategy.AuthCodeTest do
   import OAuth2.TestHelpers
 
   alias OAuth2.Client
-  alias OAuth2.AccessToken
   alias OAuth2.Strategy.AuthCode
 
   setup do
@@ -45,7 +44,7 @@ defmodule OAuth2.Strategy.AuthCodeTest do
       send_resp(conn, 302, ~s({"access_token":"#{access_token}"}))
     end
 
-    assert {:ok, %AccessToken{} = token} = Client.get_token(client, [code: code])
+    assert {:ok, %Client{token: token}} = Client.get_token(client, [code: code])
     assert token.access_token == access_token
   end
 

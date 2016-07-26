@@ -1,37 +1,41 @@
 defmodule OAuth2.Mixfile do
   use Mix.Project
 
-  @version "0.6.0"
+  @version "0.7.0"
 
   def project do
     [app: :oauth2,
      name: "OAuth2",
      version: @version,
-     elixir: "~> 1.0",
-     deps: deps,
-     package: package,
-     description: description,
-     docs: docs,
+     elixir: "~> 1.2 or ~> 1.3",
+     deps: deps(),
+     package: package(),
+     description: description(),
+     docs: docs(),
      elixirc_paths: elixirc_paths(Mix.env),
-     test_coverage: [tool: ExCoveralls]]
+     test_coverage: [tool: ExCoveralls],
+     preferred_cli_env: ["coveralls": :test,
+                         "coveralls.detail": :test,
+                         "docs": :docs,
+                         "hex.docs": :docs]]
   end
 
   def application do
-    [applications: [:httpoison, :poison, :mimetype_parser]]
+    [applications: [:hackney],
+     env: [serializers: %{"application/json" => Poison}]]
   end
 
   defp deps do
-    [{:httpoison, "~> 0.7"},
-     {:poison, "~> 1.3 or ~> 2.0"},
-     {:mimetype_parser, "~> 0.1"},
+    [{:hackney, "~> 1.6"},
 
      # Test dependencies
-     {:bypass, "~> 0.1", only: :test},
+     {:poison, "~> 2.0", only: :test},
+     {:bypass, "~> 0.5", only: :test},
      {:excoveralls, "~> 0.3", only: :test},
 
      # Docs dependencies
-     {:earmark, "~> 0.1", only: :docs},
-     {:ex_doc, "~> 0.10", only: :docs}]
+     {:earmark, "~> 0.2", only: :docs},
+     {:ex_doc, "~> 0.11", only: :docs}]
   end
 
   defp description do
@@ -40,7 +44,7 @@ defmodule OAuth2.Mixfile do
 
   defp docs do
     [extras: ["README.md"],
-     main: "extra-readme",
+     main: "readme",
      source_ref: "v#{@version}",
      source_url: "https://github.com/scrogson/oauth2"]
   end
