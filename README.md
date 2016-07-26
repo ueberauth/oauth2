@@ -18,7 +18,39 @@ end
 
 defp deps do
   # Add the dependency
-  [{:oauth2, "~> 0.6"}]
+  [{:oauth2, "~> 0.7"}]
+end
+```
+
+## Configure a serializer
+
+This library can be configured to handle encoding and decoding requests and 
+responses automatically.
+
+If you're using [Poison](https://hex.pm/packages/poison) for JSON in your
+application, this library is already pre-configured to use it for `"application/json"`
+request and response bodies. You will still need to include it as a dependency though.
+
+If you need to handle different MIME types, you can simply configure it like so:
+
+```elixir
+# config/config.exs
+config :oauth2,
+  serializers: %{
+    "application/vnd.api+json" => Poison,
+    "application/xml" => MyApp.XmlParser,
+  }
+```
+
+The `serializers` option is a map where the keys are MIME types and the values
+are modules.
+
+The modules are expected to export `encode!/1` and `decode!/1`.
+
+```elixir
+defmodule MyApp.XmlParser do
+  def encode!(data), do: # ...
+  def decode!(binary), do: # ...
 end
 ```
 
