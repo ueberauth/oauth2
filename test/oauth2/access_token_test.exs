@@ -30,5 +30,12 @@ defmodule OAuth2.AccessTokenTest do
   test "expires_in" do
     assert AccessToken.expires_at(nil) == nil
     assert AccessToken.expires_at(3600) == OAuth2.Util.unix_now + 3600
+    assert AccessToken.expires_at("3600") == OAuth2.Util.unix_now + 3600
+  end
+
+  test "expires" do
+    assert AccessToken.expires(nil) == nil
+    assert AccessToken.expires(1469725602) == 1469725602
+    assert AccessToken.expires("1469725602") == 1469725602
   end
 end
