@@ -6,34 +6,6 @@ defmodule OAuth2.AccessToken do
 
   The `OAuth2.AccessToken` struct is created for you when you use the
   `OAuth2.Client.get_token`
-
-  ### Notes
-
-  * If a full url is given (e.g. "http://www.example.com/api/resource") then it
-  will use that otherwise you can specify an endpoint (e.g. "/api/resource") and
-  it will append it to the `Client.site`.
-
-  * The headers from the `Client.headers` are appended to the request headers.
-
-  ### Examples
-
-  ```
-  token =  OAuth2.AccessToken.new("abc123")
-
-  case OAuth2.AccessToken.get(token, "/some/resource") do
-    {:ok, %OAuth2.Response{status_code: 401}} ->
-      "Not Good"
-    {:ok, %OAuth2.Response{status_code: status_code, body: body}} when status_code in [200..299] ->
-      "Yay!!"
-    {:error, %OAuth2.Error{reason: reason}} ->
-      reason
-  end
-
-  response = OAuth2.AccessToken.get!(token, "/some/resource")
-
-  response = OAuth2.AccessToken.post!(token, "/some/other/resources", %{foo: "bar"})
-```
-
   """
 
   import OAuth2.Util
@@ -63,28 +35,7 @@ defmodule OAuth2.AccessToken do
             other_params: %{}
 
   @doc """
-  Returns a new `OAuth2.AccessToken` struct given the access token `string`.
-
-  ### Example
-
-  ```
-  iex(1)> OAuth2.AccessToken.new("abc123", %OAuth2.Client{})
-  %OAuth2.AccessToken{access_token: "abc123",
-   client: %OAuth2.Client{authorize_url: "/oauth/authorize", client_id: "",
-    client_secret: "", headers: [], params: %{}, redirect_uri: "", site: "",
-    strategy: OAuth2.Strategy.AuthCode, token_method: :post,
-    token_url: "/oauth/token"}, expires_at: nil, other_params: %{},
-   refresh_token: nil, token_type: "Bearer"}
-  ```
-
-  """
-  @spec new(binary) :: t
-  def new(token) when is_binary(token) do
-    new(%{"access_token" => token})
-  end
-
-  @doc """
-  Same as `new/2` except that the first arg is a `map`.
+  Returns a new `OAuth2.AccessToken` struct given the access token `string` or a response `map`.
 
   Note if giving a map, please be sure to make the key a `string` no an `atom`.
 
@@ -92,16 +43,17 @@ defmodule OAuth2.AccessToken do
 
   ### Example
 
-  ```
-  iex(1)> OAuth2.AccessToken.new(%{"access_token" => "abc123"}, %OAuth2.Client{})
-   %OAuth2.AccessToken{access_token: "abc123",
-    client: %OAuth2.Client{authorize_url: "/oauth/authorize", client_id: "",
-     client_secret: "", headers: [], params: %{}, redirect_uri: "", site: "",
-     strategy: OAuth2.Strategy.AuthCode, token_method: :post,
-     token_url: "/oauth/token"}, expires_at: nil, other_params: %{},
-    refresh_token: nil, token_type: "Bearer"}
-  ```
+      iex> OAuth2.AccessToken.new("abc123")
+      %OAuth2.AccessToken{access_token: "abc123", expires_at: nil, other_params: %{}, refresh_token: nil, token_type: "Bearer"}
+
+      iex> OAuth2.AccessToken.new(%{"access_token" => "abc123"})
+      %OAuth2.AccessToken{access_token: "abc123", expires_at: nil, other_params: %{}, refresh_token: nil, token_type: "Bearer"}
   """
+  @spec new(binary) :: t
+  def new(token) when is_binary(token) do
+    new(%{"access_token" => token})
+  end
+
   def new(response) when is_map(response) do
     {std, other} = Map.split(response, @standard)
 

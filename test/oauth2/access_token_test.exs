@@ -1,5 +1,6 @@
 defmodule OAuth2.AccessTokenTest do
   use ExUnit.Case, async: true
+  doctest OAuth2.AccessToken
 
   alias OAuth2.{AccessToken, Response}
 
