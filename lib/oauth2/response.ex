@@ -1,7 +1,7 @@
 defmodule OAuth2.Response do
   @moduledoc """
   Defines the `OAuth2.Response` struct which is created from the HTTP responses
-  made by the `OAuth2.AccessToken` module.
+  made by the `OAuth2.Client` module.
 
   ## Struct fields
 

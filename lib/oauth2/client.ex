@@ -2,6 +2,34 @@ defmodule OAuth2.Client do
   @moduledoc """
   This module defines the `OAuth2.Client` struct and is responsible for building
   and establishing a request for an access token.
+
+  ### Notes
+
+  * If a full url is given (e.g. "http://www.example.com/api/resource") then it
+  will use that otherwise you can specify an endpoint (e.g. "/api/resource") and
+  it will append it to the `Client.site`.
+
+  * The headers from the `Client.headers` are appended to the request headers.
+
+  ### Examples
+
+  ```
+  client =  OAuth2.Client.new([{:token,"abc123"}])
+
+  case OAuth2.Client.get(client, "/some/resource") do
+  {:ok, %OAuth2.Response{status_code: 401}} ->
+  "Not Good"
+  {:ok, %OAuth2.Response{status_code: status_code, body: body}} when status_code in [200..299] ->
+  "Yay!!"
+  {:error, %OAuth2.Error{reason: reason}} ->
+  reason
+  end
+
+  response = OAuth2.Client.get!(client, "/some/resource")
+
+  response = OAuth2.Client.post!(client, "/some/other/resources", %{foo: "bar"})
+  ```
+
   """
 
   alias OAuth2.{AccessToken, Client, Error, Request}
@@ -67,6 +95,25 @@ defmodule OAuth2.Client do
     Defaults to `:post`
   * `token_url` - absolute or relative URL path to the token endpoint.
     Defaults to `"/oauth/token"`
+
+  ## Example
+
+  iex> OAuth2.Client.new([{:token, "123"}])
+  %OAuth2.Client{authorize_url: "/oauth/authorize", client_id: "",
+  client_secret: "", headers: [], params: %{}, redirect_uri: "", site: "",
+  strategy: OAuth2.Strategy.AuthCode,
+  token: %OAuth2.AccessToken{access_token: "123", expires_at: nil,
+  other_params: %{}, refresh_token: nil, token_type: "Bearer"},
+  token_method: :post, token_url: "/oauth/token"}
+
+  iex> token = OAuth2.AccessToken.new("123")
+  iex> OAuth2.Client.new([{:token, token}])
+  %OAuth2.Client{authorize_url: "/oauth/authorize", client_id: "",
+  client_secret: "", headers: [], params: %{}, redirect_uri: "", site: "",
+  strategy: OAuth2.Strategy.AuthCode,
+  token: %OAuth2.AccessToken{access_token: "123", expires_at: nil,
+  other_params: %{}, refresh_token: nil, token_type: "Bearer"},
+  token_method: :post, token_url: "/oauth/token"}
   """
   @spec new(t, Keyword.t) :: t
   def new(client \\ %Client{}, opts) do
@@ -133,7 +180,8 @@ defmodule OAuth2.Client do
 
   ## Example
 
-      redirect_url = OAuth2.Client.authorize_url!(%OAuth2.Client{})
+      iex> OAuth2.Client.authorize_url!(%OAuth2.Client{})
+      "/oauth/authorize?client_id=&redirect_uri=&response_type=code"
   """
   @spec authorize_url!(t, list) :: binary
   def authorize_url!(%Client{} = client, params \\ []) do

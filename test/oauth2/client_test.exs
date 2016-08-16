@@ -1,6 +1,7 @@
 defmodule OAuth2.ClientTest do
   use ExUnit.Case, async: true
   use Plug.Test
+  doctest OAuth2.Client
 
   import OAuth2.Client
   import OAuth2.TestHelpers
