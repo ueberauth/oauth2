@@ -24,7 +24,7 @@ end
 
 ## Configure a serializer
 
-This library can be configured to handle encoding and decoding requests and 
+This library can be configured to handle encoding and decoding requests and
 responses automatically.
 
 If you're using [Poison](https://hex.pm/packages/poison) for JSON in your
@@ -152,7 +152,7 @@ Use the access token to access desired resources.
 user = OAuth2.Client.get!(client, "/user").body
 
 # Or
-case OAuth2.Client(client, "/user") do
+case OAuth2.Client.get(client, "/user") do
   {:ok, %OAuth2.Response{status_code: 401, body: body}} ->
     Logger.error("Unauthorized token")
   {:ok, %OAuth2.Response{status_code: status_code, body: user}} when status_code in [200..399] ->
