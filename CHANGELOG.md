@@ -1,5 +1,64 @@
 # Changelog
 
+## v0.7.0 (2016-08-18)
+
+### Improvements
+* Remove dependency on HTTPoison in favor of using hackney directly.
+* Add support for serializers based on MIME types.
+
+### Bug Fixes
+* `expires_in` values that are returned as strings are now properly parsed into integers for `expires_at`.
+
+### Backward Incompatible Changes
+
+Prior to version v0.7.0 `OAuth2.Client` was primarily used for the purpose
+of interfacing with the OAuth server to retrieve a token. `OAuth2.Token` was
+then responsible for using that token to make authenticated requests.
+
+In v0.7.0 this interface has been refactored so that an `OAuth2.Client` struct
+now references an `OAuth2.Token` directly and many of the action methods have
+been moved so that they are called on `OAuth2.Client`, with an instance of the
+client struct as their first argument.
+
+Please consult the [README](https://github.com/scrogson/oauth2/blob/v0.7.0/README.md) for an example of general usage to retrieve a token and make a request.
+
+The following methods have been moved and adjusted so that they take a `Client.t` which contains a token, rather than a token directly:
+
+```
+* Token.get(Token.t, binary, Client.headers, Keyword.t) -> Client.get(Client.t, binary, headers, Keyword.t)
+* Token.get!(Token.t, binary, Client.headers, Keyword.t) -> Client.get!(Client.t, binary, headers, Keyword.t)
+* Token.put(Token.t, binary, body, Client.headers, Keyword.t) -> Client.put(Client.t, binary, body, headers, Keyword.t)
+* Token.put!(Token.t, binary, body, Client.headers, Keyword.t) -> Client.put!(Client.t, binary, body, headers, Keyword.t)
+* Token.patch(Token.t, binary, body, Client.headers, Keyword.t) -> Client.patch(Client.t, binary, body, headers, Keyword.t)
+* Token.patch!(Token.t, binary, body, Client.headers, Keyword.t) -> Client.patch!(Client.t, binary, body, headers, Keyword.t)
+* Token.post(Token.t, binary, body, Client.headers, Keyword.t) -> Client.post(Client.t, binary, body, headers, Keyword.t)
+* Token.post!(Token.t, binary, body, Client.headers, Keyword.t) -> Client.post!(Client.t, binary, body, headers, Keyword.t)
+* Token.delete(Token.t, binary, body, Client.headers, Keyword.t) -> Client.delete(Client.t, binary, body, headers, Keyword.t)
+* Token.delete!(Token.t, binary, body, Client.headers, Keyword.t) -> Client.delete!(Client.t, binary, body, headers, Keyword.t)
+* Token.refresh(Token.t, Client.params, Client.headers, Keyword.t) -> Client.refresh_token(Client.t, params, headers, Keyword.t)
+* Token.refresh!(Token.t, Client.params, Client.headers, Keyword.t) -> Client.refresh_token!(Client.t, params, headers, Keyword.t)
+```
+
+Additionally, the following methods have been moved to `OAuth2.Request`
+
+```
+* Token.request(atom, t, binary, body, Client.headers, Keyword.t) -> Request.request(atom, Client.t, binary, body, Client.headers, Keyword.t)
+* Token.request!(atom, t, binary, body, Client.headers, Keyword.t) -> Request.request!(atom, Client.t, binary, body, Client.headers, Keyword.t)
+```
+
+Diff: https://github.com/scrogson/oauth2/compare/v0.6.0...v0.7.0
+
+## v0.6.0 (2016-06-24)
+
+### Improvements
+* Use Poison ~> 2.0
+* Reset client headers after fetching the token
+
+### Bug Fixes
+* Fix up auth code flow to match the RFC
+
+Diff: https://github.com/scrogson/oauth2/compare/v0.5.0...v0.6.0
+
 ## v0.5.0 (2015-11-03)
 
 ### Improvements
@@ -100,3 +159,4 @@ http://tools.ietf.org/html/draft-ietf-oauth-v2-15#section-4.4
 Initial release.
 
 This initial release includes a functional authorization code strategy: http://tools.ietf.org/html/draft-ietf-oauth-v2-15#section-4.1
+
