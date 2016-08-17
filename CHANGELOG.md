@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.7.0 (2016-08-18)
+## v0.7.0 (2016-08-16)
 
 ### Improvements
 * Add support for custom serializers based on MIME types.
