@@ -34,8 +34,8 @@ defmodule OAuth2.Mixfile do
      {:excoveralls, "~> 0.3", only: :test},
 
      # Docs dependencies
-     {:earmark, "~> 0.2", only: :docs},
-     {:ex_doc, "~> 0.11", only: :docs}]
+     {:earmark, "~> 0.2", only: :dev},
+     {:ex_doc, "~> 0.11", only: :dev}]
   end
 
   defp description do
