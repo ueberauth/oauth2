@@ -3,48 +3,46 @@
 ## v0.7.0 (2016-08-18)
 
 ### Improvements
-* Remove dependency on HTTPoison in favor of using hackney directly.
-* Add support for serializers based on MIME types.
+* Add support for custom serializers based on MIME types.
+* Remove dependency on `HTTPoison` in favor of using `hackney` directly.
+* Remove dependency on `mimetype_parser`.
+* `Poison` is now only a `test` dependency.
 
 ### Bug Fixes
 * `expires_in` values that are returned as strings are now properly parsed into integers for `expires_at`.
 
 ### Backward Incompatible Changes
 
-Prior to version v0.7.0 `OAuth2.Client` was primarily used for the purpose
+Prior to version `v0.7.0` `OAuth2.Client` was primarily used for the purpose
 of interfacing with the OAuth server to retrieve a token. `OAuth2.Token` was
 then responsible for using that token to make authenticated requests.
 
-In v0.7.0 this interface has been refactored so that an `OAuth2.Client` struct
+In `v0.7.0` this interface has been refactored so that an `OAuth2.Client` struct
 now references an `OAuth2.Token` directly and many of the action methods have
 been moved so that they are called on `OAuth2.Client`, with an instance of the
 client struct as their first argument.
 
 Please consult the [README](https://github.com/scrogson/oauth2/blob/v0.7.0/README.md) for an example of general usage to retrieve a token and make a request.
 
-The following methods have been moved and adjusted so that they take a `Client.t` which contains a token, rather than a token directly:
+The following methods have been moved and adjusted so that they take a `OAuth2.Client.t` which contains a token, rather than a token directly:
 
-```
-* Token.get(Token.t, binary, Client.headers, Keyword.t) -> Client.get(Client.t, binary, headers, Keyword.t)
-* Token.get!(Token.t, binary, Client.headers, Keyword.t) -> Client.get!(Client.t, binary, headers, Keyword.t)
-* Token.put(Token.t, binary, body, Client.headers, Keyword.t) -> Client.put(Client.t, binary, body, headers, Keyword.t)
-* Token.put!(Token.t, binary, body, Client.headers, Keyword.t) -> Client.put!(Client.t, binary, body, headers, Keyword.t)
-* Token.patch(Token.t, binary, body, Client.headers, Keyword.t) -> Client.patch(Client.t, binary, body, headers, Keyword.t)
-* Token.patch!(Token.t, binary, body, Client.headers, Keyword.t) -> Client.patch!(Client.t, binary, body, headers, Keyword.t)
-* Token.post(Token.t, binary, body, Client.headers, Keyword.t) -> Client.post(Client.t, binary, body, headers, Keyword.t)
-* Token.post!(Token.t, binary, body, Client.headers, Keyword.t) -> Client.post!(Client.t, binary, body, headers, Keyword.t)
-* Token.delete(Token.t, binary, body, Client.headers, Keyword.t) -> Client.delete(Client.t, binary, body, headers, Keyword.t)
-* Token.delete!(Token.t, binary, body, Client.headers, Keyword.t) -> Client.delete!(Client.t, binary, body, headers, Keyword.t)
-* Token.refresh(Token.t, Client.params, Client.headers, Keyword.t) -> Client.refresh_token(Client.t, params, headers, Keyword.t)
-* Token.refresh!(Token.t, Client.params, Client.headers, Keyword.t) -> Client.refresh_token!(Client.t, params, headers, Keyword.t)
-```
+* `OAuth2.AccessToken.get` -> `OAuth2.Client.get`
+* `OAuth2.AccessToken.get!` -> `OAuth2.Client.get!`
+* `OAuth2.AccessToken.put` -> `OAuth2.Client.put`
+* `OAuth2.AccessToken.put!` -> `OAuth2.Client.put!`
+* `OAuth2.AccessToken.patch` -> `OAuth2.Client.patch`
+* `OAuth2.AccessToken.patch!` -> `OAuth2.Client.patch!`
+* `OAuth2.AccessToken.post` -> `OAuth2.Client.post`
+* `OAuth2.AccessToken.post!` -> `OAuth2.Client.post!`
+* `OAuth2.AccessToken.delete` -> `OAuth2.Client.delete`
+* `OAuth2.AccessToken.delete!` -> `OAuth2.Client.delete!`
+* `OAuth2.AccessToken.refresh` -> `OAuth2.Client.refresh_token`
+* `OAuth2.AccessToken.refresh!` -> `OAuth2.Client.refresh_token!`
 
 Additionally, the following methods have been moved to `OAuth2.Request`
 
-```
-* Token.request(atom, t, binary, body, Client.headers, Keyword.t) -> Request.request(atom, Client.t, binary, body, Client.headers, Keyword.t)
-* Token.request!(atom, t, binary, body, Client.headers, Keyword.t) -> Request.request!(atom, Client.t, binary, body, Client.headers, Keyword.t)
-```
+* `OAuth2.AccessToken.request` -> `OAuth2.Request.request`
+* `OAuth2.AccessToken.request!` -> `OAuth2.Request.request!`
 
 Diff: https://github.com/scrogson/oauth2/compare/v0.6.0...v0.7.0
 
