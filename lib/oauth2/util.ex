@@ -34,6 +34,6 @@ defmodule OAuth2.Util do
   end
 
   defp get_content_type(headers) do
-    List.keyfind(headers, "content-type", 0)
+    Enum.find(headers, fn({k,_v}) -> String.downcase(k) == "content-type" end)
   end
 end
