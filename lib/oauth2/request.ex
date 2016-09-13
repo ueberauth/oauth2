@@ -62,8 +62,14 @@ defmodule OAuth2.Request do
   defp authorization_header(token),
     do: {"authorization", "#{token.token_type} #{token.access_token}"}
 
-  defp process_request_headers(headers, content_type), do:
-    [{"accept", content_type} | headers]
+  defp process_request_headers(headers, content_type) do
+    case List.keyfind(headers, "accept", 0) do
+      {"accept", _} ->
+        headers
+      nil ->
+        [{"accept", content_type} | headers]
+    end
+  end
 
   defp encode_request_body("", _), do: ""
   defp encode_request_body([], _), do: ""

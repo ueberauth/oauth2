@@ -244,7 +244,7 @@ defmodule OAuth2.Client do
   end
   def refresh_token(%Client{token: %{refresh_token: refresh}} = client, params, headers, opts) do
     refresh =
-      %{client | strategy: OAuth2.Strategy.Refresh}
+      %{client | strategy: OAuth2.Strategy.Refresh, token: nil}
       |> Client.put_param(:refresh_token, refresh)
 
     case Client.get_token(refresh, params, headers, opts) do
@@ -262,6 +262,14 @@ defmodule OAuth2.Client do
       {:ok, %Client{} = client} -> client
       {:error, error} -> raise error
     end
+  end
+
+  @doc """
+  Adds `authorization` header for basic auth.
+  """
+  @spec basic_auth(t) :: t
+  def basic_auth(%OAuth2.Client{client_id: id, client_secret: secret} = client) do
+    put_header(client, "authorization", "Basic " <> Base.encode64(id <> ":" <> secret))
   end
 
   @doc """

@@ -57,6 +57,10 @@ defmodule OAuth2.ClientTest do
 
   test "refresh_token and refresh_token! with a POST", %{server: server, client_with_token: client} do
     bypass server, "POST", "/oauth/token", fn conn ->
+      assert get_req_header(conn, "authorization") == []
+      assert get_req_header(conn, "accept") == ["application/json"]
+      assert get_req_header(conn, "content-type") == ["application/x-www-form-urlencoded"]
+
       conn
       |> put_resp_header("content-type", "application/json")
       |> send_resp(200, ~s({"access_token":"new-access-token","refresh_token":"new-refresh-token"}))
