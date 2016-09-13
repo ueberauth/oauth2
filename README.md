@@ -126,6 +126,7 @@ defmodule GitHub do
 
   def get_token(client, params, headers) do
     client
+    |> put_param(:client_secret, client.client_secret)
     |> put_header("accept", "application/json")
     |> OAuth2.Strategy.AuthCode.get_token(params, headers)
   end
