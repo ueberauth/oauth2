@@ -205,7 +205,7 @@ defmodule OAuth2.Client do
 
   ## Options
 
-  * `:timeout` - the timeout (in milliseconds) of the request
+  * `:recv_timeout` - the timeout (in milliseconds) of the request
   * `:proxy` - a proxy to be used for the request; it can be a regular url or a
    `{Host, Proxy}` tuple
   """
