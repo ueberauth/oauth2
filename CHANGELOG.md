@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.8.0 (2016-10-05)
+
+### Bug Fixes
+
+* Fixed an issue where checking the `content-type` was defaulting to
+  `application/json` causing Poison to explode.
+
 ## v0.7.0 (2016-08-16)
 
 ### Improvements
