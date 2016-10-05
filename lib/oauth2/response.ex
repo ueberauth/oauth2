@@ -26,9 +26,10 @@ defmodule OAuth2.Response do
 
   @doc false
   def new(status_code, headers, body) do
+    headers = process_headers(headers)
     %__MODULE__{
       status_code: status_code,
-      headers: process_headers(headers),
+      headers: headers,
       body: decode_response_body(body, content_type(headers))
     }
   end
@@ -40,8 +41,6 @@ defmodule OAuth2.Response do
   defp decode_response_body("", _type), do: ""
   defp decode_response_body(" ", _type), do: ""
   defp decode_response_body(body, "application/x-www-form-urlencoded"),
-    do: URI.decode_query(body)
-  defp decode_response_body(body, "text/plain"),
     do: URI.decode_query(body)
   defp decode_response_body(body, type) do
     if serializer = Application.get_env(:oauth2, :serializers)[type] do
