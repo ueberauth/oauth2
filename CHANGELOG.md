@@ -2,8 +2,13 @@
 
 ## v0.8.0 (2016-10-05)
 
+### Improvements
+
+* Added `OAuth2.Client.basic_auth/1` convenience function.
+
 ### Bug Fixes
 
+* Fixed broken `RefreshToken` strategy reported in #66
 * Fixed an issue where checking the `content-type` was defaulting to
   `application/json` causing Poison to explode.
 
