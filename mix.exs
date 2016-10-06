@@ -14,10 +14,11 @@ defmodule OAuth2.Mixfile do
      docs: docs(),
      elixirc_paths: elixirc_paths(Mix.env),
      test_coverage: [tool: ExCoveralls],
-     preferred_cli_env: ["coveralls": :test,
-                         "coveralls.detail": :test,
-                         "docs": :docs,
-                         "hex.docs": :docs]]
+     preferred_cli_env: [
+       "coveralls": :test,
+       "coveralls.detail": :test,
+       "docs": :dev
+     ]]
   end
 
   def application do
