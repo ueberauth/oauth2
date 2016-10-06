@@ -50,7 +50,7 @@ defmodule OAuth2.Mixfile do
   end
 
   defp package do
-    [files: ["lib", "priv", "mix.exs", "README.md", "LICENSE"],
+    [files: ["lib", "mix.exs", "README.md", "LICENSE"],
      maintainers: ["Sonny Scroggin"],
      licenses: ["MIT"],
      links: %{github: "https://github.com/scrogson/oauth2"}]
