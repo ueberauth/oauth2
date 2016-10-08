@@ -27,7 +27,7 @@ defmodule OAuth2.Response do
   defstruct status_code: nil, headers: [], body: nil
 
   @doc false
-  def new(status_code, headers, body) do
+  def new(code, headers, body) do
     headers = process_headers(headers)
     body = decode_response_body(body, content_type(headers))
     resp = %__MODULE__{status_code: status_code, headers: headers, body: body}
