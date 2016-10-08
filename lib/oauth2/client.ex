@@ -148,7 +148,7 @@ defmodule OAuth2.Client do
   """
   @spec put_param(t, String.t | atom, any) :: t
   def put_param(%Client{params: params} = client, key, value) do
-    %{client | params: Map.put(params, param_key(key), value)}
+    %{client | params: Map.put(params, "#{key}", value)}
   end
 
   @doc """
@@ -157,7 +157,7 @@ defmodule OAuth2.Client do
   @spec merge_params(t, params) :: t
   def merge_params(client, params) do
     params = Enum.reduce(params, %{}, fn {k,v}, acc ->
-      Map.put(acc, param_key(k), v)
+      Map.put(acc, "#{k}", v)
     end)
     %{client | params: Map.merge(client.params, params)}
   end
@@ -402,9 +402,6 @@ defmodule OAuth2.Client do
   defp token_post_header(%Client{token_method: :post} = client), do:
     put_header(client, "content-type", "application/x-www-form-urlencoded")
   defp token_post_header(%Client{} = client), do: client
-
-  defp param_key(binary) when is_binary(binary), do: binary
-  defp param_key(atom) when is_atom(atom), do: Atom.to_string(atom)
 
   defp endpoint(client, <<"/"::utf8, _::binary>> = endpoint),
     do: client.site <> endpoint
