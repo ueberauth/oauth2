@@ -12,7 +12,12 @@ defmodule OAuth2.ClientTest do
     server = Bypass.open
     client = build_client(site: bypass_server(server))
     client_with_token = tokenize_client(client)
-    {:ok, client: client, server: server, client_with_token: client_with_token}
+    async_client = async_client(client)
+
+    {:ok, client: client,
+          server: server,
+          client_with_token: client_with_token,
+          async_client: async_client}
   end
 
   test "authorize_url!", %{client: client, server: server} do
@@ -133,6 +138,31 @@ defmodule OAuth2.ClientTest do
     result = Client.get!(client, "/api/user/1")
     assert result.status_code == 200
     assert result.body["id"] == 1
+  end
+
+  test "GET with async options", %{server: server, async_client: client} do
+    body = :binary.copy("a", 8000)
+
+    bypass(server, "GET", "/api/user/1", [token: client.token], fn conn ->
+      send_resp(conn, 200, body)
+    end)
+
+    {:ok, ref} = Client.get(client, "/api/user/1")
+
+    assert_receive {:hackney_response, ^ref, {:status, 200, "OK"}}
+    assert_receive {:hackney_response, ^ref, {:headers, headers}}
+    assert {_, "8000"} = List.keyfind(headers, "content-length", 0)
+    resp_body = stream(ref)
+    assert resp_body == body
+  end
+
+  defp stream(ref, buffer \\ []) do
+    receive do
+      {:hackney_response, ^ref, :done} ->
+        IO.iodata_to_binary(buffer)
+      {:hackney_response, ^ref, binary} ->
+        stream(ref, buffer ++ [binary])
+    end
   end
 
   ## POST
