@@ -13,23 +13,20 @@ defmodule OAuth2.Client do
 
   ### Examples
 
-  ```
-  client =  OAuth2.Client.new([{:token,"abc123"}])
+      client = OAuth2.Client.new(token: "abc123")
 
-  case OAuth2.Client.get(client, "/some/resource") do
-  {:ok, %OAuth2.Response{status_code: 401}} ->
-  "Not Good"
-  {:ok, %OAuth2.Response{status_code: status_code, body: body}} when status_code in [200..299] ->
-  "Yay!!"
-  {:error, %OAuth2.Error{reason: reason}} ->
-  reason
-  end
+      case OAuth2.Client.get(client, "/some/resource") do
+        {:ok, %OAuth2.Response{status_code: 401}} ->
+          "Not Good"
+        {:ok, %OAuth2.Response{status_code: status_code, body: body}} when status_code in [200..299] ->
+          "Yay!!"
+        {:error, %OAuth2.Error{reason: reason}} ->
+          reason
+      end
 
-  response = OAuth2.Client.get!(client, "/some/resource")
+      response = OAuth2.Client.get!(client, "/some/resource")
 
-  response = OAuth2.Client.post!(client, "/some/other/resources", %{foo: "bar"})
-  ```
-
+      response = OAuth2.Client.post!(client, "/some/other/resources", %{foo: "bar"})
   """
 
   alias OAuth2.{AccessToken, Client, Error, Request}
@@ -81,7 +78,7 @@ defmodule OAuth2.Client do
             token_url: "/oauth/token"
 
   @doc """
-  Builds a new OAuth2 client struct using the `opts` provided.
+  Builds a new `OAuth2.Client` struct using the `opts` provided.
 
   ## Client struct fields
 
@@ -107,22 +104,24 @@ defmodule OAuth2.Client do
 
   ## Example
 
-  iex> OAuth2.Client.new([{:token, "123"}])
-  %OAuth2.Client{authorize_url: "/oauth/authorize", client_id: "",
-  client_secret: "", headers: [], params: %{}, redirect_uri: "", site: "",
-  strategy: OAuth2.Strategy.AuthCode,
-  token: %OAuth2.AccessToken{access_token: "123", expires_at: nil,
-  other_params: %{}, refresh_token: nil, token_type: "Bearer"},
-  token_method: :post, token_url: "/oauth/token"}
+      iex> OAuth2.Client.new(token: "123")
+      %OAuth2.Client{authorize_url: "/oauth/authorize", client_id: "",
+      client_secret: "", headers: [], params: %{}, redirect_uri: "", site: "",
+      strategy: OAuth2.Strategy.AuthCode,
+      token: %OAuth2.AccessToken{access_token: "123", expires_at: nil,
+      other_params: %{}, refresh_token: nil, token_type: "Bearer"},
+      token_method: :post, token_url: "/oauth/token"}
 
-  iex> token = OAuth2.AccessToken.new("123")
-  iex> OAuth2.Client.new([{:token, token}])
-  %OAuth2.Client{authorize_url: "/oauth/authorize", client_id: "",
-  client_secret: "", headers: [], params: %{}, redirect_uri: "", site: "",
-  strategy: OAuth2.Strategy.AuthCode,
-  token: %OAuth2.AccessToken{access_token: "123", expires_at: nil,
-  other_params: %{}, refresh_token: nil, token_type: "Bearer"},
-  token_method: :post, token_url: "/oauth/token"}
+      iex> token = OAuth2.AccessToken.new("123")
+      iex> OAuth2.Client.new(token: token)
+      %OAuth2.Client{authorize_url: "/oauth/authorize", client_id: "",
+      client_secret: "", headers: [], params: %{}, redirect_uri: "", site: "",
+      strategy: OAuth2.Strategy.AuthCode,
+      token: %OAuth2.AccessToken{access_token: "123", expires_at: nil,
+      other_params: %{}, refresh_token: nil, token_type: "Bearer"},
+      token_method: :post, token_url: "/oauth/token"}
+
+  [hackney documentation]: https://github.com/benoitc/hackney/blob/master/doc/hackney.md#request5
   """
   @spec new(t, Keyword.t) :: t
   def new(client \\ %Client{}, opts) do
@@ -213,15 +212,17 @@ defmodule OAuth2.Client do
 
   * `client` - a `OAuth2.Client` struct with the strategy to use, defaults to
     `OAuth2.Strategy.AuthCode`
-  * `params` - a keyword list of request parameters
+  * `params` - a keyword list of request parameters which will be encoded into
+    a query string or request body dependening on the selected strategy
   * `headers` - a list of request headers
-  * `opts` - a `Keyword` list of options
+  * `opts` - a Keyword list of request options which will be merged with
+    `OAuth2.Client.request_opts`
 
   ## Options
 
   * `:recv_timeout` - the timeout (in milliseconds) of the request
   * `:proxy` - a proxy to be used for the request; it can be a regular url or a
-   `{Host, Proxy}` tuple
+    `{host, proxy}` tuple
   """
   @spec get_token(t, params, headers, Keyword.t) :: {:ok, Client.t} | {:error, Error.t}
   def get_token(%{token_method: method} = client, params \\ [], headers \\ [], opts \\ []) do
