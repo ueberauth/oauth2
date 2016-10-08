@@ -42,6 +42,8 @@ defmodule OAuth2.Client do
   @type param         :: binary | %{binary => param} | [param]
   @type params        :: %{binary => param} | Keyword.t
   @type redirect_uri  :: binary
+  @type ref           :: reference
+  @type request_opts  :: Keyword.t
   @type site          :: binary
   @type strategy      :: module
   @type token         :: AccessToken.t | nil
@@ -55,6 +57,8 @@ defmodule OAuth2.Client do
     headers:       headers,
     params:        params,
     redirect_uri:  redirect_uri,
+    ref:           ref,
+    request_opts:  request_opts,
     site:          site,
     strategy:      strategy,
     token:         token,
@@ -68,6 +72,8 @@ defmodule OAuth2.Client do
             headers: [],
             params: %{},
             redirect_uri: "",
+            ref: nil,
+            request_opts: [],
             site: "",
             strategy: OAuth2.Strategy.AuthCode,
             token: nil,
@@ -87,6 +93,9 @@ defmodule OAuth2.Client do
   * `params` - a map of request parameters
   * `redirect_uri` - the URI the provider should redirect to after authorization
      or token requests
+  * `request_opts` - a keyword list of request options that will be sent to the
+    `hackney` client. See the [hackney documentation] for a list of available
+    options.
   * `site` - the OAuth2 provider site host
   * `strategy` - a module that implements the appropriate OAuth2 strategy,
     default `OAuth2.Strategy.AuthCode`
@@ -118,7 +127,12 @@ defmodule OAuth2.Client do
   @spec new(t, Keyword.t) :: t
   def new(client \\ %Client{}, opts) do
     {token, opts} = Keyword.pop(opts, :token)
-    opts = Keyword.put(opts, :token, process_token(token))
+    {req_opts, opts} = Keyword.pop(opts, :request_opts, [])
+
+    opts =
+      opts
+      |> Keyword.put(:token, process_token(token))
+      |> Keyword.put(:request_opts, Keyword.merge(client.request_opts, req_opts))
 
     struct(client, opts)
   end

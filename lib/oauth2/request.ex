@@ -17,9 +17,10 @@ defmodule OAuth2.Request do
     content_type = content_type(headers)
     body = encode_request_body(body, content_type)
     headers = process_request_headers(headers, content_type)
+    req_opts = Keyword.merge(client.request_opts, opts)
 
-    case :hackney.request(method, url, headers, body, opts ++ [with_body: true]) do
       {:ok, status, headers, body} ->
+    case :hackney.request(method, url, headers, body, req_opts) do
         {:ok, Response.new(status, headers, body)}
       {:error, reason} ->
         {:error, %Error{reason: reason}}
