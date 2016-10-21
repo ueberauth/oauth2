@@ -40,6 +40,13 @@ defmodule OAuth2.Response do
 
   defp decode_response_body("", _type), do: ""
   defp decode_response_body(" ", _type), do: ""
+  # Facebook sends text/plain tokens!?
+  defp decode_response_body(body, "text/plain") do
+    case URI.decode_query(body) do
+      %{"access_token" => _} = token -> token
+      _ -> body
+    end
+  end
   defp decode_response_body(body, "application/x-www-form-urlencoded"),
     do: URI.decode_query(body)
   defp decode_response_body(body, type) do
