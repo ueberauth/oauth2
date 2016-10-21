@@ -10,6 +10,7 @@ defmodule OAuth2.Response do
   * `body` - Parsed HTTP response body (based on "content-type" header)
   """
 
+  require Logger
   import OAuth2.Util
 
   @type status_code :: integer
@@ -27,11 +28,14 @@ defmodule OAuth2.Response do
   @doc false
   def new(status_code, headers, body) do
     headers = process_headers(headers)
-    %__MODULE__{
-      status_code: status_code,
-      headers: headers,
-      body: decode_response_body(body, content_type(headers))
-    }
+    body = decode_response_body(body, content_type(headers))
+    resp = %__MODULE__{status_code: status_code, headers: headers, body: body}
+
+    if Application.get_env(:oauth2, :debug) do
+      Logger.debug("OAuth2 Provider Response #{inspect resp}")
+    end
+
+    resp
   end
 
   defp process_headers(headers) do

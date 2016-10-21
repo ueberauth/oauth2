@@ -1,5 +1,15 @@
 # Changelog
 
+## master
+
+### Improvements
+
+* Added the ability to debug responses from the provider.
+
+### Bug Fixes
+
+* Fixed regression in handling `text/plain` content-type for tokens in #74
+
 ## v0.8.0 (2016-10-05)
 
 ### Improvements

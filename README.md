@@ -54,6 +54,15 @@ defmodule MyApp.XmlParser do
 end
 ```
 
+## Debug mode
+
+Some times its handy to see what's coming back from the response when getting
+a token. You can configure OAuth2 to output the response like so:
+
+```elixir
+config :oauth2, debug: true
+```
+
 ## Usage
 
 Current implemented strategies:
