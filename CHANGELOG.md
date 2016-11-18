@@ -1,6 +1,6 @@
 # Changelog
 
-## master
+## v0.8.1 (2016-11-18)
 
 ### Improvements
 
