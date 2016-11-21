@@ -60,7 +60,7 @@ defmodule OAuth2.AccessToken do
     struct(AccessToken, [
       access_token:  std["access_token"],
       refresh_token: std["refresh_token"],
-      expires_at:    (std["expires_in"] |> expires_at) || (other["expires"] |> expires),
+      expires_at:    (std["expires_in"] || other["expires"]) |> expires_at,
       token_type:    std["token_type"] |> normalize_token_type(),
       other_params:  other
     ])
@@ -93,17 +93,6 @@ defmodule OAuth2.AccessToken do
     |> expires_at
   end
   def expires_at(int), do: unix_now + int
-
-  @doc """
-  Returns the expires value as an integer
-  """
-  def expires(nil), do: nil
-  def expires(val) when is_binary(val) do
-    val
-    |> Integer.parse
-    |> elem(0)
-  end
-  def expires(int), do: int
 
   defp normalize_token_type(nil), do: "Bearer"
   defp normalize_token_type("bearer"), do: "Bearer"

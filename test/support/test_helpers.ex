@@ -26,6 +26,11 @@ defmodule OAuth2.TestHelpers do
     end
   end
 
+  def unix_now do
+    {mega, sec, _micro} = :os.timestamp
+    (mega * 1_000_000) + sec
+  end
+
   defp parse_req_body(conn) do
     opts = [parsers: [:urlencoded, :json],
             pass: ["*/*"],
