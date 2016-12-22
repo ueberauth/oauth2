@@ -79,7 +79,7 @@ defmodule OAuth2.AccessToken do
   Determines if the access token has expired.
   """
   def expired?(token) do
-    expires?(token) && unix_now > token.expires_at
+    expires?(token) && unix_now() > token.expires_at
   end
 
   @doc """
@@ -92,7 +92,7 @@ defmodule OAuth2.AccessToken do
     |> elem(0)
     |> expires_at
   end
-  def expires_at(int), do: unix_now + int
+  def expires_at(int), do: unix_now() + int
 
   defp normalize_token_type(nil), do: "Bearer"
   defp normalize_token_type("bearer"), do: "Bearer"
