@@ -3,7 +3,7 @@ defmodule OAuth2.Request do
 
   import OAuth2.Util
 
-  alias OAuth2.{Client, Error, Response}
+  alias OAuth2.{Client, Error, Response, Serializer}
 
   @type body :: any
 
@@ -75,11 +75,5 @@ defmodule OAuth2.Request do
   defp encode_request_body([], _), do: ""
   defp encode_request_body(body, "application/x-www-form-urlencoded"),
     do: URI.encode_query(body)
-  defp encode_request_body(body, type) do
-    if serializer = Application.get_env(:oauth2, :serializers)[type] do
-      serializer.encode!(body)
-    else
-      body
-    end
-  end
+  defp encode_request_body(body, type), do: Serializer.encode!(body, type)
 end

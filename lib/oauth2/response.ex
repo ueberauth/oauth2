@@ -12,6 +12,7 @@ defmodule OAuth2.Response do
 
   require Logger
   import OAuth2.Util
+  alias OAuth2.Serializer
 
   @type status_code :: integer
   @type headers     :: list
@@ -53,11 +54,5 @@ defmodule OAuth2.Response do
   end
   defp decode_response_body(body, "application/x-www-form-urlencoded"),
     do: URI.decode_query(body)
-  defp decode_response_body(body, type) do
-    if serializer = Application.get_env(:oauth2, :serializers)[type] do
-      serializer.decode!(body)
-    else
-      body
-    end
-  end
+  defp decode_response_body(body, type), do: Serializer.decode!(body, type)
 end
