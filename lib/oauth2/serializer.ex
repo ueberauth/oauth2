@@ -11,7 +11,7 @@ defmodule OAuth2.Serializer do
   def encode!(content, type), do: serializer(type).encode!(content)
 
   defp serializer(type) do
-    configured_serializers
+    configured_serializers()
     |> Map.get(type, NullSerializer)
   end
 
