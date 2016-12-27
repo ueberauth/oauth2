@@ -59,14 +59,14 @@ defmodule OAuth2.TestHelpers do
   end
 
   def build_client(opts \\ []) do
-    default_client_opts
+    default_client_opts()
     |> Keyword.merge(opts)
     |> OAuth2.Client.new()
   end
 
   def tokenize_client(opts \\ [], %OAuth2.Client{} = client) do
     token =
-      default_token_opts
+      default_token_opts()
       |> Keyword.merge(opts)
       |> stringify_keys()
       |> OAuth2.AccessToken.new()
