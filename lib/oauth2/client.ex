@@ -40,7 +40,7 @@ defmodule OAuth2.Client do
   @type client_secret :: binary
   @type headers       :: [{binary, binary}]
   @type param         :: binary | %{binary => param} | [param]
-  @type params        :: %{binary => param}
+  @type params        :: %{binary => param} | Keyword.t
   @type redirect_uri  :: binary
   @type site          :: binary
   @type strategy      :: module
