@@ -242,13 +242,18 @@ defmodule OAuth2.Client do
   def refresh_token(%Client{token: %{refresh_token: nil}}, _params, _headers, _opts) do
     {:error, %Error{reason: "Refresh token not available."}}
   end
-  def refresh_token(%Client{token: %{refresh_token: refresh}} = client, params, headers, opts) do
-    refresh =
+  def refresh_token(%Client{token: %{refresh_token: refresh_token}} = client, params, headers, opts) do
+    refresh_client =
       %{client | strategy: OAuth2.Strategy.Refresh, token: nil}
-      |> Client.put_param(:refresh_token, refresh)
+      |> Client.put_param(:refresh_token, refresh_token)
 
-    case Client.get_token(refresh, params, headers, opts) do
-      {:ok, %Client{} = client} -> {:ok, client}
+    case Client.get_token(refresh_client, params, headers, opts) do
+      {:ok, %Client{} = client} ->
+        if client.token.refresh_token do
+          {:ok, client}
+        else
+          {:ok, put_in(client.token.refresh_token, refresh_token)}
+        end
       {:error, error} -> {:error, error}
     end
   end
