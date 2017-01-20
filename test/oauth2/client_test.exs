@@ -79,6 +79,24 @@ defmodule OAuth2.ClientTest do
     assert client.token.refresh_token == "new-refresh-token"
   end
 
+  test "refresh token when response missing refresh_token", %{server: server, client_with_token: client} do
+    bypass server, "POST", "/oauth/token", fn conn ->
+      assert get_req_header(conn, "authorization") == []
+      assert get_req_header(conn, "accept") == ["application/json"]
+      assert get_req_header(conn, "content-type") == ["application/x-www-form-urlencoded"]
+
+      conn
+      |> put_resp_header("content-type", "application/json")
+      |> send_resp(200, ~s({"access_token":"new-access-token"}))
+    end
+
+    token = client.token
+    client = %{client | token: %{token | refresh_token: "old-refresh-token"}}
+    assert {:ok, client} = Client.refresh_token(client, [], [{"accept", "application/json"}])
+    assert client.token.access_token == "new-access-token"
+    assert client.token.refresh_token == "old-refresh-token"
+  end
+
 
   test "put_param, merge_params", %{client: client} do
     assert Map.size(client.params) == 0
