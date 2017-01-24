@@ -18,10 +18,8 @@ defmodule OAuth2.Util do
   end
 
   defp remove_params(binary) do
-    case String.split(binary, ";") do
-      [content_type, _] -> content_type
-      [content_type]    -> content_type
-    end
+    [content_type | _] = String.split(binary, ";")
+    content_type
   end
 
   defp parse_content_type(content_type) do
