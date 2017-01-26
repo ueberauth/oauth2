@@ -1,5 +1,13 @@
 # Changelog
 
+# v0.8.3 (2017-01-26)
+
+* Fix compile-time warnings for Elixir 1.4
+* Fix dialyzer warnings on `@type params`
+* Fix `content-type` resolving when there are multiple params
+* Return the same refresh token unless a new one is provided
+* Raise an exception when missing serializer configuration
+
 ## v0.8.2 (2016-11-22)
 
 ### Bug Fixes
