@@ -16,10 +16,10 @@ defmodule OAuth2.Client do
       client = OAuth2.Client.new(token: "abc123")
 
       case OAuth2.Client.get(client, "/some/resource") do
-        {:ok, %OAuth2.Response{status_code: 401}} ->
-          "Not Good"
         {:ok, %OAuth2.Response{status_code: status_code, body: body}} when status_code in [200..299] ->
           "Yay!!"
+        {:error, %OAuth2.Response{status_code: 401}} ->
+          "Not Good"
         {:error, %OAuth2.Error{reason: reason}} ->
           reason
       end

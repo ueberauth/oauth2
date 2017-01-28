@@ -22,7 +22,7 @@ defmodule OAuth2.Mixfile do
   end
 
   def application do
-    [applications: [:hackney],
+    [applications: [:logger, :hackney],
      env: [serializers: %{"application/json" => Poison}]]
   end
 

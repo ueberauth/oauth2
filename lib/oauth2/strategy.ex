@@ -63,8 +63,6 @@ defmodule OAuth2.Strategy do
       user = OAuth2.AccessToken.get!(token, "/user")
   """
 
-  use Behaviour
-
   alias OAuth2.Client
 
   @doc """
@@ -80,7 +78,7 @@ defmodule OAuth2.Strategy do
         |> merge_params(params)
       end
   """
-  defcallback authorize_url(Client.t, OAuth2.params) :: Client.t
+  @callback authorize_url(Client.t, OAuth2.params) :: Client.t
 
   @doc """
   Builds the URL to token endpoint.
@@ -98,7 +96,7 @@ defmodule OAuth2.Strategy do
         |> put_headers(headers)
       end
   """
-  defcallback get_token(Client.t, OAuth2.params, OAuth2.headers) :: Client.t
+  @callback get_token(Client.t, OAuth2.params, OAuth2.headers) :: Client.t
 
   defmacro __using__(_) do
     quote do

@@ -25,7 +25,7 @@ defmodule OAuth2.Request do
       {:ok, status, headers, ref} when is_reference(ref) ->
         process_body(status, headers, ref)
       {:ok, status, headers, body} when is_binary(body) ->
-        {:ok, Response.new(status, headers, body)}
+        process_body(status, headers, body)
       {:error, reason} ->
         {:error, %Error{reason: reason}}
     end
@@ -54,12 +54,21 @@ defmodule OAuth2.Request do
     end
   end
 
-  defp process_body(status, headers, ref) do
+  defp process_body(status, headers, ref) when is_reference(ref) do
     case :hackney.body(ref) do
       {:ok, body} ->
-        {:ok, Response.new(status, headers, body)}
+        process_body(status, headers, body)
       {:error, reason} ->
         {:error, %Error{reason: reason}}
+    end
+  end
+  defp process_body(status, headers, body) when is_binary(body) do
+    resp = Response.new(status, headers, body)
+    case status do
+      status when status in 200..399 ->
+        {:ok, resp}
+      status when status in 400..599 ->
+        {:error, resp}
     end
   end
 

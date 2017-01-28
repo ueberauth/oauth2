@@ -250,14 +250,31 @@ defmodule OAuth2.ClientTest do
     assert {:ok, _} = Client.get(client, "/me", [], params: [access_token: client.token.access_token])
   end
 
-  test "get returning 401 with no content-type", %{server: server, client_with_token: client} do
+  test "follow redirects", %{server: server, client_with_token: client} do
+    Bypass.expect server, fn conn ->
+      case conn.path_info do
+        ["old"] ->
+          conn
+          |> put_resp_header("location", "http://localhost:#{server.port}/new")
+          |> send_resp(302, "")
+        ["new"] ->
+          conn
+          |> put_resp_content_type("text/html")
+          |> send_resp(200, "ok")
+      end
+    end
+
+    assert {:ok, %{body: "ok", status_code: 200}} = Client.get(client, "/old", [], params: [access_token: client.token.access_token], follow_redirect: true)
+  end
+
+  test "get returning 401 with no content", %{server: server, client_with_token: client} do
     bypass server, "GET", "/api/user", [token: client.token], fn conn ->
       conn
       |> put_resp_header("content-type", "text/html")
       |> send_resp(401, " ")
     end
 
-    {:ok, result} = Client.get(client, "/api/user")
+    {:error, result} = Client.get(client, "/api/user")
     assert result.status_code == 401
     assert result.body == ""
   end
