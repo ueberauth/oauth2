@@ -41,8 +41,12 @@ defmodule OAuth2.Request do
   @spec request!(atom, Client.t, binary, body, Client.headers, Keyword.t) :: Response.t | Error.t
   def request!(method, %Client{} = client, url, body, headers, opts) do
     case request(method, client, url, body, headers, opts) do
-      {:ok, response} -> response
-      {:error, error} -> raise error
+      {:ok, resp} ->
+        resp
+      {:error, %{status_code: code, body: body}} ->
+        raise %Error{reason: "Server responded with status: #{code}; body: #{inspect body}"}
+      {:error, error} ->
+        raise error
     end
   end
 

@@ -279,6 +279,16 @@ defmodule OAuth2.ClientTest do
     assert result.body == ""
   end
 
+  test "bang functions raise errors", %{server: server, client: client} do
+    Bypass.expect server, fn conn ->
+      json(conn, 400, %{error: "error"})
+    end
+
+    assert_raise OAuth2.Error, ~r/Server responded with status: 400; body:/, fn ->
+      Client.get!(client, "/api/error")
+    end
+  end
+
   test "connection error", %{server: server, client_with_token: client} do
     Bypass.down(server)
 

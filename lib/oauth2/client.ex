@@ -1,5 +1,5 @@
 defmodule OAuth2.Client do
-  @moduledoc """
+  @moduledoc ~S"""
   This module defines the `OAuth2.Client` struct and is responsible for building
   and establishing a request for an access token.
 
@@ -16,10 +16,10 @@ defmodule OAuth2.Client do
       client = OAuth2.Client.new(token: "abc123")
 
       case OAuth2.Client.get(client, "/some/resource") do
-        {:ok, %OAuth2.Response{status_code: status_code, body: body}} when status_code in [200..299] ->
+        {:ok, %OAuth2.Response{body: body}} ->
           "Yay!!"
-        {:error, %OAuth2.Response{status_code: 401}} ->
-          "Not Good"
+        {:error, %OAuth2.Response{body: body}} ->
+          "Something bad happen: #{inspect body}"
         {:error, %OAuth2.Error{reason: reason}} ->
           reason
       end
