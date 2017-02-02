@@ -1,27 +1,28 @@
 defmodule OAuth2.Mixfile do
   use Mix.Project
 
-  @version "0.8.3"
+  @version "0.9.0"
 
   def project do
     [app: :oauth2,
      name: "OAuth2",
      version: @version,
-     elixir: "~> 1.2 or ~> 1.3",
+     elixir: "~> 1.2",
      deps: deps(),
      package: package(),
      description: description(),
      docs: docs(),
      elixirc_paths: elixirc_paths(Mix.env),
      test_coverage: [tool: ExCoveralls],
-     preferred_cli_env: ["coveralls": :test,
-                         "coveralls.detail": :test,
-                         "docs": :docs,
-                         "hex.docs": :docs]]
+     preferred_cli_env: [
+       "coveralls": :test,
+       "coveralls.detail": :test,
+       "docs": :dev
+     ]]
   end
 
   def application do
-    [applications: [:hackney],
+    [applications: [:logger, :hackney],
      env: [serializers: %{"application/json" => Poison}]]
   end
 
@@ -29,13 +30,12 @@ defmodule OAuth2.Mixfile do
     [{:hackney, "~> 1.6"},
 
      # Test dependencies
-     {:poison, "~> 2.0", only: :test},
+     {:poison, "~> 3.0", only: :test},
      {:bypass, "~> 0.5", only: :test},
-     {:excoveralls, "~> 0.3", only: :test},
+     {:excoveralls, "~> 0.5", only: :test},
 
      # Docs dependencies
-     {:earmark, "~> 0.2", only: :dev},
-     {:ex_doc, "~> 0.11", only: :dev}]
+     {:ex_doc, "~> 0.14", only: :dev}]
   end
 
   defp description do

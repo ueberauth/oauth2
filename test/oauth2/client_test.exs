@@ -12,7 +12,12 @@ defmodule OAuth2.ClientTest do
     server = Bypass.open
     client = build_client(site: bypass_server(server))
     client_with_token = tokenize_client(client)
-    {:ok, client: client, server: server, client_with_token: client_with_token}
+    async_client = async_client(client)
+
+    {:ok, client: client,
+          server: server,
+          client_with_token: client_with_token,
+          async_client: async_client}
   end
 
   test "authorize_url!", %{client: client, server: server} do
@@ -135,6 +140,31 @@ defmodule OAuth2.ClientTest do
     assert result.body["id"] == 1
   end
 
+  test "GET with async options", %{server: server, async_client: client} do
+    body = :binary.copy("a", 8000)
+
+    bypass(server, "GET", "/api/user/1", [token: client.token], fn conn ->
+      send_resp(conn, 200, body)
+    end)
+
+    {:ok, ref} = Client.get(client, "/api/user/1")
+
+    assert_receive {:hackney_response, ^ref, {:status, 200, "OK"}}
+    assert_receive {:hackney_response, ^ref, {:headers, headers}}
+    assert {_, "8000"} = List.keyfind(headers, "content-length", 0)
+    resp_body = stream(ref)
+    assert resp_body == body
+  end
+
+  defp stream(ref, buffer \\ []) do
+    receive do
+      {:hackney_response, ^ref, :done} ->
+        IO.iodata_to_binary(buffer)
+      {:hackney_response, ^ref, binary} ->
+        stream(ref, buffer ++ [binary])
+    end
+  end
+
   ## POST
 
   test "POST", %{server: server, client_with_token: client} do
@@ -220,16 +250,43 @@ defmodule OAuth2.ClientTest do
     assert {:ok, _} = Client.get(client, "/me", [], params: [access_token: client.token.access_token])
   end
 
-  test "get returning 401 with no content-type", %{server: server, client_with_token: client} do
+  test "follow redirects", %{server: server, client_with_token: client} do
+    Bypass.expect server, fn conn ->
+      case conn.path_info do
+        ["old"] ->
+          conn
+          |> put_resp_header("location", "http://localhost:#{server.port}/new")
+          |> send_resp(302, "")
+        ["new"] ->
+          conn
+          |> put_resp_content_type("text/html")
+          |> send_resp(200, "ok")
+      end
+    end
+
+    assert {:ok, %{body: "ok", status_code: 200}} = Client.get(client, "/old", [], params: [access_token: client.token.access_token], follow_redirect: true)
+  end
+
+  test "get returning 401 with no content", %{server: server, client_with_token: client} do
     bypass server, "GET", "/api/user", [token: client.token], fn conn ->
       conn
       |> put_resp_header("content-type", "text/html")
       |> send_resp(401, " ")
     end
 
-    {:ok, result} = Client.get(client, "/api/user")
+    {:error, result} = Client.get(client, "/api/user")
     assert result.status_code == 401
     assert result.body == ""
+  end
+
+  test "bang functions raise errors", %{server: server, client: client} do
+    Bypass.expect server, fn conn ->
+      json(conn, 400, %{error: "error"})
+    end
+
+    assert_raise OAuth2.Error, ~r/Server responded with status: 400/, fn ->
+      Client.get!(client, "/api/error")
+    end
   end
 
   test "connection error", %{server: server, client_with_token: client} do

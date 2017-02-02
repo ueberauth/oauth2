@@ -1,5 +1,5 @@
 defmodule OAuth2.Client do
-  @moduledoc """
+  @moduledoc ~S"""
   This module defines the `OAuth2.Client` struct and is responsible for building
   and establishing a request for an access token.
 
@@ -13,23 +13,20 @@ defmodule OAuth2.Client do
 
   ### Examples
 
-  ```
-  client =  OAuth2.Client.new([{:token,"abc123"}])
+      client = OAuth2.Client.new(token: "abc123")
 
-  case OAuth2.Client.get(client, "/some/resource") do
-  {:ok, %OAuth2.Response{status_code: 401}} ->
-  "Not Good"
-  {:ok, %OAuth2.Response{status_code: status_code, body: body}} when status_code in [200..299] ->
-  "Yay!!"
-  {:error, %OAuth2.Error{reason: reason}} ->
-  reason
-  end
+      case OAuth2.Client.get(client, "/some/resource") do
+        {:ok, %OAuth2.Response{body: body}} ->
+          "Yay!!"
+        {:error, %OAuth2.Response{body: body}} ->
+          "Something bad happen: #{inspect body}"
+        {:error, %OAuth2.Error{reason: reason}} ->
+          reason
+      end
 
-  response = OAuth2.Client.get!(client, "/some/resource")
+      response = OAuth2.Client.get!(client, "/some/resource")
 
-  response = OAuth2.Client.post!(client, "/some/other/resources", %{foo: "bar"})
-  ```
-
+      response = OAuth2.Client.post!(client, "/some/other/resources", %{foo: "bar"})
   """
 
   alias OAuth2.{AccessToken, Client, Error, Request}
@@ -42,6 +39,8 @@ defmodule OAuth2.Client do
   @type param         :: binary | %{binary => param} | [param]
   @type params        :: %{binary => param} | Keyword.t
   @type redirect_uri  :: binary
+  @type ref           :: reference
+  @type request_opts  :: Keyword.t
   @type site          :: binary
   @type strategy      :: module
   @type token         :: AccessToken.t | nil
@@ -55,6 +54,8 @@ defmodule OAuth2.Client do
     headers:       headers,
     params:        params,
     redirect_uri:  redirect_uri,
+    ref:           ref,
+    request_opts:  request_opts,
     site:          site,
     strategy:      strategy,
     token:         token,
@@ -68,6 +69,8 @@ defmodule OAuth2.Client do
             headers: [],
             params: %{},
             redirect_uri: "",
+            ref: nil,
+            request_opts: [],
             site: "",
             strategy: OAuth2.Strategy.AuthCode,
             token: nil,
@@ -75,7 +78,7 @@ defmodule OAuth2.Client do
             token_url: "/oauth/token"
 
   @doc """
-  Builds a new OAuth2 client struct using the `opts` provided.
+  Builds a new `OAuth2.Client` struct using the `opts` provided.
 
   ## Client struct fields
 
@@ -87,6 +90,9 @@ defmodule OAuth2.Client do
   * `params` - a map of request parameters
   * `redirect_uri` - the URI the provider should redirect to after authorization
      or token requests
+  * `request_opts` - a keyword list of request options that will be sent to the
+    `hackney` client. See the [hackney documentation] for a list of available
+    options.
   * `site` - the OAuth2 provider site host
   * `strategy` - a module that implements the appropriate OAuth2 strategy,
     default `OAuth2.Strategy.AuthCode`
@@ -98,27 +104,34 @@ defmodule OAuth2.Client do
 
   ## Example
 
-  iex> OAuth2.Client.new([{:token, "123"}])
-  %OAuth2.Client{authorize_url: "/oauth/authorize", client_id: "",
-  client_secret: "", headers: [], params: %{}, redirect_uri: "", site: "",
-  strategy: OAuth2.Strategy.AuthCode,
-  token: %OAuth2.AccessToken{access_token: "123", expires_at: nil,
-  other_params: %{}, refresh_token: nil, token_type: "Bearer"},
-  token_method: :post, token_url: "/oauth/token"}
+      iex> OAuth2.Client.new(token: "123")
+      %OAuth2.Client{authorize_url: "/oauth/authorize", client_id: "",
+      client_secret: "", headers: [], params: %{}, redirect_uri: "", site: "",
+      strategy: OAuth2.Strategy.AuthCode,
+      token: %OAuth2.AccessToken{access_token: "123", expires_at: nil,
+      other_params: %{}, refresh_token: nil, token_type: "Bearer"},
+      token_method: :post, token_url: "/oauth/token"}
 
-  iex> token = OAuth2.AccessToken.new("123")
-  iex> OAuth2.Client.new([{:token, token}])
-  %OAuth2.Client{authorize_url: "/oauth/authorize", client_id: "",
-  client_secret: "", headers: [], params: %{}, redirect_uri: "", site: "",
-  strategy: OAuth2.Strategy.AuthCode,
-  token: %OAuth2.AccessToken{access_token: "123", expires_at: nil,
-  other_params: %{}, refresh_token: nil, token_type: "Bearer"},
-  token_method: :post, token_url: "/oauth/token"}
+      iex> token = OAuth2.AccessToken.new("123")
+      iex> OAuth2.Client.new(token: token)
+      %OAuth2.Client{authorize_url: "/oauth/authorize", client_id: "",
+      client_secret: "", headers: [], params: %{}, redirect_uri: "", site: "",
+      strategy: OAuth2.Strategy.AuthCode,
+      token: %OAuth2.AccessToken{access_token: "123", expires_at: nil,
+      other_params: %{}, refresh_token: nil, token_type: "Bearer"},
+      token_method: :post, token_url: "/oauth/token"}
+
+  [hackney documentation]: https://github.com/benoitc/hackney/blob/master/doc/hackney.md#request5
   """
   @spec new(t, Keyword.t) :: t
   def new(client \\ %Client{}, opts) do
     {token, opts} = Keyword.pop(opts, :token)
-    opts = Keyword.put(opts, :token, process_token(token))
+    {req_opts, opts} = Keyword.pop(opts, :request_opts, [])
+
+    opts =
+      opts
+      |> Keyword.put(:token, process_token(token))
+      |> Keyword.put(:request_opts, Keyword.merge(client.request_opts, req_opts))
 
     struct(client, opts)
   end
@@ -135,7 +148,7 @@ defmodule OAuth2.Client do
   """
   @spec put_param(t, String.t | atom, any) :: t
   def put_param(%Client{params: params} = client, key, value) do
-    %{client | params: Map.put(params, param_key(key), value)}
+    %{client | params: Map.put(params, "#{key}", value)}
   end
 
   @doc """
@@ -144,7 +157,7 @@ defmodule OAuth2.Client do
   @spec merge_params(t, params) :: t
   def merge_params(client, params) do
     params = Enum.reduce(params, %{}, fn {k,v}, acc ->
-      Map.put(acc, param_key(k), v)
+      Map.put(acc, "#{k}", v)
     end)
     %{client | params: Map.merge(client.params, params)}
   end
@@ -199,15 +212,17 @@ defmodule OAuth2.Client do
 
   * `client` - a `OAuth2.Client` struct with the strategy to use, defaults to
     `OAuth2.Strategy.AuthCode`
-  * `params` - a keyword list of request parameters
+  * `params` - a keyword list of request parameters which will be encoded into
+    a query string or request body dependening on the selected strategy
   * `headers` - a list of request headers
-  * `opts` - a `Keyword` list of options
+  * `opts` - a Keyword list of request options which will be merged with
+    `OAuth2.Client.request_opts`
 
   ## Options
 
   * `:recv_timeout` - the timeout (in milliseconds) of the request
   * `:proxy` - a proxy to be used for the request; it can be a regular url or a
-   `{Host, Proxy}` tuple
+    `{host, proxy}` tuple
   """
   @spec get_token(t, params, headers, Keyword.t) :: {:ok, Client.t} | {:error, Error.t}
   def get_token(%{token_method: method} = client, params \\ [], headers \\ [], opts \\ []) do
@@ -387,9 +402,6 @@ defmodule OAuth2.Client do
   defp token_post_header(%Client{token_method: :post} = client), do:
     put_header(client, "content-type", "application/x-www-form-urlencoded")
   defp token_post_header(%Client{} = client), do: client
-
-  defp param_key(binary) when is_binary(binary), do: binary
-  defp param_key(atom) when is_atom(atom), do: Atom.to_string(atom)
 
   defp endpoint(client, <<"/"::utf8, _::binary>> = endpoint),
     do: client.site <> endpoint

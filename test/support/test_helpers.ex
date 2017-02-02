@@ -73,6 +73,11 @@ defmodule OAuth2.TestHelpers do
     %{client | token: token}
   end
 
+  def async_client(%{request_opts: req_opts} = client) do
+    async_opts = [async: true, stream_to: self()]
+    %{client | request_opts: Keyword.merge(req_opts, async_opts)}
+  end
+
   defp get_config(key) do
     Application.get_env(:oauth2, key)
   end
@@ -80,7 +85,8 @@ defmodule OAuth2.TestHelpers do
   defp default_client_opts do
     [client_id: get_config(:client_id),
      client_secret: get_config(:client_secret),
-     redirect_uri: get_config(:redirect_uri)]
+     redirect_uri: get_config(:redirect_uri),
+     request_opts: get_config(:request_opts)]
   end
 
   defp default_token_opts do

@@ -17,10 +17,15 @@ defmodule OAuth2.Request do
     content_type = content_type(headers)
     body = encode_request_body(body, content_type)
     headers = process_request_headers(headers, content_type)
+    req_opts = Keyword.merge(client.request_opts, opts)
 
-    case :hackney.request(method, url, headers, body, opts ++ [with_body: true]) do
-      {:ok, status, headers, body} ->
-        {:ok, Response.new(status, headers, body)}
+    case :hackney.request(method, url, headers, body, req_opts) do
+      {:ok, ref} when is_reference(ref) ->
+        {:ok, ref}
+      {:ok, status, headers, ref} when is_reference(ref) ->
+        process_body(status, headers, ref)
+      {:ok, status, headers, body} when is_binary(body) ->
+        process_body(status, headers, body)
       {:error, reason} ->
         {:error, %Error{reason: reason}}
     end
@@ -36,8 +41,21 @@ defmodule OAuth2.Request do
   @spec request!(atom, Client.t, binary, body, Client.headers, Keyword.t) :: Response.t | Error.t
   def request!(method, %Client{} = client, url, body, headers, opts) do
     case request(method, client, url, body, headers, opts) do
-      {:ok, response} -> response
-      {:error, error} -> raise error
+      {:ok, resp} ->
+        resp
+      {:error, %{status_code: code, headers: headers, body: body}} ->
+        raise %Error{reason: """
+        Server responded with status: #{code}
+
+        Headers:
+
+        #{Enum.reduce(headers, "", fn {k, v}, acc -> acc <> "#{k}: #{v}\n" end)}
+        Body:
+
+        #{inspect body}
+        """}
+      {:error, error} ->
+        raise error
     end
   end
 
@@ -46,6 +64,24 @@ defmodule OAuth2.Request do
       <<"http://"::utf8, _::binary>> -> url
       <<"https://"::utf8, _::binary>> -> url
       _ -> client.site <> url
+    end
+  end
+
+  defp process_body(status, headers, ref) when is_reference(ref) do
+    case :hackney.body(ref) do
+      {:ok, body} ->
+        process_body(status, headers, body)
+      {:error, reason} ->
+        {:error, %Error{reason: reason}}
+    end
+  end
+  defp process_body(status, headers, body) when is_binary(body) do
+    resp = Response.new(status, headers, body)
+    case status do
+      status when status in 200..399 ->
+        {:ok, resp}
+      status when status in 400..599 ->
+        {:error, resp}
     end
   end
 

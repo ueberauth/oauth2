@@ -40,7 +40,7 @@ defmodule OAuth2.Strategy.AuthCodeTest do
       assert body["client_id"] == client.client_id
       assert body["redirect_uri"] == client.redirect_uri
 
-      send_resp(conn, 302, ~s({"access_token":"#{access_token}"}))
+      send_resp(conn, 200, ~s({"access_token":"#{access_token}"}))
     end
 
     assert {:ok, %Client{token: token}} = Client.get_token(client, [code: code])
