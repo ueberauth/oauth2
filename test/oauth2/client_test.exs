@@ -284,7 +284,7 @@ defmodule OAuth2.ClientTest do
       json(conn, 400, %{error: "error"})
     end
 
-    assert_raise OAuth2.Error, ~r/Server responded with status: 400; body:/, fn ->
+    assert_raise OAuth2.Error, ~r/Server responded with status: 400/, fn ->
       Client.get!(client, "/api/error")
     end
   end

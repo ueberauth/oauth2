@@ -7,7 +7,7 @@ defmodule OAuth2.Mixfile do
     [app: :oauth2,
      name: "OAuth2",
      version: @version,
-     elixir: "~> 1.2 or ~> 1.3",
+     elixir: "~> 1.2",
      deps: deps(),
      package: package(),
      description: description(),
