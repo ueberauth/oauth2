@@ -163,10 +163,10 @@ user = OAuth2.Client.get!(client, "/user").body
 
 # Or
 case OAuth2.Client.get(client, "/user") do
-  {:ok, %OAuth2.Response{status_code: 401, body: body}} ->
-    Logger.error("Unauthorized token")
-  {:ok, %OAuth2.Response{status_code: status_code, body: user}} when status_code in [200..399] ->
+  {:ok, %OAuth2.Response{body: user}} ->
     user
+  {:error, %OAuth2.Response{status_code: 401, body: body}} ->
+    Logger.error("Unauthorized token")
   {:error, %OAuth2.Error{reason: reason}} ->
     Logger.error("Error: #{inspect reason}")
 end
