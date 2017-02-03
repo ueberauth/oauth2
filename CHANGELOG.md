@@ -1,6 +1,23 @@
 # Changelog
 
-# v0.8.3 (2017-01-26)
+## v0.9.0 (2017-02-02)
+
+### Improvements
+
+* Remove deprecated usage of `Behaviour` and `defcallback`
+* Provides better support for configuring `request_opts` that will be used on
+  every request. This is useful for configuring SSL options, etc.
+* Provides support for `hackney`s streaming of responses.
+* Better warnings when a serializer isn't properly configured.
+
+### Backward Incompatible Changes
+
+* Responses with status codes between `400..599` will now return `{:error,
+  %OAuth2.Response{}}` instead of `{:ok, %OAuth2.Response{}}`
+* When using the `!` versions of functions, `{:error, %OAuth2.Response{}}` will
+  be converted to an `%OAuth2.Error{}` and raised.
+
+## v0.8.3 (2017-01-26)
 
 * Fix compile-time warnings for Elixir 1.4
 * Fix dialyzer warnings on `@type params`
