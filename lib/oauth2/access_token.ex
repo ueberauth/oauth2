@@ -15,7 +15,7 @@ defmodule OAuth2.AccessToken do
   @standard ["access_token", "refresh_token", "expires_in", "token_type"]
 
   @type access_token  :: binary
-  @type refresh_token :: binary
+  @type refresh_token :: binary | nil
   @type expires_at    :: integer
   @type token_type    :: binary
   @type other_params  :: %{}
