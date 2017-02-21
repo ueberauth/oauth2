@@ -39,7 +39,7 @@ defmodule OAuth2.Client do
   @type param         :: binary | %{binary => param} | [param]
   @type params        :: %{binary => param} | Keyword.t
   @type redirect_uri  :: binary
-  @type ref           :: reference
+  @type ref           :: reference | nil
   @type request_opts  :: Keyword.t
   @type site          :: binary
   @type strategy      :: module
