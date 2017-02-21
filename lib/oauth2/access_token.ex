@@ -54,6 +54,7 @@ defmodule OAuth2.AccessToken do
     new(%{"access_token" => token})
   end
 
+  @spec new(%{binary => binary}) :: t
   def new(response) when is_map(response) do
     {std, other} = Map.split(response, @standard)
 
