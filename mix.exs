@@ -33,6 +33,7 @@ defmodule OAuth2.Mixfile do
      {:poison, "~> 3.0", only: :test},
      {:bypass, "~> 0.5", only: :test},
      {:excoveralls, "~> 0.5", only: :test},
+     {:dialyxir, "~> 0.4", only: [:dev], runtime: false},
 
      # Docs dependencies
      {:ex_doc, "~> 0.14", only: :dev}]
