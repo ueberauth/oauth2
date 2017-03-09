@@ -27,7 +27,7 @@ defmodule OAuth2.Mixfile do
   end
 
   defp deps do
-    [{:hackney, "~> 1.6"},
+    [{:hackney, "~> 1.7"},
 
      # Test dependencies
      {:poison, "~> 3.0", only: :test},

@@ -13,7 +13,7 @@ defmodule OAuth2.Request do
   @spec request(atom, Client.t, binary, body, Client.headers, Keyword.t) :: {:ok, Response.t} | {:error, Error.t}
   def request(method, %Client{} = client, url, body, headers, opts) do
     url = client |> process_url(url) |> process_params(opts[:params])
-    headers = req_headers(client, headers)
+    headers = req_headers(client, headers) |> Enum.uniq
     content_type = content_type(headers)
     body = encode_request_body(body, content_type)
     headers = process_request_headers(headers, content_type)
