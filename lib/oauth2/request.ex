@@ -10,7 +10,8 @@ defmodule OAuth2.Request do
   @doc """
   Makes a request of given type to the given URL using the `OAuth2.AccessToken`.
   """
-  @spec request(atom, Client.t, binary, body, Client.headers, Keyword.t) :: {:ok, Response.t} | {:error, Error.t}
+  @spec request(atom, Client.t, binary, body, Client.headers, Keyword.t)
+    :: {:ok, Response.t} | {:error, Response.t} | {:error, Error.t}
   def request(method, %Client{} = client, url, body, headers, opts) do
     url = client |> process_url(url) |> process_params(opts[:params])
     headers = req_headers(client, headers) |> Enum.uniq
@@ -38,12 +39,12 @@ defmodule OAuth2.Request do
   An `OAuth2.Error` exception is raised if the request results in an
   error tuple (`{:error, reason}`).
   """
-  @spec request!(atom, Client.t, binary, body, Client.headers, Keyword.t) :: Response.t | Error.t
+  @spec request!(atom, Client.t, binary, body, Client.headers, Keyword.t) :: Response.t
   def request!(method, %Client{} = client, url, body, headers, opts) do
     case request(method, client, url, body, headers, opts) do
       {:ok, resp} ->
         resp
-      {:error, %{status_code: code, headers: headers, body: body}} ->
+      {:error, %Response{status_code: code, headers: headers, body: body}} ->
         raise %Error{reason: """
         Server responded with status: #{code}
 

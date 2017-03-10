@@ -29,7 +29,7 @@ defmodule OAuth2.Client do
       response = OAuth2.Client.post!(client, "/some/other/resources", %{foo: "bar"})
   """
 
-  alias OAuth2.{AccessToken, Client, Error, Request}
+  alias OAuth2.{AccessToken, Client, Error, Response, Request}
 
   @type authorize_url :: binary
   @type body          :: any

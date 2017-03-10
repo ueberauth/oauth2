@@ -38,9 +38,9 @@ defmodule OAuth2.ClientTest do
       send_resp(conn, 200, ~s({"access_token":"test1234"}))
     end
 
-    assert {:ok, client} = Client.get_token(client, [code: "code1234"], [{"Accept", "application/json"}])
+    assert {:ok, client} = Client.get_token(client, [code: "code1234"], [{"accept", "application/json"}])
     assert client.token.access_token == "test1234"
-    assert %Client{} = Client.get_token!(client, [code: "code1234"], [{"Accept", "application/json"}])
+    assert %Client{} = Client.get_token!(client, [code: "code1234"], [{"accept", "application/json"}])
   end
 
   test "get_token, get_token! when `:token_method` is `:get`", %{client: client, server: server} do

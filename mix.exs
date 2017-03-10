@@ -1,7 +1,7 @@
 defmodule OAuth2.Mixfile do
   use Mix.Project
 
-  @version "0.9.0"
+  @version "0.9.1"
 
   def project do
     [app: :oauth2,
@@ -31,9 +31,9 @@ defmodule OAuth2.Mixfile do
 
      # Test dependencies
      {:poison, "~> 3.0", only: :test},
-     {:bypass, "~> 0.5", only: :test},
+     {:bypass, "~> 0.6", only: :test},
      {:excoveralls, "~> 0.5", only: :test},
-     {:dialyxir, "~> 0.4", only: [:dev], runtime: false},
+     {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
 
      # Docs dependencies
      {:ex_doc, "~> 0.14", only: :dev}]
