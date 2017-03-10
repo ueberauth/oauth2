@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.9.1 (2017-03-10)
+
+### Improvements
+
+* Fix dialyzer warnings.
+* Update `hackney` to `1.7`
+
+### Bug fixes
+
+* De-dupe headers.
+
 ## v0.9.0 (2017-02-02)
 
 ### Improvements
