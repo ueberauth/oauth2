@@ -2,6 +2,8 @@ defmodule OAuth2Test do
   use ExUnit.Case
   import OAuth2.TestHelpers
 
+  doctest OAuth2
+
   @client build_client(client_id: "abc123",
                      client_secret: "xyz987",
                      site: "https://api.github.com",

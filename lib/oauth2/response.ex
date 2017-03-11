@@ -12,7 +12,7 @@ defmodule OAuth2.Response do
 
   require Logger
   import OAuth2.Util
-  alias OAuth2.Serializer
+  alias OAuth2.Client
 
   @type status_code :: integer
   @type headers     :: list
@@ -27,9 +27,11 @@ defmodule OAuth2.Response do
   defstruct status_code: nil, headers: [], body: nil
 
   @doc false
-  def new(code, headers, body) do
+  def new(client, code, headers, body) do
     headers = process_headers(headers)
-    body = decode_response_body(body, content_type(headers))
+    content_type = content_type(headers)
+    serializer = Client.get_serializer(client, content_type)
+    body = decode_response_body(body, content_type, serializer)
     resp = %__MODULE__{status_code: code, headers: headers, body: body}
 
     if Application.get_env(:oauth2, :debug) do
@@ -43,16 +45,23 @@ defmodule OAuth2.Response do
     Enum.map(headers, fn {k, v} -> {String.downcase(k), v} end)
   end
 
-  defp decode_response_body("", _type), do: ""
-  defp decode_response_body(" ", _type), do: ""
+  defp decode_response_body("", _type, _), do: ""
+  defp decode_response_body(" ", _type, _), do: ""
   # Facebook sends text/plain tokens!?
-  defp decode_response_body(body, "text/plain") do
+  defp decode_response_body(body, "text/plain", _) do
     case URI.decode_query(body) do
       %{"access_token" => _} = token -> token
       _ -> body
     end
   end
-  defp decode_response_body(body, "application/x-www-form-urlencoded"),
-    do: URI.decode_query(body)
-  defp decode_response_body(body, type), do: Serializer.decode!(body, type)
+  defp decode_response_body(body, "application/x-www-form-urlencoded", _) do
+    URI.decode_query(body)
+  end
+  defp decode_response_body(body, mime, OAuth2.Serializer.Null) do
+    OAuth2.Serializer.Null.maybe_warn_missing_serializer(mime)
+    body
+  end
+  defp decode_response_body(body, _type, serializer) do
+    serializer.decode!(body)
+  end
 end

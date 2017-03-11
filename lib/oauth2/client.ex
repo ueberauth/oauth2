@@ -41,6 +41,7 @@ defmodule OAuth2.Client do
   @type redirect_uri  :: binary
   @type ref           :: reference | nil
   @type request_opts  :: Keyword.t
+  @type serializers   :: %{binary => module}
   @type site          :: binary
   @type strategy      :: module
   @type token         :: AccessToken.t | nil
@@ -56,6 +57,7 @@ defmodule OAuth2.Client do
     redirect_uri:  redirect_uri,
     ref:           ref,
     request_opts:  request_opts,
+    serializers:   serializers,
     site:          site,
     strategy:      strategy,
     token:         token,
@@ -71,6 +73,7 @@ defmodule OAuth2.Client do
             redirect_uri: "",
             ref: nil,
             request_opts: [],
+            serializers: %{},
             site: "",
             strategy: OAuth2.Strategy.AuthCode,
             token: nil,
@@ -179,7 +182,9 @@ defmodule OAuth2.Client do
   @spec put_headers(t, list) :: t
   def put_headers(%Client{} = client, []), do: client
   def put_headers(%Client{} = client, [{k,v}|rest]) do
-    client |> put_header(k,v) |> put_headers(rest)
+    client
+    |> put_header(k, v)
+    |> put_headers(rest)
   end
 
   @doc false
@@ -200,6 +205,43 @@ defmodule OAuth2.Client do
   def authorize_url!(%Client{} = client, params \\ []) do
     {_, url} = authorize_url(client, params)
     url
+  end
+
+  @doc """
+  Register a serialization module for a given mime type.
+
+  ## Example
+
+      iex> client = OAuth2.Client.put_serializer(%OAuth2.Client{}, "application/json", Jason)
+      %OAuth2.Client{serializers: %{"application/json" => Jason}}
+      iex> OAuth2.Client.get_serializer(client, "application/json")
+      Jason
+  """
+  @spec put_serializer(t, binary, atom) :: t
+  def put_serializer(%Client{serializers: serializers} = client, mime, module)
+    when is_binary(mime) and is_atom(module) do
+    %Client{client | serializers: Map.put(serializers, mime, module)}
+  end
+
+  @doc """
+  Un-register a serialization module for a given mime type.
+
+  ## Example
+
+      iex> client = OAuth2.Client.delete_serializer(%OAuth2.Client{}, "application/json")
+      %OAuth2.Client{}
+      iex> OAuth2.Client.get_serializer(client, "application/json")
+      OAuth2.Serializer.Null
+  """
+  @spec delete_serializer(t, binary) :: t
+  def delete_serializer(%Client{serializers: serializers} = client, mime) do
+    %Client{client | serializers: Map.delete(serializers, mime)}
+  end
+
+  @doc false
+  @spec get_serializer(t, binary) :: atom
+  def get_serializer(%Client{serializers: serializers}, mime) do
+    Map.get(serializers, mime) || OAuth2.Serializer.Null
   end
 
   @doc """

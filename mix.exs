@@ -22,17 +22,17 @@ defmodule OAuth2.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :hackney],
-     env: [serializers: %{"application/json" => Poison}]]
+    [applications: [:logger, :hackney]]
   end
 
   defp deps do
-    [{:hackney, "~> 1.7"},
+    [{:hackney, "~> 1.13.0"},
 
      # Test dependencies
-     {:poison, "~> 3.0", only: :test},
-     {:bypass, "~> 0.6", only: :test},
-     {:excoveralls, "~> 0.5", only: :test},
+     {:jason, "~> 1.0", only: :test},
+     {:bypass, "~> 0.9", only: :test},
+     {:plug_cowboy, "~> 1.0", only: :test},
+     {:excoveralls, "~> 0.9", only: :test},
      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
 
      # Docs dependencies

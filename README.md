@@ -25,34 +25,26 @@ end
 ## Configure a serializer
 
 This library can be configured to handle encoding and decoding requests and
-responses automatically.
+responses automatically based on the `accept` and/or `content-type` headers.
 
-If you're using [Poison](https://hex.pm/packages/poison) for JSON in your
-application, this library is already pre-configured to use it for `"application/json"`
-request and response bodies. You will still need to include it as a dependency though.
-
-If you need to handle different MIME types, you can simply configure it like so:
+If you need to handle various MIME types, you can simply register serializers like so:
 
 ```elixir
-# config/config.exs
-config :oauth2,
-  serializers: %{
-    "application/vnd.api+json" => Poison,
-    "application/xml" => MyApp.XmlParser,
-  }
+OAuth2.Client.put_serializer(client, "application/vnd.api+json", Jason)
+OAuth2.Client.put_serializer(client, "application/xml", MyApp.Parsers.XML)
 ```
-
-The `serializers` option is a map where the keys are MIME types and the values
-are modules.
 
 The modules are expected to export `encode!/1` and `decode!/1`.
 
 ```elixir
-defmodule MyApp.XmlParser do
+defmodule MyApp.Parsers.XML do
   def encode!(data), do: # ...
   def decode!(binary), do: # ...
 end
 ```
+
+Please see the documentation for [OAuth2.Serializer](https://hexdocs.pm/oauth2/OAuth2.Serializer.html)
+for more details.
 
 ## Debug mode
 
@@ -158,6 +150,7 @@ defmodule GitHub do
       authorize_url: "https://github.com/login/oauth/authorize",
       token_url: "https://github.com/login/oauth/access_token"
     ])
+    |> OAuth2.Client.put_serializer("application/json", Jason)
   end
 
   def authorize_url! do
