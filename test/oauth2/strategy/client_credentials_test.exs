@@ -45,4 +45,12 @@ defmodule OAuth2.Strategy.ClientCredentialsTest do
     assert client.params["client_id"] == client.client_id
     assert client.params["client_secret"] == client.client_secret
   end
+
+  test "get_token: when params is map", %{client: client} do
+    client = ClientCredentials.get_token(client, %{"auth_scheme" => "request_body"}, [])
+    assert client.headers == []
+    assert client.params["grant_type"] == "client_credentials"
+    assert client.params["client_id"] == client.client_id
+    assert client.params["client_secret"] == client.client_secret
+  end
 end

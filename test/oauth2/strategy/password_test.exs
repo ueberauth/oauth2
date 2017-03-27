@@ -25,6 +25,15 @@ defmodule OAuth2.Strategy.PasswordTest do
     assert client.params["client_secret"] == client.client_secret
   end
 
+  test "get_token when params is map", %{client: client} do
+    client = Password.get_token(client, %{"username" => "scrogson", "password" => "password"}, [])
+    assert client.params["username"] == "scrogson"
+    assert client.params["password"] == "password"
+    assert client.params["grant_type"] == "password"
+    assert client.params["client_id"] == client.client_id
+    assert client.params["client_secret"] == client.client_secret
+  end
+
   test "get_token when username and password updated via put_param", %{client: client} do
     client =
       client

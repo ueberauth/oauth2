@@ -45,6 +45,9 @@ defmodule OAuth2.Strategy.AuthCodeTest do
 
     assert {:ok, %Client{token: token}} = Client.get_token(client, [code: code])
     assert token.access_token == access_token
+
+    assert {:ok, %AccessToken{} = token} = Client.get_token(client, %{"code" => code})
+    assert token.access_token == access_token
   end
 
   test "get_token throws and error if there is no 'code' param" do
