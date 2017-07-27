@@ -59,6 +59,20 @@ defmodule OAuth2.ClientTest do
     assert token.access_token == "test1234"
   end
 
+  test "get_token, get_token! when 400-599 error", %{client: client, server: server} do
+    client = %{client | token_method: :get}
+
+    bypass server, "GET", "/oauth/token", fn conn ->
+      send_resp(conn, 401, ~s({"error":"invalid_client","error_description": "Bad client credential"}))
+    end
+
+    assert {:error, %OAuth2.Error{}} = Client.get_token(client, code: "code1234")
+
+    assert_raise  OAuth2.Error, fn ->
+      Client.get_token!(client, code: "code1234")
+    end
+  end
+
   test "refresh_token and refresh_token! with a POST", %{server: server, client_with_token: client} do
     bypass server, "POST", "/oauth/token", fn conn ->
       assert get_req_header(conn, "authorization") == []
