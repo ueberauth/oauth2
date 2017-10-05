@@ -244,8 +244,21 @@ defmodule OAuth2.Client do
   @spec get_token!(t, params, headers, Keyword.t) :: Client.t | Error.t
   def get_token!(client, params \\ [], headers \\ [], opts \\ []) do
     case get_token(client, params, headers, opts) do
-      {:ok, client} -> client
-      {:error, error} -> raise error
+      {:ok, client} ->
+        client
+      {:error, %Response{status_code: code, headers: headers, body: body}} ->
+        raise %Error{reason: """
+        Server responded with status: #{code}
+
+        Headers:
+
+        #{Enum.reduce(headers, "", fn {k, v}, acc -> acc <> "#{k}: #{v}\n" end)}
+        Body:
+
+        #{inspect body}
+        """}
+      {:error, error} ->
+        raise error
     end
   end
 
