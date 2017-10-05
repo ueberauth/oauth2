@@ -44,6 +44,22 @@ defmodule OAuth2.ClientTest do
     assert %Client{} = Client.get_token!(client, [code: "code1234"], [{"accept", "application/json"}])
   end
 
+  test "get_token, get_token! when `:token_method` is `:get`", %{client: client, server: server} do
+    client = %{client | token_method: :get}
+
+    bypass server, "GET", "/oauth/token", fn conn ->
+      refute conn.query_string == ""
+      assert conn.query_params["code"] == "code1234"
+      assert conn.query_params["redirect_uri"]
+      send_resp(conn, 200, ~s({"access_token":"test1234","token_type":"bearer"}))
+    end
+
+    assert {:ok, %Client{token: token}} = Client.get_token(client, code: "code1234")
+    assert token.access_token == "test1234"
+    assert %Client{token: token} = Client.get_token!(client, code: "code1234")
+    assert token.access_token == "test1234"
+  end
+
   test "get_token, get_token! when response error", %{client: client, server: server} do
     code = [code: "code1234"]
     headers = [{"accept", "application/json"}]
@@ -60,22 +76,6 @@ defmodule OAuth2.ClientTest do
     assert_raise OAuth2.Error, ~r/Body/, fn ->
       Client.get_token!(client, code, headers)
     end
-  end
-
-  test "get_token, get_token! when `:token_method` is `:get`", %{client: client, server: server} do
-    client = %{client | token_method: :get}
-
-    bypass server, "GET", "/oauth/token", fn conn ->
-      refute conn.query_string == ""
-      assert conn.query_params["code"] == "code1234"
-      assert conn.query_params["redirect_uri"]
-      send_resp(conn, 200, ~s({"access_token":"test1234","token_type":"bearer"}))
-    end
-
-    assert {:ok, %Client{token: token}} = Client.get_token(client, code: "code1234")
-    assert token.access_token == "test1234"
-    assert %Client{token: token} = Client.get_token!(client, code: "code1234")
-    assert token.access_token == "test1234"
   end
 
   test "refresh_token and refresh_token! with a POST", %{server: server, client_with_token: client} do
@@ -141,6 +141,14 @@ defmodule OAuth2.ClientTest do
     client = put_headers(client, [{"accepts", "application/xml"},{"content-type", "application/xml"}])
     assert {"accepts", "application/xml"} = List.keyfind(client.headers, "accepts", 0)
     assert {"content-type", "application/xml"} = List.keyfind(client.headers, "content-type", 0)
+  end
+
+  test "basic_auth", %{client: client} do
+    %OAuth2.Client{client_id: id, client_secret: secret} = client
+    client = basic_auth(client)
+
+    assert {"authorization", value} = List.keyfind(client.headers, "authorization", 0)
+    assert value == "Basic " <> Base.encode64(id <> ":" <> secret)
   end
 
   ## GET
