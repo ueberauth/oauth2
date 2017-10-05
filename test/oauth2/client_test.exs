@@ -7,6 +7,7 @@ defmodule OAuth2.ClientTest do
   import OAuth2.TestHelpers
 
   alias OAuth2.Client
+  alias OAuth2.Response
 
   setup do
     server = Bypass.open
@@ -41,6 +42,24 @@ defmodule OAuth2.ClientTest do
     assert {:ok, client} = Client.get_token(client, [code: "code1234"], [{"accept", "application/json"}])
     assert client.token.access_token == "test1234"
     assert %Client{} = Client.get_token!(client, [code: "code1234"], [{"accept", "application/json"}])
+  end
+
+  test "get_token, get_token! when response error", %{client: client, server: server} do
+    code = [code: "code1234"]
+    headers = [{"accept", "application/json"}]
+
+    bypass server, "POST", "/oauth/token", fn conn ->
+      assert conn.query_string == ""
+      send_resp(conn, 500, ~s({"error":"missing_client_id"}))
+    end
+
+    assert {:error, error} = Client.get_token(client, code, headers)
+    assert %Response{body: body, status_code: 500} = error
+    assert body == %{"error" => "missing_client_id"}
+
+    assert_raise OAuth2.Error, ~r/Body/, fn ->
+      Client.get_token!(client, code, headers)
+    end
   end
 
   test "get_token, get_token! when `:token_method` is `:get`", %{client: client, server: server} do
