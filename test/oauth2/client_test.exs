@@ -7,6 +7,7 @@ defmodule OAuth2.ClientTest do
   import OAuth2.TestHelpers
 
   alias OAuth2.Client
+  alias OAuth2.Response
 
   setup do
     server = Bypass.open
@@ -57,6 +58,24 @@ defmodule OAuth2.ClientTest do
     assert token.access_token == "test1234"
     assert %Client{token: token} = Client.get_token!(client, code: "code1234")
     assert token.access_token == "test1234"
+  end
+
+  test "get_token, get_token! when response error", %{client: client, server: server} do
+    code = [code: "code1234"]
+    headers = [{"accept", "application/json"}]
+
+    bypass server, "POST", "/oauth/token", fn conn ->
+      assert conn.query_string == ""
+      send_resp(conn, 500, ~s({"error":"missing_client_id"}))
+    end
+
+    assert {:error, error} = Client.get_token(client, code, headers)
+    assert %Response{body: body, status_code: 500} = error
+    assert body == %{"error" => "missing_client_id"}
+
+    assert_raise OAuth2.Error, ~r/Body/, fn ->
+      Client.get_token!(client, code, headers)
+    end
   end
 
   test "refresh_token and refresh_token! with a POST", %{server: server, client_with_token: client} do
@@ -122,6 +141,14 @@ defmodule OAuth2.ClientTest do
     client = put_headers(client, [{"accepts", "application/xml"},{"content-type", "application/xml"}])
     assert {"accepts", "application/xml"} = List.keyfind(client.headers, "accepts", 0)
     assert {"content-type", "application/xml"} = List.keyfind(client.headers, "content-type", 0)
+  end
+
+  test "basic_auth", %{client: client} do
+    %OAuth2.Client{client_id: id, client_secret: secret} = client
+    client = basic_auth(client)
+
+    assert {"authorization", value} = List.keyfind(client.headers, "authorization", 0)
+    assert value == "Basic " <> Base.encode64(id <> ":" <> secret)
   end
 
   ## GET
