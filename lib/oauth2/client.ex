@@ -46,6 +46,7 @@ defmodule OAuth2.Client do
   @type token         :: AccessToken.t | nil
   @type token_method  :: :post | :get | atom
   @type token_url     :: binary
+  @type hd            :: binary
 
   @type t :: %Client{
     authorize_url: authorize_url,
@@ -60,7 +61,8 @@ defmodule OAuth2.Client do
     strategy:      strategy,
     token:         token,
     token_method:  token_method,
-    token_url:     token_url
+    token_url:     token_url,
+    hd:            hd
   }
 
   defstruct authorize_url: "/oauth/authorize",
@@ -75,7 +77,8 @@ defmodule OAuth2.Client do
             strategy: OAuth2.Strategy.AuthCode,
             token: nil,
             token_method: :post,
-            token_url: "/oauth/token"
+            token_url: "/oauth/token",
+            hd: ""
 
   @doc """
   Builds a new `OAuth2.Client` struct using the `opts` provided.
@@ -101,6 +104,7 @@ defmodule OAuth2.Client do
     Defaults to `:post`
   * `token_url` - absolute or relative URL path to the token endpoint.
     Defaults to `"/oauth/token"`
+  * `hd` -  hosted domain, should be provided only if the user belongs to a Google specific hosted domain.
 
   ## Example
 
@@ -147,6 +151,7 @@ defmodule OAuth2.Client do
   convert to strings.
   """
   @spec put_param(t, String.t | atom, any) :: t
+  def put_param(%Client{} = client, :hd, ""), do: client
   def put_param(%Client{params: params} = client, key, value) do
     %{client | params: Map.put(params, "#{key}", value)}
   end
@@ -195,6 +200,9 @@ defmodule OAuth2.Client do
 
       iex> OAuth2.Client.authorize_url!(%OAuth2.Client{})
       "/oauth/authorize?client_id=&redirect_uri=&response_type=code"
+
+      iex> OAuth2.Client.authorize_url!(%OAuth2.Client{hd: "example.com"})
+      "/oauth/authorize?client_id=&hd=example.com&redirect_uri=&response_type=code"
   """
   @spec authorize_url!(t, list) :: binary
   def authorize_url!(%Client{} = client, params \\ []) do
