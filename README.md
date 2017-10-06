@@ -172,6 +172,56 @@ case OAuth2.Client.get(client, "/user") do
 end
 ```
 
+### Hosted Domain
+
+```elixir
+# If you want to restrict the user to a specific Google Hosted domain you may initialize the client with `hd`.
+
+defmodule Google do
+  use OAuth2.Strategy
+  
+  alias OAuth2.Strategy.AuthCode
+
+  def client do
+    OAuth2.Client.new([
+      strategy: __MODULE__,
+      client_id: System.get_env("GOOGLE_CLIENT_ID"),
+      client_secret: System.get_env("GOOGLE_CLIENT_SECRET"),
+      redirect_uri: System.get_env("REDIRECT_URI"),
+      site: "https://accounts.google.com",
+      authorize_url: "https://accounts.google.com/o/oauth2/auth",
+      token_url: "https://accounts.google.com/o/oauth2/token",
+      hd: System.get_env("YOUR_HOSTED_DOMAIN")
+    ])
+  end
+
+  def authorize_url!(params \\ []) do
+    OAuth2.Client.authorize_url!(client(), params)
+  end
+
+  def get_token!(params \\ [], headers \\ []) do
+    OAuth2.Client.get_token!(client(), params, headers)
+  end
+
+  # strategy callbacks
+
+  def authorize_url(client, params) do
+    AuthCode.authorize_url(client, params)
+  end
+
+  def get_token(client, params, headers) do
+    client
+    |> put_param(:client_secret, client.client_secret)
+    |> put_header("Accept", "application/json")
+    |> AuthCode.get_token(params, headers)
+  end
+end
+
+# Generate the authorization URL limited to the Hosted Domain and redirect the user to the provider.
+Google.authorize_url!(client)
+# => "https://accounts.google.com/o/oauth2/auth?client_id=GOOGLE_CLIENT_ID&hd=unbabel.com&redirect_uri=REDIRECT_URI&response_type=code"
+```
+
 ## Examples
 
 - [Authenticate with Github (OAuth2/Phoenix)](https://github.com/scrogson/oauth2_example)
