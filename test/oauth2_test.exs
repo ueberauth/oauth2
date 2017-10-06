@@ -7,6 +7,12 @@ defmodule OAuth2Test do
                      site: "https://api.github.com",
                      redirect_uri: "http://localhost/auth/callback")
 
+  @client_with_hd build_client(client_id: "abc123",
+                     client_secret: "xyz987",
+                     site: "https://api.github.com",
+                     redirect_uri: "http://localhost/auth/callback",
+                     hd: "github.com")
+
   test "`new` delegates to `OAuth2.Client.new/1`" do
     client = @client
     assert client.strategy == OAuth2.Strategy.AuthCode
@@ -16,6 +22,23 @@ defmodule OAuth2Test do
     assert client.site == "https://api.github.com"
     assert client.authorize_url == "/oauth/authorize"
     assert client.token_url == "/oauth/token"
+    assert client.token_method == :post
+    assert client.params == %{}
+    assert client.headers == []
+    assert client.redirect_uri == "http://localhost/auth/callback"
+    assert client.hd == ""
+  end
+
+  test "`new` with hosted domain delegates to `OAuth2.Client.new/1`" do
+    client = @client_with_hd
+    assert client.strategy == OAuth2.Strategy.AuthCode
+    assert client.site == "https://api.github.com"
+    assert client.client_id == "abc123"
+    assert client.client_secret == "xyz987"
+    assert client.site == "https://api.github.com"
+    assert client.authorize_url == "/oauth/authorize"
+    assert client.token_url == "/oauth/token"
+    assert client.hd == "github.com"
     assert client.token_method == :post
     assert client.params == %{}
     assert client.headers == []

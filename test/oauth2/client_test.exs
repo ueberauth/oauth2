@@ -11,11 +11,13 @@ defmodule OAuth2.ClientTest do
 
   setup do
     server = Bypass.open
+    client_with_hd = build_client(site: bypass_server(server), hd: "example.com")
     client = build_client(site: bypass_server(server))
     client_with_token = tokenize_client(client)
     async_client = async_client(client)
 
     {:ok, client: client,
+          client_with_hd: client_with_hd,
           server: server,
           client_with_token: client_with_token,
           async_client: async_client}
@@ -31,6 +33,20 @@ defmodule OAuth2.ClientTest do
     assert query["client_id"] == client.client_id
     assert query["redirect_uri"] == client.redirect_uri
     assert query["response_type"] == "code"
+    assert is_nil(query["hd"])
+  end
+
+  test "authorize_url! with hosted domain", %{client_with_hd: client, server: server} do
+    uri = URI.parse(authorize_url!(client))
+    assert "#{uri.scheme}://#{uri.host}:#{uri.port}" == client.site
+    assert uri.port == server.port
+    assert uri.path == "/oauth/authorize"
+
+    query = URI.decode_query(uri.query)
+    assert query["client_id"] == client.client_id
+    assert query["redirect_uri"] == client.redirect_uri
+    assert query["response_type"] == "code"
+    assert query["hd"] == "example.com"
   end
 
   test "get_token, get_token!", %{client: client, server: server} do
