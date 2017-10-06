@@ -20,7 +20,7 @@ defmodule OAuth2 do
 
   #### Authorization Code Flow (AuthCode Strategy)
 
-  Initialize a client with your `client_id`, `client_secret`, and `site`.
+  Initialize a client with your `client_id`, `client_secret`, and `site`. Optionally, You may add `hd` to specify your hosted domain when using Google.
 
       client = OAuth2.Client.new([
         strategy: OAuth2.Strategy.AuthCode, # default strategy is AuthCode
