@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.9.2 (2017-11-17)
+
+### Bug fixes
+
+* Updates the `OAuth2.Client.get_token!` function to handle error `OAuth2.Response` structs.
+
 ## v0.9.1 (2017-03-10)
 
 ### Improvements
