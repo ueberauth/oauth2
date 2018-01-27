@@ -1,11 +1,29 @@
 language: elixir
-elixir:
-  - 1.2.6
-  - 1.3.4
-  - 1.4.0
-otp_release:
-  - 18.3
-  - 19.0
+
+matrix:
+  include:
+    - otp_release: 18.3
+      elixir: 1.3
+    - otp_release: 19.3
+      elixir: 1.3
+    - otp_release: 18.3
+      elixir: 1.4
+    - otp_release: 19.3
+      elixir: 1.4
+    - otp_release: 20.2
+      elixir: 1.4
+    - otp_release: 19.3
+      elixir: 1.5
+    - otp_release: 20.2
+      elixir: 1.5
+    - otp_release: 20.2
+      elixir: 1.6
+
+env:
+  GLOBAL:
+    - MIX_ENV=test
+
 sudo: false
+
 after_script:
-  - MIX_ENV=test mix coveralls.travis
+  - mix coveralls.travis
