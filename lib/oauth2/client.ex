@@ -224,7 +224,7 @@ defmodule OAuth2.Client do
   * `:proxy` - a proxy to be used for the request; it can be a regular url or a
     `{host, proxy}` tuple
   """
-  @spec get_token(t, params, headers, Keyword.t) :: {:ok, Client.t} | {:error, Error.t}
+  @spec get_token(t, params, headers, Keyword.t) :: {:ok, Client.t} | {:error, Response.t} | {:error, Error.t}
   def get_token(%{token_method: method} = client, params \\ [], headers \\ [], opts \\ []) do
     {client, url} = token_url(client, params, headers)
 
