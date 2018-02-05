@@ -18,8 +18,8 @@ defmodule OAuth2.AccessToken do
   @type refresh_token :: binary | nil
   @type expires_at    :: integer
   @type token_type    :: binary
-  @type other_params  :: %{}
-  @type body          :: binary | %{}
+  @type other_params  :: %{binary => binary}
+  @type body          :: binary | map
 
   @type t :: %__MODULE__{
               access_token:  access_token,
