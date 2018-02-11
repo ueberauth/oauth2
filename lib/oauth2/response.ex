@@ -45,11 +45,9 @@ defmodule OAuth2.Response do
     Enum.map(headers, fn {k, v} -> {String.downcase(k), v} end)
   end
 
-  defp decode_response_body(body, nil), do: body
-  defp decode_response_body(body, ""), do: body
   defp decode_response_body(body, "gzip"), do: :zlib.gunzip(body)
   defp decode_response_body(body, "x-gzip"), do: :zlib.gunzip(body)
-  defp decode_response_body(body, encoding), do: body
+  defp decode_response_body(body, _encoding), do: body
 
   defp parse_response_body("", _type), do: ""
   defp parse_response_body(" ", _type), do: ""
