@@ -6,6 +6,14 @@ defmodule OAuth2.Util do
     (mega * 1_000_000) + sec
   end
 
+  def content_encoding(headers) do
+    case get_content_encoding(headers) do
+      {_, content_encoding} ->
+        content_encoding
+      nil -> ""
+    end
+  end
+
   def content_type(headers) do
     case get_content_type(headers) do
       {_, content_type} ->
@@ -29,6 +37,10 @@ defmodule OAuth2.Util do
       [bad_type] ->
         raise OAuth2.Error, reason: "bad content-type: #{bad_type}"
     end
+  end
+
+  defp get_content_encoding(headers) do
+    List.keyfind(headers, "content-encoding", 0)
   end
 
   defp get_content_type(headers) do

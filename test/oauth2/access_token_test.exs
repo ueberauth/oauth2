@@ -54,4 +54,23 @@ defmodule OAuth2.AccessTokenTest do
     assert AccessToken.expires_at("3600") == unix_now() + 3600
   end
 
+  test "no content-encoding" do
+    response = Response.new(200, [{"content-type", "text/plain"}], "Testing")
+    assert response.body == "Testing"
+  end
+
+  test "gzip content-encoding" do
+    response = Response.new(200, [{"content-type", "text/plain"}, {"content-encoding", "gzip"}], :zlib.gzip("Testing"))
+    assert response.body == "Testing"
+  end
+
+  test "x-gzip content-encoding" do
+    response = Response.new(200, [{"content-type", "text/plain"}, {"content-encoding", "x-gzip"}], :zlib.gzip("Testing"))
+    assert response.body == "Testing"
+  end
+
+  test "unknown content-encoding" do
+    response = Response.new(200, [{"content-type", "text/plain"}, {"content-encoding", "x-unknown"}], "Testing")
+    assert response.body == "Testing"
+  end
 end

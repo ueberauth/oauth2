@@ -29,7 +29,9 @@ defmodule OAuth2.Response do
   @doc false
   def new(code, headers, body) do
     headers = process_headers(headers)
-    body = decode_response_body(body, content_type(headers))
+
+    body = decode_response_body(body, content_encoding(headers))
+    body = parse_response_body(body, content_type(headers))
     resp = %__MODULE__{status_code: code, headers: headers, body: body}
 
     if Application.get_env(:oauth2, :debug) do
@@ -43,16 +45,22 @@ defmodule OAuth2.Response do
     Enum.map(headers, fn {k, v} -> {String.downcase(k), v} end)
   end
 
-  defp decode_response_body("", _type), do: ""
-  defp decode_response_body(" ", _type), do: ""
+  defp decode_response_body(body, nil), do: body
+  defp decode_response_body(body, ""), do: body
+  defp decode_response_body(body, "gzip"), do: :zlib.gunzip(body)
+  defp decode_response_body(body, "x-gzip"), do: :zlib.gunzip(body)
+  defp decode_response_body(body, encoding), do: body
+
+  defp parse_response_body("", _type), do: ""
+  defp parse_response_body(" ", _type), do: ""
   # Facebook sends text/plain tokens!?
-  defp decode_response_body(body, "text/plain") do
+  defp parse_response_body(body, "text/plain") do
     case URI.decode_query(body) do
       %{"access_token" => _} = token -> token
       _ -> body
     end
   end
-  defp decode_response_body(body, "application/x-www-form-urlencoded"),
+  defp parse_response_body(body, "application/x-www-form-urlencoded"),
     do: URI.decode_query(body)
-  defp decode_response_body(body, type), do: Serializer.decode!(body, type)
+  defp parse_response_body(body, type), do: Serializer.decode!(body, type)
 end
