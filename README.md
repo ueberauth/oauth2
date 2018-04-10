@@ -90,10 +90,10 @@ OAuth2.Client.authorize_url!(client)
 # => "https://auth.example.com/oauth/authorize?client_id=client_id&redirect_uri=https%3A%2F%2Fexample.com%2Fauth%2Fcallback&response_type=code"
 
 # Use the authorization code returned from the provider to obtain an access token.
-client = OAuth2.Client.get_token!(client, code: "someauthcode")
+token = OAuth2.Client.get_token!(client, code: "someauthcode")
 
 # Use the access token to make a request for resources
-resource = OAuth2.Client.get!(client, "/api/resource").body
+resource = OAuth2.Client.get!(token, "/api/resource").body
 ```
 
 ## Write Your Own Strategy
