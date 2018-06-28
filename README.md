@@ -96,6 +96,48 @@ client = OAuth2.Client.get_token!(client, code: "someauthcode")
 resource = OAuth2.Client.get!(client, "/api/resource").body
 ```
 
+### Client Credentials Flow
+
+Getting an initial access token:
+
+```elixir
+# Initializing a client with the strategy `OAuth2.Strategy.ClientCredentials`
+
+client = OAuth2.Client.new([
+  strategy: OAuth2.Strategy.ClientCredentials,
+  client_id: "client_id",
+  client_secret: "abc123",
+  site: "https://auth.example.com"
+])
+
+# Request a token from with the newly created client
+# Token will be stored inside the `%OAuth2.Client{}` struct (client.token)
+client = OAuth2.Client.get_token!(client)
+
+# client.token contains the `%OAuth2.AccessToken{}` struct
+
+# raw access token
+access_token = client.token.access_token
+```
+
+Refreshing an access token:
+
+```elixir
+# raw refresh token - use a client with `OAuth2.Strategy.Refresh` for refreshing the token
+refresh_token = client.token.refresh_token
+
+refresh_client = OAuth2.Client.new([
+  strategy: OAuth2.Strategy.Refresh,
+  client_id: "client_id",
+  client_secret: "abc123",
+  site: "https://auth.example.com",
+  refresh_token: refresh_token
+])
+
+# refresh_client.token contains the `%OAuth2.AccessToken{}` struct again
+refresh_client = OAuth2.Client.get_token!(refresh_client)
+```
+
 ## Write Your Own Strategy
 
 Here's an example strategy for GitHub:
