@@ -131,7 +131,7 @@ refresh_client = OAuth2.Client.new([
   client_id: "client_id",
   client_secret: "abc123",
   site: "https://auth.example.com",
-  refresh_token: refresh_token
+  params: %{"refresh_token" => refresh_token}
 ])
 
 # refresh_client.token contains the `%OAuth2.AccessToken{}` struct again
