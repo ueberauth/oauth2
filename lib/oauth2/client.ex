@@ -309,7 +309,7 @@ defmodule OAuth2.Client do
   Makes a `GET` request to the given `url` using the `OAuth2.AccessToken`
   struct.
   """
-  @spec get(t, binary, headers, Keyword.t) :: {:ok, Response.t} | {:error, Error.t}
+  @spec get(t, binary, headers, Keyword.t) :: {:ok, Response.t} | {:error, Response.t} | {:error, Error.t}
   def get(%Client{} = client, url, headers \\ [], opts \\ []),
     do: Request.request(:get, client, url, "", headers, opts)
 
@@ -325,7 +325,7 @@ defmodule OAuth2.Client do
   Makes a `PUT` request to the given `url` using the `OAuth2.AccessToken`
   struct.
   """
-  @spec put(t, binary, body, headers, Keyword.t) :: {:ok, Response.t} | {:error, Error.t}
+  @spec put(t, binary, body, headers, Keyword.t) :: {:ok, Response.t} | {:error, Response.t} | {:error, Error.t}
   def put(%Client{} = client, url, body \\ "", headers \\ [], opts \\ []),
     do: Request.request(:put, client, url, body, headers, opts)
 
@@ -344,7 +344,7 @@ defmodule OAuth2.Client do
   Makes a `PATCH` request to the given `url` using the `OAuth2.AccessToken`
   struct.
   """
-  @spec patch(t, binary, body, headers, Keyword.t) :: {:ok, Response.t} | {:error, Error.t}
+  @spec patch(t, binary, body, headers, Keyword.t) :: {:ok, Response.t} | {:error, Response.t} | {:error, Error.t}
   def patch(%Client{} = client, url, body \\ "", headers \\ [], opts \\ []),
     do: Request.request(:patch, client, url, body, headers, opts)
 
@@ -362,7 +362,7 @@ defmodule OAuth2.Client do
   @doc """
   Makes a `POST` request to the given URL using the `OAuth2.AccessToken`.
   """
-  @spec post(t, binary, body, headers, Keyword.t) :: {:ok, Response.t} | {:error, Error.t}
+  @spec post(t, binary, body, headers, Keyword.t) :: {:ok, Response.t} | {:error, Response.t} | {:error, Error.t}
   def post(%Client{} = client, url, body \\ "", headers \\ [], opts \\ []),
     do: Request.request(:post, client, url, body, headers, opts)
 
@@ -380,7 +380,7 @@ defmodule OAuth2.Client do
   @doc """
   Makes a `DELETE` request to the given URL using the `OAuth2.AccessToken`.
   """
-  @spec delete(t, binary, body, headers, Keyword.t) :: {:ok, Response.t} | {:error, Error.t}
+  @spec delete(t, binary, body, headers, Keyword.t) :: {:ok, Response.t} | {:error, Response.t} | {:error, Error.t}
   def delete(%Client{} = client, url, body \\ "", headers \\ [], opts \\ []),
     do: Request.request(:delete, client, url, body, headers, opts)
 
