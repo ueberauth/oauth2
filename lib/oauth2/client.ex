@@ -265,7 +265,7 @@ defmodule OAuth2.Client do
   @doc """
   Refreshes an existing access token using a refresh token.
   """
-  @spec refresh_token(t, params, headers, Keyword.t) :: {:ok, Client.t} | {:error, Error.t}
+  @spec refresh_token(t, params, headers, Keyword.t) :: {:ok, Client.t} | {:error, Response.t} | {:error, Error.t}
   def refresh_token(token, params \\ [], headers \\ [], opts \\ [])
   def refresh_token(%Client{token: %{refresh_token: nil}}, _params, _headers, _opts) do
     {:error, %Error{reason: "Refresh token not available."}}
