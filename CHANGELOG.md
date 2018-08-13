@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.9.3 (2018-08-13)
+
+### Bug fixes
+
+* Various type specs fixed
+
 ## v0.9.2 (2017-11-17)
 
 ### Bug fixes
