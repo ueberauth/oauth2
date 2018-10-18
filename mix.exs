@@ -1,7 +1,7 @@
 defmodule OAuth2.Mixfile do
   use Mix.Project
 
-  @version "0.9.3"
+  @version "0.9.4"
 
   def project do
     [app: :oauth2,
@@ -17,7 +17,7 @@ defmodule OAuth2.Mixfile do
      preferred_cli_env: [
        "coveralls": :test,
        "coveralls.detail": :test,
-       "docs": :dev
+       docs: :dev
      ]]
   end
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.9.4 (2018-10-18)
+
+### Improvements
+
+* Relaxed `hackney` version requirements
+
 ## v0.9.3 (2018-08-13)
 
 ### Bug fixes
