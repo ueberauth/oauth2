@@ -15,7 +15,7 @@ defmodule OAuth2.Mixfile do
      elixirc_paths: elixirc_paths(Mix.env),
      test_coverage: [tool: ExCoveralls],
      preferred_cli_env: [
-       "coveralls": :test,
+       coveralls: :test,
        "coveralls.detail": :test,
        docs: :dev
      ]]
@@ -36,7 +36,7 @@ defmodule OAuth2.Mixfile do
      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
 
      # Docs dependencies
-     {:ex_doc, "~> 0.14", only: :dev}]
+     {:ex_doc, "~> 0.19", only: :dev}]
   end
 
   defp description do
