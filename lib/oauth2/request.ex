@@ -1,6 +1,7 @@
 defmodule OAuth2.Request do
   @moduledoc false
-
+  
+  require Logger
   import OAuth2.Util
 
   alias OAuth2.{Client, Error, Response, Serializer}
@@ -19,6 +20,17 @@ defmodule OAuth2.Request do
     body = encode_request_body(body, content_type)
     headers = process_request_headers(headers, content_type)
     req_opts = Keyword.merge(client.request_opts, opts)
+
+    if Application.get_env(:oauth2, :debug) do
+      Logger.debug("""
+        OAuth2 Prvider Request 
+        url: #{inspect url}
+        method: #{inspect method}
+        headers: #{inspect headers}
+        body: #{inspect body}
+        req_opts: #{inspect req_opts}
+      """)
+    end
 
     case :hackney.request(method, url, headers, body, req_opts) do
       {:ok, ref} when is_reference(ref) ->
