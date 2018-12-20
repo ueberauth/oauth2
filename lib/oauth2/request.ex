@@ -23,7 +23,7 @@ defmodule OAuth2.Request do
 
     if Application.get_env(:oauth2, :debug) do
       Logger.debug("""
-        OAuth2 Prvider Request 
+        OAuth2 Provider Request 
         url: #{inspect url}
         method: #{inspect method}
         headers: #{inspect headers}
