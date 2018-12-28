@@ -28,9 +28,9 @@ defmodule OAuth2.Mixfile do
 
   defp deps do
     [{:hackney, "~> 1.7"},
+     {:poison, "~> 3.0"},
 
      # Test dependencies
-     {:poison, "~> 3.0", only: :test},
      {:bypass, "~> 0.6", only: :test},
      {:excoveralls, "~> 0.5", only: :test},
      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
