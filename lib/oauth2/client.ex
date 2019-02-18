@@ -231,7 +231,7 @@ defmodule OAuth2.Client do
       iex> client = OAuth2.Client.delete_serializer(%OAuth2.Client{}, "application/json")
       %OAuth2.Client{}
       iex> OAuth2.Client.get_serializer(client, "application/json")
-      OAuth2.Serializer.Null
+      nil
   """
   @spec delete_serializer(t, binary) :: t
   def delete_serializer(%Client{serializers: serializers} = client, mime) do
@@ -241,7 +241,7 @@ defmodule OAuth2.Client do
   @doc false
   @spec get_serializer(t, binary) :: atom
   def get_serializer(%Client{serializers: serializers}, mime) do
-    Map.get(serializers, mime) || OAuth2.Serializer.Null
+    Map.get(serializers, mime)
   end
 
   @doc """

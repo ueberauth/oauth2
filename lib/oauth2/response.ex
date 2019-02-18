@@ -57,8 +57,7 @@ defmodule OAuth2.Response do
   defp decode_response_body(body, "application/x-www-form-urlencoded", _) do
     URI.decode_query(body)
   end
-  defp decode_response_body(body, mime, OAuth2.Serializer.Null) do
-    OAuth2.Serializer.Null.maybe_warn_missing_serializer(mime)
+  defp decode_response_body(body, _mime, nil) do
     body
   end
   defp decode_response_body(body, _type, serializer) do

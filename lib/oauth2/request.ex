@@ -125,8 +125,7 @@ defmodule OAuth2.Request do
   defp encode_request_body([], _, _), do: ""
   defp encode_request_body(body, "application/x-www-form-urlencoded", _),
     do: URI.encode_query(body)
-  defp encode_request_body(body, mime, OAuth2.Serializer.Null) do
-    OAuth2.Serializer.Null.maybe_warn_missing_serializer(mime)
+  defp encode_request_body(body, _mime, nil) do
     body
   end
   defp encode_request_body(body, _mime, serializer) do
