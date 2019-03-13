@@ -1,7 +1,7 @@
 defmodule OAuth2.Mixfile do
   use Mix.Project
 
-  @version "0.9.4"
+  @version "1.0.0"
 
   def project do
     [app: :oauth2,
