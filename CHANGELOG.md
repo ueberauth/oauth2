@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v1.0.0 (2019-03-13)
 
 ### Backward Incompatible Changes
 
