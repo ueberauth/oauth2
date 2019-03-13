@@ -1,0 +1,6 @@
+{
+  "skip_files": [
+    "lib/oauth2/strategy.ex",
+    "test/support/test_helpers.ex"
+  ]
+}
