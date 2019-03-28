@@ -44,9 +44,8 @@ defmodule OAuth2.Strategy.Password do
     |> put_param(:username, username)
     |> put_param(:password, password)
     |> put_param(:grant_type, "password")
-    |> put_param(:client_id, client.client_id)
-    |> put_param(:client_secret, client.client_secret)
     |> merge_params(params)
+    |> basic_auth()
     |> put_headers(headers)
   end
 end
