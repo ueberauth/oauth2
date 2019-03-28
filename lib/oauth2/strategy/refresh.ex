@@ -44,9 +44,8 @@ defmodule OAuth2.Strategy.Refresh do
     client
     |> put_param(:refresh_token, token)
     |> put_param(:grant_type, "refresh_token")
-    |> put_param(:client_id, client.client_id)
-    |> put_param(:client_secret, client.client_secret)
     |> merge_params(params)
+    |> basic_auth()
     |> put_headers(headers)
   end
 end

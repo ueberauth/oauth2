@@ -15,10 +15,12 @@ defmodule OAuth2.Strategy.RefreshTest do
   test "get_token" do
     client = build_client()
     client = Refresh.get_token(client, [refresh_token: "refresh-token"], [])
+    base64 = Base.encode64(client.client_id <> ":" <> client.client_secret)
+
     assert client.params["grant_type"] == "refresh_token"
     assert client.params["refresh_token"] == "refresh-token"
-    assert client.params["client_id"] == client.client_id
-    assert client.params["client_secret"] == client.client_secret
+
+    assert List.keyfind(client.headers, "authorization", 0) == {"authorization", "Basic #{base64}"}
   end
 
   test "get_token throws and error if there is no 'refresh_token' param" do
