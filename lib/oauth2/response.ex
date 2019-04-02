@@ -47,6 +47,9 @@ defmodule OAuth2.Response do
 
   defp decode_response_body("", _type, _), do: ""
   defp decode_response_body(" ", _type, _), do: ""
+  defp decode_response_body(body, _type, serializer) when serializer != nil do
+    serializer.decode!(body)
+  end
   # Facebook sends text/plain tokens!?
   defp decode_response_body(body, "text/plain", _) do
     case URI.decode_query(body) do
@@ -59,8 +62,5 @@ defmodule OAuth2.Response do
   end
   defp decode_response_body(body, _mime, nil) do
     body
-  end
-  defp decode_response_body(body, _type, serializer) do
-    serializer.decode!(body)
   end
 end
