@@ -26,11 +26,13 @@ defmodule OAuth2.Strategy.AuthCodeTest do
   test "get_token", %{client: client, server: server} do
     code = "abc1234"
     access_token = "access-token-1234"
+    base64 = Base.encode64(client.client_id <> ":" <> client.client_secret)
 
     Bypass.expect server, fn conn ->
+      assert conn.method == "POST"
       assert conn.request_path == "/oauth/token"
       assert get_req_header(conn, "content-type") == ["application/x-www-form-urlencoded"]
-      assert conn.method == "POST"
+      assert get_req_header(conn, "authorization") == ["Basic #{base64}"]
 
       {:ok, body, conn} = read_body(conn)
       body = URI.decode_query(body)

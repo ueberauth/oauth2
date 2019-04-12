@@ -14,8 +14,10 @@ defmodule OAuth2.ClientTest do
     client = build_client(site: bypass_server(server))
     client_with_token = tokenize_client(client)
     async_client = async_client(client)
+    basic_auth = Base.encode64(client.client_id <> ":" <> client.client_secret)
 
-    {:ok, client: client,
+    {:ok, basic_auth: basic_auth,
+          client: client,
           server: server,
           client_with_token: client_with_token,
           async_client: async_client}
@@ -78,9 +80,9 @@ defmodule OAuth2.ClientTest do
     end
   end
 
-  test "refresh_token and refresh_token! with a POST", %{server: server, client_with_token: client} do
+  test "refresh_token and refresh_token! with a POST", %{basic_auth: base64, server: server, client_with_token: client} do
     bypass server, "POST", "/oauth/token", fn conn ->
-      assert get_req_header(conn, "authorization") == []
+      assert get_req_header(conn, "authorization") == ["Basic #{base64}"]
       assert get_req_header(conn, "accept") == ["application/json"]
       assert get_req_header(conn, "content-type") == ["application/x-www-form-urlencoded"]
 
@@ -103,9 +105,9 @@ defmodule OAuth2.ClientTest do
     assert client.token.refresh_token == "new-refresh-token"
   end
 
-  test "refresh token when response missing refresh_token", %{server: server, client_with_token: client} do
+  test "refresh token when response missing refresh_token", %{basic_auth: base64, server: server, client_with_token: client} do
     bypass server, "POST", "/oauth/token", fn conn ->
-      assert get_req_header(conn, "authorization") == []
+      assert get_req_header(conn, "authorization") == ["Basic #{base64}"]
       assert get_req_header(conn, "accept") == ["application/json"]
       assert get_req_header(conn, "content-type") == ["application/x-www-form-urlencoded"]
 

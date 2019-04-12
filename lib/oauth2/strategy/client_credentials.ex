@@ -37,12 +37,8 @@ defmodule OAuth2.Strategy.ClientCredentials do
     |> put_headers(headers)
   end
 
-  defp auth_scheme(client, "auth_header"),  do: auth_header(client)
+  defp auth_scheme(client, "auth_header"),  do: basic_auth(client)
   defp auth_scheme(client, "request_body"), do: request_body(client)
-
-  defp auth_header(%{client_id: id, client_secret: secret} = client) do
-    put_header(client, "Authorization", "Basic " <> Base.encode64(id <> ":" <> secret))
-  end
 
   defp request_body(client) do
     client
