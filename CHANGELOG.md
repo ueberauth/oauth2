@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.1 (2019-04-12)
+
+### Bug fixes
+
+- Always use the provided serializer if one is registered (#132)
+
 ## v1.0.0 (2019-03-13)
 
 ### Backward Incompatible Changes

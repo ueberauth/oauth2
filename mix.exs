@@ -1,7 +1,7 @@
 defmodule OAuth2.Mixfile do
   use Mix.Project
 
-  @version "1.0.0"
+  @version "1.0.1"
 
   def project do
     [app: :oauth2,
@@ -26,7 +26,7 @@ defmodule OAuth2.Mixfile do
   end
 
   defp deps do
-    [{:hackney, "~> 1.13.0"},
+    [{:hackney, "~> 1.13"},
 
      # Test dependencies
      {:jason, "~> 1.0", only: :test},
