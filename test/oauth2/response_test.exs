@@ -19,4 +19,10 @@ defmodule OAuth2.ResponseTest do
     response = Response.new(%OAuth2.Client{}, 200, [{"content-type", "text/plain"}], "hello")
     assert response.body == "hello"
   end
+
+  test "always parse body by serializer if it exists" do
+    client = OAuth2.Client.put_serializer(%OAuth2.Client{}, "text/plain", Jason)
+    response = Response.new(client, 200, [{"content-type", "text/plain"}], ~S({"hello": "world"}))
+    assert response.body == %{"hello" => "world"}
+  end
 end
