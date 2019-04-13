@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Bug Fixes
+
+- Ensure that the OAuth client is authenticated via Authorization header as
+  described in the spec (#131)
+
 ## v1.0.1 (2019-04-12)
 
 ### Bug fixes
