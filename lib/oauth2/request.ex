@@ -12,7 +12,7 @@ defmodule OAuth2.Request do
   Makes a request of given type to the given URL using the `OAuth2.AccessToken`.
   """
   @spec request(atom, Client.t(), binary, body, Client.headers(), Keyword.t()) ::
-          {:ok, Response.t()} | {:error, Response.t()} | {:error, Error.t()}
+          {:ok, Response.t()} | {:ok, reference} | {:error, Response.t()} | {:error, Error.t()}
   def request(method, %Client{} = client, url, body, headers, opts) do
     url = client |> process_url(url) |> process_params(opts[:params])
     headers = req_headers(client, headers) |> Enum.uniq()
