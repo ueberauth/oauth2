@@ -15,7 +15,7 @@ defmodule OAuth2.Response do
   alias OAuth2.Client
 
   @type status_code :: integer
-  @type headers :: list
+  @type headers :: [{binary, binary}]
   @type body :: binary | map | list
 
   @type t :: %__MODULE__{
