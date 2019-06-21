@@ -1,4 +1,5 @@
 defmodule OAuth2.TestHelpers do
+  @moduledoc false
   import Plug.Conn
   import ExUnit.Assertions
 

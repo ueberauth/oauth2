@@ -32,10 +32,11 @@ defmodule OAuth2.Mixfile do
       {:hackney, "~> 1.13"},
 
       # Test dependencies
-      {:jason, "~> 1.0", only: :test},
+      {:jason, "~> 1.0", only: [:dev, :test]},
       {:bypass, "~> 0.9", only: :test},
       {:plug_cowboy, "~> 1.0", only: :test},
       {:excoveralls, "~> 0.9", only: :test},
+      {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false},
 
       # Docs dependencies

@@ -2,8 +2,8 @@ defmodule OAuth2.Strategy.ClientCredentialsTest do
   use ExUnit.Case, async: true
   use Plug.Test
 
-  alias OAuth2.Strategy.ClientCredentials
   alias OAuth2.Client
+  alias OAuth2.Strategy.ClientCredentials
   import OAuth2.TestHelpers
 
   setup do
