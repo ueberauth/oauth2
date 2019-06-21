@@ -1,11 +1,13 @@
 defmodule OAuth2.Util do
   @moduledoc false
 
+  @spec unix_now :: integer
   def unix_now do
     {mega, sec, _micro} = :os.timestamp()
     mega * 1_000_000 + sec
   end
 
+  @spec content_type([{binary, binary}]) :: binary
   def content_type(headers) do
     case get_content_type(headers) do
       {_, content_type} ->

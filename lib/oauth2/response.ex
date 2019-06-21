@@ -27,6 +27,7 @@ defmodule OAuth2.Response do
   defstruct status_code: nil, headers: [], body: nil
 
   @doc false
+  @spec new(Client.t(), integer, headers, body) :: t
   def new(client, code, headers, body) do
     headers = process_headers(headers)
     content_type = content_type(headers)
