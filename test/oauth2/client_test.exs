@@ -112,9 +112,13 @@ defmodule OAuth2.ClientTest do
 
     token = client.token
     client = %{client | token: %{token | refresh_token: "abcdefg"}}
-    assert {:ok, client} = Client.refresh_token(client, [], [{"accept", "application/json"}])
-    assert client.token.access_token == "new-access-token"
-    assert client.token.refresh_token == "new-refresh-token"
+    assert {:ok, client_a} = Client.refresh_token(client, [], [{"accept", "application/json"}])
+    assert client_a.token.access_token == "new-access-token"
+    assert client_a.token.refresh_token == "new-refresh-token"
+
+    assert client_b = Client.refresh_token!(client, [], [{"accept", "application/json"}])
+    assert client_b.token.access_token == "new-access-token"
+    assert client_b.token.refresh_token == "new-refresh-token"
   end
 
   test "refresh token when response missing refresh_token", %{
