@@ -2,7 +2,7 @@ defmodule OAuth2 do
   @moduledoc """
   The OAuth2 specification
 
-  http://tools.ietf.org/html/rfc6749
+  [RFC6749](http://tools.ietf.org/html/rfc6749)
 
   The OAuth 2.0 authorization framework enables a third-party
   application to obtain limited access to an HTTP service, either on
@@ -12,13 +12,13 @@ defmodule OAuth2 do
 
   ## API
 
-  Current implemented strategies:
+  Currently implemented strategies:
 
   - Authorization Code
   - Password
   - Client Credentials
 
-  #### Authorization Code Flow (AuthCode Strategy)
+  ### Authorization Code Flow (AuthCode Strategy)
 
   Initialize a client with your `client_id`, `client_secret`, and `site`.
 
