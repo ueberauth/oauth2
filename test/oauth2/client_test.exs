@@ -207,6 +207,20 @@ defmodule OAuth2.ClientTest do
     assert resp_body == body
   end
 
+  test "GET with with_body: true", %{server: server, client_with_token: client} do
+    bypass(server, "GET", "/api/user/1", [token: client.token], fn conn ->
+      json(conn, 200, %{id: 1})
+    end)
+
+    {:ok, result} = Client.get(client, "/api/user/1", [], with_body: true)
+    assert result.status_code == 200
+    assert result.body["id"] == 1
+
+    result = Client.get!(client, "/api/user/1")
+    assert result.status_code == 200
+    assert result.body["id"] == 1
+  end
+
   defp stream(ref, buffer \\ []) do
     receive do
       {:hackney_response, ^ref, :done} ->
