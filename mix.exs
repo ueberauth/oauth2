@@ -18,6 +18,7 @@ defmodule OAuth2.Mixfile do
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,
+        "coveralls.html": :test,
         docs: :dev
       ]
     ]
