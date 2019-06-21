@@ -22,5 +22,9 @@ defmodule OAuth2.UtilTest do
     assert_raise OAuth2.Error, fn ->
       Util.content_type([{"content-type", "trash"}])
     end
+
+    assert_raise OAuth2.Error, fn ->
+      Util.content_type([{"content-type", "trash/trash/trash"}])
+    end
   end
 end

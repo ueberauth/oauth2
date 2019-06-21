@@ -30,8 +30,8 @@ defmodule OAuth2.Util do
       [type, subtype] ->
         type <> "/" <> subtype
 
-      [bad_type] ->
-        raise OAuth2.Error, reason: "bad content-type: #{bad_type}"
+      _ ->
+        raise OAuth2.Error, reason: "bad content-type: #{content_type}"
     end
   end
 
