@@ -140,7 +140,7 @@ defmodule OAuth2.ClientTest do
   end
 
   test "put_param, merge_params", %{client: client} do
-    assert Map.size(client.params) == 0
+    assert map_size(client.params) == 0
 
     client = put_param(client, :scope, "user,email")
     assert client.params["scope"] == "user,email"
