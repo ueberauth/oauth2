@@ -30,4 +30,6 @@ env:
 sudo: false
 
 after_script:
+  - mix format --check-formatted
+  - mix credo
   - mix coveralls.travis
