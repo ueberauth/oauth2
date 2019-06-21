@@ -37,7 +37,8 @@ defmodule OAuth2.Strategy.Password do
     {password, params} = Keyword.pop(params, :password, client.params["password"])
 
     unless username && password do
-      raise OAuth2.Error, reason: "Missing required keys `username` and `password` for #{inspect __MODULE__}"
+      raise OAuth2.Error,
+        reason: "Missing required keys `username` and `password` for #{inspect(__MODULE__)}"
     end
 
     client

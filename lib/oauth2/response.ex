@@ -15,14 +15,14 @@ defmodule OAuth2.Response do
   alias OAuth2.Client
 
   @type status_code :: integer
-  @type headers     :: list
-  @type body        :: binary | map
+  @type headers :: list
+  @type body :: binary | map
 
   @type t :: %__MODULE__{
-    status_code: status_code,
-    headers: headers,
-    body: body
-  }
+          status_code: status_code,
+          headers: headers,
+          body: body
+        }
 
   defstruct status_code: nil, headers: [], body: nil
 
@@ -35,7 +35,7 @@ defmodule OAuth2.Response do
     resp = %__MODULE__{status_code: code, headers: headers, body: body}
 
     if Application.get_env(:oauth2, :debug) do
-      Logger.debug("OAuth2 Provider Response #{inspect resp}")
+      Logger.debug("OAuth2 Provider Response #{inspect(resp)}")
     end
 
     resp
@@ -47,9 +47,11 @@ defmodule OAuth2.Response do
 
   defp decode_response_body("", _type, _), do: ""
   defp decode_response_body(" ", _type, _), do: ""
+
   defp decode_response_body(body, _type, serializer) when serializer != nil do
     serializer.decode!(body)
   end
+
   # Facebook sends text/plain tokens!?
   defp decode_response_body(body, "text/plain", _) do
     case URI.decode_query(body) do
@@ -57,9 +59,11 @@ defmodule OAuth2.Response do
       _ -> body
     end
   end
+
   defp decode_response_body(body, "application/x-www-form-urlencoded", _) do
     URI.decode_query(body)
   end
+
   defp decode_response_body(body, _mime, nil) do
     body
   end

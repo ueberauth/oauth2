@@ -4,10 +4,12 @@ defmodule OAuth2Test do
 
   doctest OAuth2
 
-  @client build_client(client_id: "abc123",
-                     client_secret: "xyz987",
-                     site: "https://api.github.com",
-                     redirect_uri: "http://localhost/auth/callback")
+  @client build_client(
+            client_id: "abc123",
+            client_secret: "xyz987",
+            site: "https://api.github.com",
+            redirect_uri: "http://localhost/auth/callback"
+          )
 
   test "`new` delegates to `OAuth2.Client.new/1`" do
     client = @client
@@ -24,4 +26,3 @@ defmodule OAuth2Test do
     assert client.redirect_uri == "http://localhost/auth/callback"
   end
 end
-

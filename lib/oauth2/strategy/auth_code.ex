@@ -45,7 +45,7 @@ defmodule OAuth2.Strategy.AuthCode do
     {code, params} = Keyword.pop(params, :code, client.params["code"])
 
     unless code do
-      raise OAuth2.Error, reason: "Missing required key `code` for `#{inspect __MODULE__}`"
+      raise OAuth2.Error, reason: "Missing required key `code` for `#{inspect(__MODULE__)}`"
     end
 
     client
@@ -58,4 +58,3 @@ defmodule OAuth2.Strategy.AuthCode do
     |> put_headers(headers)
   end
 end
-

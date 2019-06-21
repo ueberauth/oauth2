@@ -12,7 +12,14 @@ defmodule OAuth2.AccessTokenTest do
   end
 
   test "new with 'expires_in' param" do
-    response = Response.new(%Client{}, 200, [{"content-type", "application/x-www-form-urlencoded"}], "access_token=abc123&expires_in=123")
+    response =
+      Response.new(
+        %Client{},
+        200,
+        [{"content-type", "application/x-www-form-urlencoded"}],
+        "access_token=abc123&expires_in=123"
+      )
+
     token = AccessToken.new(response.body)
     assert token.access_token == "abc123"
     assert token.expires_at == 123 + unix_now()
@@ -21,7 +28,14 @@ defmodule OAuth2.AccessTokenTest do
   end
 
   test "new with 'expires' param" do
-    response = Response.new(%Client{}, 200, [{"content-type", "application/x-www-form-urlencoded"}], "access_token=abc123&expires=123")
+    response =
+      Response.new(
+        %Client{},
+        200,
+        [{"content-type", "application/x-www-form-urlencoded"}],
+        "access_token=abc123&expires=123"
+      )
+
     token = AccessToken.new(response.body)
     assert token.access_token == "abc123"
     assert token.expires_at == 123 + unix_now()
@@ -30,7 +44,14 @@ defmodule OAuth2.AccessTokenTest do
   end
 
   test "new from text/plain content-type" do
-    response = Response.new(%Client{}, 200, [{"content-type", "text/plain"}], "access_token=abc123&expires=123")
+    response =
+      Response.new(
+        %Client{},
+        200,
+        [{"content-type", "text/plain"}],
+        "access_token=abc123&expires=123"
+      )
+
     token = AccessToken.new(response.body)
     assert token.access_token == "abc123"
     assert token.expires_at == 123 + unix_now()
@@ -53,5 +74,4 @@ defmodule OAuth2.AccessTokenTest do
     assert AccessToken.expires_at(3600) == unix_now() + 3600
     assert AccessToken.expires_at("3600") == unix_now() + 3600
   end
-
 end

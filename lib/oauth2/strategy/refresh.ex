@@ -38,7 +38,8 @@ defmodule OAuth2.Strategy.Refresh do
     {token, params} = Keyword.pop(params, :refresh_token, client.params["refresh_token"])
 
     unless token do
-      raise OAuth2.Error, reason: "Missing required key `refresh_token` for `#{inspect __MODULE__}`"
+      raise OAuth2.Error,
+        reason: "Missing required key `refresh_token` for `#{inspect(__MODULE__)}`"
     end
 
     client
