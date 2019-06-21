@@ -81,7 +81,7 @@ defmodule OAuth2.Strategy do
   @callback authorize_url(Client.t(), Client.params()) :: Client.t()
 
   @doc """
-  Builds the URL to token endpoint.
+  Builds the URL to the token endpoint.
 
   ## Example
 
