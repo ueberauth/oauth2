@@ -19,7 +19,7 @@ defmodule OAuth2.AccessToken do
   @type expires_at :: integer
   @type token_type :: binary
   @type other_params :: %{binary => binary}
-  @type body :: binary | map
+  @type body :: binary | map | list
 
   @type t :: %__MODULE__{
           access_token: access_token,
