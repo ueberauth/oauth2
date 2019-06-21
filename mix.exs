@@ -34,8 +34,8 @@ defmodule OAuth2.Mixfile do
 
       # Test dependencies
       {:jason, "~> 1.0", only: [:dev, :test]},
-      {:bypass, "~> 1.0", only: :test},
-      {:plug_cowboy, "~> 2.0", only: :test},
+      {:bypass, "~> 0.9", only: :test},
+      {:plug_cowboy, "~> 1.0", only: :test},
       {:excoveralls, "~> 0.9", only: :test},
       {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false},
