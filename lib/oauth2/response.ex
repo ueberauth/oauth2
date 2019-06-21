@@ -16,7 +16,7 @@ defmodule OAuth2.Response do
 
   @type status_code :: integer
   @type headers :: list
-  @type body :: binary | map
+  @type body :: binary | map | list
 
   @type t :: %__MODULE__{
           status_code: status_code,
