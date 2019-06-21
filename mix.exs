@@ -26,17 +26,19 @@ defmodule OAuth2.Mixfile do
   end
 
   defp deps do
-    [{:hackney, "~> 1.13"},
+    [
+      {:hackney, "~> 1.13"},
 
-     # Test dependencies
-     {:jason, "~> 1.0", only: :test},
-     {:bypass, "~> 0.9", only: :test},
-     {:plug_cowboy, "~> 1.0", only: :test},
-     {:excoveralls, "~> 0.9", only: :test},
-     {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
+      # Test dependencies
+      {:jason, "~> 1.0", only: :test},
+      {:bypass, "~> 0.9", only: :test},
+      {:plug_cowboy, "~> 1.0", only: :test},
+      {:excoveralls, "~> 0.9", only: :test},
+      {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false},
 
-     # Docs dependencies
-     {:ex_doc, "~> 0.19", only: :dev}]
+      # Docs dependencies
+      {:ex_doc, "~> 0.19", only: :dev}
+    ]
   end
 
   defp description do
