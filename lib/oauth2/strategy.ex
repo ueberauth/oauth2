@@ -78,10 +78,10 @@ defmodule OAuth2.Strategy do
         |> merge_params(params)
       end
   """
-  @callback authorize_url(Client.t, Client.params) :: Client.t
+  @callback authorize_url(Client.t(), Client.params()) :: Client.t()
 
   @doc """
-  Builds the URL to token endpoint.
+  Builds the URL to the token endpoint.
 
   ## Example
 
@@ -96,7 +96,7 @@ defmodule OAuth2.Strategy do
         |> put_headers(headers)
       end
   """
-  @callback get_token(Client.t, Client.params, Client.headers) :: Client.t
+  @callback get_token(Client.t(), Client.params(), Client.headers()) :: Client.t()
 
   defmacro __using__(_) do
     quote do

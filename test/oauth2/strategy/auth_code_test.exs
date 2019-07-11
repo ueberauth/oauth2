@@ -1,5 +1,4 @@
 defmodule OAuth2.Strategy.AuthCodeTest do
-
   use ExUnit.Case, async: true
   use Plug.Test
 
@@ -9,7 +8,7 @@ defmodule OAuth2.Strategy.AuthCodeTest do
   alias OAuth2.Strategy.AuthCode
 
   setup do
-    server = Bypass.open
+    server = Bypass.open()
     client = build_client(strategy: AuthCode, site: bypass_server(server))
     {:ok, client: client, server: server}
   end
@@ -28,7 +27,7 @@ defmodule OAuth2.Strategy.AuthCodeTest do
     access_token = "access-token-1234"
     base64 = Base.encode64(client.client_id <> ":" <> client.client_secret)
 
-    Bypass.expect server, fn conn ->
+    Bypass.expect(server, fn conn ->
       assert conn.method == "POST"
       assert conn.request_path == "/oauth/token"
       assert get_req_header(conn, "content-type") == ["application/x-www-form-urlencoded"]
@@ -43,9 +42,9 @@ defmodule OAuth2.Strategy.AuthCodeTest do
       assert body["redirect_uri"] == client.redirect_uri
 
       send_resp(conn, 200, ~s({"access_token":"#{access_token}"}))
-    end
+    end)
 
-    assert {:ok, %Client{token: token}} = Client.get_token(client, [code: code])
+    assert {:ok, %Client{token: token}} = Client.get_token(client, code: code)
     assert token.access_token == access_token
   end
 

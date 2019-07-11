@@ -25,6 +25,7 @@ defmodule OAuth2.Strategy.Password do
   @doc """
   Not used for this strategy.
   """
+  @impl true
   def authorize_url(_client, _params) do
     raise OAuth2.Error, reason: "This strategy does not implement `authorize_url`."
   end
@@ -32,12 +33,14 @@ defmodule OAuth2.Strategy.Password do
   @doc """
   Retrieve an access token given the specified End User username and password.
   """
+  @impl true
   def get_token(client, params, headers) do
     {username, params} = Keyword.pop(params, :username, client.params["username"])
     {password, params} = Keyword.pop(params, :password, client.params["password"])
 
     unless username && password do
-      raise OAuth2.Error, reason: "Missing required keys `username` and `password` for #{inspect __MODULE__}"
+      raise OAuth2.Error,
+        reason: "Missing required keys `username` and `password` for #{inspect(__MODULE__)}"
     end
 
     client

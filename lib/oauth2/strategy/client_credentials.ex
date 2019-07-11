@@ -20,6 +20,7 @@ defmodule OAuth2.Strategy.ClientCredentials do
   @doc """
   Not used for this strategy.
   """
+  @impl true
   def authorize_url(_client, _params) do
     raise OAuth2.Error, reason: "This strategy does not implement `authorize_url`."
   end
@@ -27,6 +28,7 @@ defmodule OAuth2.Strategy.ClientCredentials do
   @doc """
   Retrieve an access token given the specified strategy.
   """
+  @impl true
   def get_token(client, params, headers) do
     {auth_scheme, params} = Keyword.pop(params, :auth_scheme, "auth_header")
 
@@ -37,7 +39,7 @@ defmodule OAuth2.Strategy.ClientCredentials do
     |> put_headers(headers)
   end
 
-  defp auth_scheme(client, "auth_header"),  do: basic_auth(client)
+  defp auth_scheme(client, "auth_header"), do: basic_auth(client)
   defp auth_scheme(client, "request_body"), do: request_body(client)
 
   defp request_body(client) do
@@ -46,4 +48,3 @@ defmodule OAuth2.Strategy.ClientCredentials do
     |> put_param(:client_secret, client.client_secret)
   end
 end
-

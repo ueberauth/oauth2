@@ -24,7 +24,8 @@ defmodule OAuth2.Strategy.PasswordTest do
     assert client.params["password"] == "password"
     assert client.params["grant_type"] == "password"
 
-    assert List.keyfind(client.headers, "authorization", 0) == {"authorization", "Basic #{base64}"}
+    assert List.keyfind(client.headers, "authorization", 0) ==
+             {"authorization", "Basic #{base64}"}
   end
 
   test "get_token when username and password updated via put_param", %{client: client} do

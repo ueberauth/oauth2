@@ -2,12 +2,12 @@ defmodule OAuth2.Strategy.ClientCredentialsTest do
   use ExUnit.Case, async: true
   use Plug.Test
 
-  alias OAuth2.Strategy.ClientCredentials
   alias OAuth2.Client
+  alias OAuth2.Strategy.ClientCredentials
   import OAuth2.TestHelpers
 
   setup do
-    server = Bypass.open
+    server = Bypass.open()
     client = build_client(strategy: ClientCredentials, site: bypass_server(server))
     {:ok, client: client, server: server}
   end
@@ -26,12 +26,17 @@ defmodule OAuth2.Strategy.ClientCredentialsTest do
   end
 
   test "get_token: Duplicated auth_header ", %{client: client, server: server} do
-    Bypass.expect server, fn conn ->
+    Bypass.expect(server, fn conn ->
       base64 = Base.encode64(client.client_id <> ":" <> client.client_secret)
       assert get_req_header(conn, "authorization") == ["Basic #{base64}"]
 
-      send_resp conn, 200, ~s({"access_token": "123456==", "token_type": "bearer", "expires_in": "999" })
-    end
+      send_resp(
+        conn,
+        200,
+        ~s({"access_token": "123456==", "token_type": "bearer", "expires_in": "999" })
+      )
+    end)
+
     client = Client.get_token!(client)
 
     assert client.token.access_token == "123456=="

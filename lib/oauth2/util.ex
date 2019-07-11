@@ -1,17 +1,20 @@
 defmodule OAuth2.Util do
   @moduledoc false
 
+  @spec unix_now :: integer
   def unix_now do
-    {mega, sec, _micro} = :os.timestamp
-    (mega * 1_000_000) + sec
+    {mega, sec, _micro} = :os.timestamp()
+    mega * 1_000_000 + sec
   end
 
+  @spec content_type([{binary, binary}]) :: binary
   def content_type(headers) do
     case get_content_type(headers) do
       {_, content_type} ->
         content_type
         |> remove_params
         |> parse_content_type
+
       nil ->
         "application/json"
     end
@@ -26,8 +29,9 @@ defmodule OAuth2.Util do
     case String.split(content_type, "/") do
       [type, subtype] ->
         type <> "/" <> subtype
-      [bad_type] ->
-        raise OAuth2.Error, reason: "bad content-type: #{bad_type}"
+
+      _ ->
+        raise OAuth2.Error, reason: "bad content-type: #{content_type}"
     end
   end
 

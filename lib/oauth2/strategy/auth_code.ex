@@ -30,6 +30,7 @@ defmodule OAuth2.Strategy.AuthCode do
   The authorization URL endpoint of the provider.
   params additional query parameters for the URL
   """
+  @impl true
   def authorize_url(client, params) do
     client
     |> put_param(:response_type, "code")
@@ -41,11 +42,12 @@ defmodule OAuth2.Strategy.AuthCode do
   @doc """
   Retrieve an access token given the specified validation code.
   """
+  @impl true
   def get_token(client, params, headers) do
     {code, params} = Keyword.pop(params, :code, client.params["code"])
 
     unless code do
-      raise OAuth2.Error, reason: "Missing required key `code` for `#{inspect __MODULE__}`"
+      raise OAuth2.Error, reason: "Missing required key `code` for `#{inspect(__MODULE__)}`"
     end
 
     client
@@ -58,4 +60,3 @@ defmodule OAuth2.Strategy.AuthCode do
     |> put_headers(headers)
   end
 end
-

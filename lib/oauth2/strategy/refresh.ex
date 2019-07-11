@@ -27,6 +27,7 @@ defmodule OAuth2.Strategy.Refresh do
   @doc """
   Not used for this strategy.
   """
+  @impl true
   def authorize_url(_client, _params) do
     raise OAuth2.Error, reason: "This strategy does not implement `authorize_url`."
   end
@@ -34,11 +35,13 @@ defmodule OAuth2.Strategy.Refresh do
   @doc """
   Refresh an access token given the specified validation code.
   """
+  @impl true
   def get_token(client, params, headers) do
     {token, params} = Keyword.pop(params, :refresh_token, client.params["refresh_token"])
 
     unless token do
-      raise OAuth2.Error, reason: "Missing required key `refresh_token` for `#{inspect __MODULE__}`"
+      raise OAuth2.Error,
+        reason: "Missing required key `refresh_token` for `#{inspect(__MODULE__)}`"
     end
 
     client

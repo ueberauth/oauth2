@@ -14,19 +14,20 @@ defmodule OAuth2.AccessToken do
 
   @standard ["access_token", "refresh_token", "expires_in", "token_type"]
 
-  @type access_token  :: binary
+  @type access_token :: binary
   @type refresh_token :: binary | nil
-  @type expires_at    :: integer
-  @type token_type    :: binary
-  @type other_params  :: %{binary => binary}
-  @type body          :: binary | map
+  @type expires_at :: integer
+  @type token_type :: binary
+  @type other_params :: %{binary => binary}
+  @type body :: binary | map | list
 
   @type t :: %__MODULE__{
-              access_token:  access_token,
-              refresh_token: refresh_token,
-              expires_at:    expires_at,
-              token_type:    token_type,
-              other_params:  other_params}
+          access_token: access_token,
+          refresh_token: refresh_token,
+          expires_at: expires_at,
+          token_type: token_type,
+          other_params: other_params
+        }
 
   defstruct access_token: "",
             refresh_token: nil,
@@ -58,13 +59,13 @@ defmodule OAuth2.AccessToken do
   def new(response) when is_map(response) do
     {std, other} = Map.split(response, @standard)
 
-    struct(AccessToken, [
-      access_token:  std["access_token"],
+    struct(AccessToken,
+      access_token: std["access_token"],
       refresh_token: std["refresh_token"],
-      expires_at:    (std["expires_in"] || other["expires"]) |> expires_at,
-      token_type:    std["token_type"] |> normalize_token_type(),
-      other_params:  other
-    ])
+      expires_at: (std["expires_in"] || other["expires"]) |> expires_at,
+      token_type: std["token_type"] |> normalize_token_type(),
+      other_params: other
+    )
   end
 
   @doc """
@@ -72,7 +73,7 @@ defmodule OAuth2.AccessToken do
 
   Returns `true` unless `expires_at` is `nil`.
   """
-  @spec expires?(AccessToken.t) :: boolean
+  @spec expires?(AccessToken.t()) :: boolean
   def expires?(%AccessToken{expires_at: nil} = _token), do: false
   def expires?(_), do: true
 
@@ -87,12 +88,14 @@ defmodule OAuth2.AccessToken do
   Returns a unix timestamp based on now + expires_at (in seconds).
   """
   def expires_at(nil), do: nil
+
   def expires_at(val) when is_binary(val) do
     val
-    |> Integer.parse
+    |> Integer.parse()
     |> elem(0)
     |> expires_at
   end
+
   def expires_at(int), do: unix_now() + int
 
   defp normalize_token_type(nil), do: "Bearer"
