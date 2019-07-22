@@ -2,6 +2,7 @@ defmodule OAuth2.AccessTokenTest do
   use ExUnit.Case, async: true
   doctest OAuth2.AccessToken
 
+  import ExUnit.CaptureIO
   import OAuth2.TestHelpers, only: [unix_now: 0]
 
   alias OAuth2.{AccessToken, Client, Response}
@@ -73,5 +74,13 @@ defmodule OAuth2.AccessTokenTest do
     assert AccessToken.expires_at(nil) == nil
     assert AccessToken.expires_at(3600) == unix_now() + 3600
     assert AccessToken.expires_at("3600") == unix_now() + 3600
+  end
+
+  test "does not log sensitive values" do
+    token = %AccessToken{access_token: "abc123", refresh_token: "def456"}
+    captured_string = capture_io(fn -> IO.inspect(token) end)
+    refute captured_string =~ "abc123"
+    refute captured_string =~ "def456"
+    assert captured_string =~ "Bearer"
   end
 end

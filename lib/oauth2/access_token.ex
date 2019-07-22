@@ -29,6 +29,7 @@ defmodule OAuth2.AccessToken do
           other_params: other_params
         }
 
+  @derive {Inspect, except: [:access_token, :refresh_token]}
   defstruct access_token: "",
             refresh_token: nil,
             expires_at: nil,

@@ -3,6 +3,7 @@ defmodule OAuth2.ClientTest do
   use Plug.Test
   doctest OAuth2.Client
 
+  import ExUnit.CaptureIO
   import OAuth2.Client
   import OAuth2.TestHelpers
 
@@ -369,5 +370,13 @@ defmodule OAuth2.ClientTest do
     end
 
     Bypass.up(server)
+  end
+
+  test "does not log sensitive values", %{client: client} do
+    client = %Client{client_id: client.client_id, client_secret: "abc123", token: "def456"}
+    captured_string = capture_io(fn -> IO.inspect(client) end)
+    refute captured_string =~ "abc123"
+    refute captured_string =~ "def456"
+    assert captured_string =~ client.client_id
   end
 end

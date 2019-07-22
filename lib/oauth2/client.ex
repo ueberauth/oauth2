@@ -65,6 +65,7 @@ defmodule OAuth2.Client do
           token_url: token_url
         }
 
+  @derive {Inspect, except: [:client_secret, :token]}
   defstruct authorize_url: "/oauth/authorize",
             client_id: "",
             client_secret: "",
