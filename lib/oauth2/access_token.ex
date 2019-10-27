@@ -12,7 +12,7 @@ defmodule OAuth2.AccessToken do
 
   alias OAuth2.AccessToken
 
-  @standard ["access_token", "refresh_token", "expires_in", "token_type"]
+  @standard ["access_token", "refresh_token", "expires_in", "expires_at", "token_type"]
 
   @type access_token :: binary
   @type refresh_token :: binary | nil
@@ -62,8 +62,9 @@ defmodule OAuth2.AccessToken do
     struct(AccessToken,
       access_token: std["access_token"],
       refresh_token: std["refresh_token"],
-      expires_at: (std["expires_in"] || other["expires"]) |> expires_at,
-      token_type: std["token_type"] |> normalize_token_type(),
+      expires_at:
+        parse_timestamp(std["expires_at"]) || expires_at(std["expires_in"] || other["expires"]),
+      token_type: normalize_token_type(std["token_type"]),
       other_params: other
     )
   end
@@ -97,6 +98,15 @@ defmodule OAuth2.AccessToken do
   end
 
   def expires_at(int), do: unix_now() + int
+
+  defp parse_timestamp(nil), do: nil
+  defp parse_timestamp(timestamp) when is_integer(timestamp), do: timestamp
+
+  defp parse_timestamp(timestamp) when is_binary(timestamp) do
+    timestamp
+    |> Integer.parse()
+    |> elem(0)
+  end
 
   defp normalize_token_type(nil), do: "Bearer"
   defp normalize_token_type("bearer"), do: "Bearer"
