@@ -281,7 +281,7 @@ defmodule OAuth2.Client do
           {:ok, %{client | headers: [], params: %{}, token: token}}
         else
           token = AccessToken.new(response.body)
-          {:ok, %{client | headers: [], params: %{}, token: body}}
+          {:ok, %{client | headers: [], params: %{}, token: token}}
         end
       {:error, error} ->
         {:error, error}
