@@ -276,12 +276,8 @@ defmodule OAuth2.Client do
 
     case Request.request(method, client, url, client.params, client.headers, opts) do
       {:ok, response} ->
-        if response.body =~ ~r/\{/ do
-          %{"access_token" => token} = Jason.decode!(response.body)
-          {:ok, %{client | headers: [], params: %{}, token: token}}
-        else
-          token = AccessToken.new(response.body)
-          {:ok, %{client | headers: [], params: %{}, token: token}}
+        token = AccessToken.new(Jason.decode!(response.body))
+        {:ok, %{client | headers: [], params: %{}, token: token}}
         end
       {:error, error} ->
         {:error, error}
