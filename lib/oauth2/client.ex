@@ -278,7 +278,6 @@ defmodule OAuth2.Client do
       {:ok, response} ->
         token = AccessToken.new(Jason.decode!(response.body))
         {:ok, %{client | headers: [], params: %{}, token: token}}
-        end
       {:error, error} ->
         {:error, error}
     end
