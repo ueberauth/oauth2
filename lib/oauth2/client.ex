@@ -363,7 +363,7 @@ defmodule OAuth2.Client do
   """
   @spec basic_auth(t) :: t
   def basic_auth(%OAuth2.Client{client_id: id, client_secret: secret} = client) do
-    put_header(client, "authorization", "Basic " <> Base.encode64(id <> ":" <> secret))
+    put_header(client, "authorization", "Basic " <> client_auth(id, secret))
   end
 
   @doc """
@@ -460,6 +460,15 @@ defmodule OAuth2.Client do
   @spec delete!(t, binary, body, headers, Keyword.t()) :: Response.t() | Error.t()
   def delete!(%Client{} = client, url, body \\ "", headers \\ [], opts \\ []),
     do: Request.request!(:delete, client, url, body, headers, opts)
+
+  defp client_auth(id, secret) do
+    # Format the client identifier for basic auth according to RFC 6749 section 2.3.1 and Appendix B:
+    # https://tools.ietf.org/html/rfc6749#section-2.3.1
+    [id, secret]
+    |> Enum.map(&(URI.encode(&1)))
+    |> Enum.join(":")
+    |> Base.encode64
+  end
 
   defp to_url(%Client{token_method: :post} = client, :token_url) do
     {client, endpoint(client, client.token_url)}
