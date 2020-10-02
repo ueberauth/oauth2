@@ -10,6 +10,7 @@ defmodule OAuth2.Response do
   * `body` - Parsed HTTP response body (based on "content-type" header)
   """
 
+  require Jason
   require Logger
   import OAuth2.Util
   alias OAuth2.Client
@@ -63,6 +64,11 @@ defmodule OAuth2.Response do
 
   defp decode_response_body(body, "application/x-www-form-urlencoded", _) do
     URI.decode_query(body)
+  end
+
+  # Okta responds with JSON
+  defp decode_response_body(body, "application/json", _) do
+    Jason.decode!(body)
   end
 
   defp decode_response_body(body, _mime, nil) do
