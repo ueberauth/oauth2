@@ -1,6 +1,7 @@
 defmodule OAuth2.Mixfile do
   use Mix.Project
 
+  @source_url "https://github.com/scrogson/oauth2"
   @version "2.0.0"
 
   def project do
@@ -41,7 +42,7 @@ defmodule OAuth2.Mixfile do
       {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false},
 
       # Docs dependencies
-      {:ex_doc, "~> 0.19", only: :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end
 
@@ -51,19 +52,24 @@ defmodule OAuth2.Mixfile do
 
   defp docs do
     [
-      extras: ["README.md"],
+      extras: ["CHANGELOG.md", "README.md": [title: "Overview"]],
       main: "readme",
       source_ref: "v#{@version}",
-      source_url: "https://github.com/scrogson/oauth2"
+      source_url: @source_url,
+      skip_undefined_reference_warnings_on: ["CHANGELOG.md"],
+      formatters: ["html"]
     ]
   end
 
   defp package do
     [
-      files: ["lib", "mix.exs", "README.md", "LICENSE"],
+      files: ["lib", "mix.exs", "CHANGELOG.md", "README.md", "LICENSE"],
       maintainers: ["Sonny Scroggin"],
       licenses: ["MIT"],
-      links: %{github: "https://github.com/scrogson/oauth2"}
+      links: %{
+        Changelog: "https://hexdocs.pm/oauth2/changelog.html",
+        GitHub: @source_url
+      }
     ]
   end
 

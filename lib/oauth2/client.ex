@@ -258,7 +258,7 @@ defmodule OAuth2.Client do
   * `client` - a `OAuth2.Client` struct with the strategy to use, defaults to
     `OAuth2.Strategy.AuthCode`
   * `params` - a keyword list of request parameters which will be encoded into
-    a query string or request body dependening on the selected strategy
+    a query string or request body depending on the selected strategy
   * `headers` - a list of request headers
   * `opts` - a Keyword list of request options which will be merged with
     `OAuth2.Client.request_opts`
