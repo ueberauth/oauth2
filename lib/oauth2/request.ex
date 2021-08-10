@@ -15,7 +15,7 @@ defmodule OAuth2.Request do
           {:ok, Response.t()} | {:ok, reference} | {:error, Response.t()} | {:error, Error.t()}
   def request(method, %Client{} = client, url, body, headers, opts) do
     url = client |> process_url(url) |> process_params(opts[:params])
-    headers = req_headers(client, headers) |> Enum.uniq()
+    headers = req_headers(client, headers) |> normalize_headers() |> Enum.uniq()
     content_type = content_type(headers)
     serializer = Client.get_serializer(client, content_type)
     body = encode_request_body(body, content_type, serializer)
@@ -121,6 +121,9 @@ defmodule OAuth2.Request do
 
   defp req_headers(%Client{token: token} = client, headers),
     do: [authorization_header(token) | headers] ++ client.headers
+
+  defp normalize_headers(headers),
+    do: Enum.map(headers, fn {key, val} -> {to_string(key), val} end)
 
   defp authorization_header(token),
     do: {"authorization", "#{token.token_type} #{token.access_token}"}

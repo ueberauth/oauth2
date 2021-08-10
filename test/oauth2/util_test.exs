@@ -15,6 +15,8 @@ defmodule OAuth2.UtilTest do
     assert "application/json" ==
              Util.content_type([{"content-type", "application/json;param;param"}])
 
+    assert "vendor/specific" == Util.content_type([{"Content-Type", "vendor/specific"}])
+
     assert_raise OAuth2.Error, fn ->
       Util.content_type([{"content-type", "trash; trash"}])
     end
