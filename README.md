@@ -1,9 +1,14 @@
 # OAuth2 (Client)
 
-> An Elixir OAuth2 Client
-
 [![Build Status](https://travis-ci.org/scrogson/oauth2.svg?branch=master)](https://travis-ci.org/scrogson/oauth2)
 [![Coverage Status](https://coveralls.io/repos/scrogson/oauth2/badge.svg?branch=master&service=github)](https://coveralls.io/github/scrogson/oauth2?branch=master)
+[![Module Version](https://img.shields.io/hexpm/v/oauth2.svg)](https://hex.pm/packages/oauth2)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/oauth2/)
+[![Total Download](https://img.shields.io/hexpm/dt/oauth2.svg)](https://hex.pm/packages/oauth2)
+[![License](https://img.shields.io/hexpm/l/oauth2.svg)](https://github.com/scrogson/oauth2/blob/master/LICENSE)
+[![Last Updated](https://img.shields.io/github/last-commit/scrogson/oauth2.svg)](https://github.com/scrogson/oauth2/commits/master)
+
+An Elixir [OAuth](https://en.wikipedia.org/wiki/OAuth) 2.0 Client Library.
 
 ## Install
 
@@ -13,12 +18,16 @@
 def application do
   # Add the application to your list of applications.
   # This will ensure that it will be included in a release.
-  [applications: [:logger, :oauth2]]
+  [
+    applications: [:logger, :oauth2]
+  ]
 end
 
 defp deps do
   # Add the dependency
-  [{:oauth2, "~> 2.0"}]
+  [
+    {:oauth2, "~> 2.0"}
+  ]
 end
 ```
 

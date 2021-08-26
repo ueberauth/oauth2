@@ -204,7 +204,7 @@ Diff: https://github.com/scrogson/oauth2/compare/v0.4.0...v0.5.0
 
 - `OAuth2.AccessToken.get!/4` now returns `OAuth2.Response{}` instead of just the parsed body.
 
-### Aknowledgements
+### Acknowledgments
 
 Thanks to @meatherly, @dejanstrbac, and @optikfluffel for their contributions!
 
@@ -240,7 +240,7 @@ Diff: https://github.com/scrogson/oauth2/compare/v0.0.5...v0.1.0
 
 ## v0.0.5 (2015-04-11)
 
-- Handles Facebooks `expires` key for Access Tokens.
+- Handles Facebook `expires` key for Access Tokens.
 - Ensure the token type defaults to 'Bearer' when it is not present.
 
 Diff: https://github.com/scrogson/oauth2/compare/0.0.3...v0.0.5
