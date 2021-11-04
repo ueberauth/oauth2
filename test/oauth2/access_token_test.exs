@@ -43,6 +43,42 @@ defmodule OAuth2.AccessTokenTest do
     assert token.other_params == %{"expires" => "123"}
   end
 
+  test "new with 'refresh_token_expires_in' param" do
+    response =
+      Response.new(
+        %Client{},
+        200,
+        [{"content-type", "application/x-www-form-urlencoded"}],
+        "access_token=abc123&expires_in=123&refresh_token=xyz456&refresh_token_expires_in=456"
+      )
+
+    token = AccessToken.new(response.body)
+    assert token.access_token == "abc123"
+    assert token.expires_at == 123 + unix_now()
+    assert token.refresh_token == "xyz456"
+    assert token.refresh_token_expires_at == 456 + unix_now()
+    assert token.token_type == "Bearer"
+    assert token.other_params == %{}
+  end
+
+  test "new with 'refresh_token_expires' param" do
+    response =
+      Response.new(
+        %Client{},
+        200,
+        [{"content-type", "application/x-www-form-urlencoded"}],
+        "access_token=abc123&expires=123&refresh_token=xyz456&refresh_token_expires=456"
+      )
+
+    token = AccessToken.new(response.body)
+    assert token.access_token == "abc123"
+    assert token.expires_at == 123 + unix_now()
+    assert token.refresh_token == "xyz456"
+    assert token.refresh_token_expires_at == 456 + unix_now()
+    assert token.token_type == "Bearer"
+    assert token.other_params == %{"expires" => "123", "refresh_token_expires" => "456"}
+  end
+
   test "new from text/plain content-type" do
     response =
       Response.new(

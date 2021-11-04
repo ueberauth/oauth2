@@ -12,11 +12,18 @@ defmodule OAuth2.AccessToken do
 
   alias OAuth2.AccessToken
 
-  @standard ["access_token", "refresh_token", "expires_in", "token_type"]
+  @standard [
+    "access_token",
+    "refresh_token",
+    "expires_in",
+    "refresh_token_expires_in",
+    "token_type"
+  ]
 
   @type access_token :: binary
   @type refresh_token :: binary | nil
   @type expires_at :: integer
+  @type refresh_token_expires_at :: integer
   @type token_type :: binary
   @type other_params :: %{binary => binary}
   @type body :: binary | map | list
@@ -25,6 +32,7 @@ defmodule OAuth2.AccessToken do
           access_token: access_token,
           refresh_token: refresh_token,
           expires_at: expires_at,
+          refresh_token_expires_at: refresh_token_expires_at,
           token_type: token_type,
           other_params: other_params
         }
@@ -32,6 +40,7 @@ defmodule OAuth2.AccessToken do
   defstruct access_token: "",
             refresh_token: nil,
             expires_at: nil,
+            refresh_token_expires_at: nil,
             token_type: "Bearer",
             other_params: %{}
 
@@ -63,6 +72,8 @@ defmodule OAuth2.AccessToken do
       access_token: std["access_token"],
       refresh_token: std["refresh_token"],
       expires_at: (std["expires_in"] || other["expires"]) |> expires_at,
+      refresh_token_expires_at:
+        (std["refresh_token_expires_in"] || other["refresh_token_expires"]) |> expires_at,
       token_type: std["token_type"] |> normalize_token_type(),
       other_params: other
     )
