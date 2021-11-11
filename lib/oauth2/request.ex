@@ -7,6 +7,7 @@ defmodule OAuth2.Request do
   alias OAuth2.{Client, Error, Response}
 
   @type body :: any
+  @http_client Application.get_env(:oauth2, :http_client, OAuth2.HTTPClient.Hackney)
 
   @doc """
   Makes a request of given type to the given URL using the `OAuth2.AccessToken`.
@@ -33,7 +34,7 @@ defmodule OAuth2.Request do
       """)
     end
 
-    case :hackney.request(method, url, headers, body, req_opts) do
+    case @http_client.request(method, url, headers, body, req_opts) do
       {:ok, ref} when is_reference(ref) ->
         {:ok, ref}
 
@@ -89,7 +90,7 @@ defmodule OAuth2.Request do
   end
 
   defp process_body(client, status, headers, ref) when is_reference(ref) do
-    case :hackney.body(ref) do
+    case @http_client.body(ref) do
       {:ok, body} ->
         process_body(client, status, headers, body)
 

@@ -55,7 +55,20 @@ end
 Please see the documentation for [OAuth2.Serializer](https://hexdocs.pm/oauth2/OAuth2.Serializer.html)
 for more details.
 
-## Debug mode
+## Configuration
+
+### HTTP client
+
+The default HTTP client for requests is [hackney](https://hex.pm/packages/hackney).
+You can configure it like so:
+
+```elixir
+config :oauth2, http_client: MyCustomClient
+```
+
+It must conform to the `OAuth2.HTTPClient` behaviour.
+
+### Debug mode
 
 Sometimes it's handy to see what's coming back from the response when getting
 a token. You can configure OAuth2 to output the response like so:
