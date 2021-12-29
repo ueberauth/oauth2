@@ -38,13 +38,4 @@ defmodule OAuth2.Strategy.ClientCredentials do
     |> merge_params(params)
     |> put_headers(headers)
   end
-
-  defp auth_scheme(client, "auth_header"), do: basic_auth(client)
-  defp auth_scheme(client, "request_body"), do: request_body(client)
-
-  defp request_body(client) do
-    client
-    |> put_param(:client_id, client.client_id)
-    |> put_param(:client_secret, client.client_secret)
-  end
 end

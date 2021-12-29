@@ -359,11 +359,28 @@ defmodule OAuth2.Client do
   end
 
   @doc """
+  Add authentication context by auth_scheme param
+  """
+  @spec auth_scheme(t, binary) :: t
+  def auth_scheme(client, "auth_header"), do: basic_auth(client)
+  def auth_scheme(client, "request_body"), do: request_body(client)
+
+  @doc """
   Adds `authorization` header for basic auth.
   """
   @spec basic_auth(t) :: t
   def basic_auth(%OAuth2.Client{client_id: id, client_secret: secret} = client) do
     put_header(client, "authorization", "Basic " <> Base.encode64(id <> ":" <> secret))
+  end
+
+  @doc """
+  Adds client credentials to params.
+  """
+  @spec request_body(t) :: t
+  def request_body(client) do
+    client
+    |> put_param(:client_id, client.client_id)
+    |> put_param(:client_secret, client.client_secret)
   end
 
   @doc """
