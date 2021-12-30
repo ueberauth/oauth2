@@ -48,6 +48,32 @@ defmodule OAuth2.Strategy.AuthCodeTest do
     assert token.access_token == access_token
   end
 
+  test "get_token: with auth_scheme set to 'request_body'", %{client: client, server: server} do
+    code = "abc1234"
+    access_token = "access-token-1234"
+
+    Bypass.expect(server, fn conn ->
+      assert conn.method == "POST"
+      assert conn.request_path == "/oauth/token"
+      assert get_req_header(conn, "content-type") == ["application/x-www-form-urlencoded"]
+      assert get_req_header(conn, "authorization") == []
+
+      {:ok, body, conn} = read_body(conn)
+      body = URI.decode_query(body)
+
+      assert body["grant_type"] == "authorization_code"
+      assert body["code"] == code
+      assert body["client_id"] == client.client_id
+      assert body["client_secret"] == client.client_secret
+      assert body["redirect_uri"] == client.redirect_uri
+
+      send_resp(conn, 200, ~s({"access_token":"#{access_token}"}))
+    end)
+
+    assert {:ok, %Client{token: token}} = Client.get_token(client, [code: code, auth_scheme: "request_body"])
+    assert token.access_token == access_token
+  end
+
   test "get_token throws and error if there is no 'code' param" do
     assert_raise OAuth2.Error, ~r/Missing required key/, fn ->
       AuthCode.get_token(build_client(), [], [])
