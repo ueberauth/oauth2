@@ -70,7 +70,9 @@ defmodule OAuth2.Strategy.AuthCodeTest do
       send_resp(conn, 200, ~s({"access_token":"#{access_token}"}))
     end)
 
-    assert {:ok, %Client{token: token}} = Client.get_token(client, [code: code, auth_scheme: "request_body"])
+    assert {:ok, %Client{token: token}} =
+             Client.get_token(client, code: code, auth_scheme: "request_body")
+
     assert token.access_token == access_token
   end
 
