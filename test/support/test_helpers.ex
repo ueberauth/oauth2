@@ -21,7 +21,7 @@ defmodule OAuth2.TestHelpers do
       assert conn.method == method
       assert conn.request_path == path
       assert_accepts(conn, accept)
-      # assert_token(conn, token)
+      assert_token(conn, token)
 
       fun.(conn)
     end)
