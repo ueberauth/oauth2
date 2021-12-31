@@ -32,6 +32,7 @@ defmodule OAuth2.Mixfile do
   defp deps do
     [
       {:hackney, "~> 1.13"},
+      {:jose, "~> 1.11"},
 
       # Test dependencies
       {:jason, "~> 1.0", only: [:dev, :test]},
