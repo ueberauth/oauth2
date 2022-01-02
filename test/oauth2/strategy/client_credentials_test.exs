@@ -23,6 +23,10 @@ defmodule OAuth2.Strategy.ClientCredentialsTest do
     base64 = Base.encode64(client.client_id <> ":" <> client.client_secret)
     assert client.headers == [{"authorization", "Basic #{base64}"}]
     assert client.params["grant_type"] == "client_credentials"
+    refute client.params["client_id"]
+    refute client.params["client_secret"]
+    refute client.params["client_assertion_type"]
+    refute client.params["client_assertion"]
   end
 
   test "get_token: Duplicated auth_header ", %{client: client, server: server} do
@@ -49,5 +53,20 @@ defmodule OAuth2.Strategy.ClientCredentialsTest do
     assert client.params["grant_type"] == "client_credentials"
     assert client.params["client_id"] == client.client_id
     assert client.params["client_secret"] == client.client_secret
+    refute client.params["client_assertion_type"]
+    refute client.params["client_assertion"]
+  end
+
+  test "get_token: with auth_scheme set to 'client_secret_jwt'", %{client: client} do
+    client = ClientCredentials.get_token(client, [auth_scheme: "client_secret_jwt"], [])
+    assert client.headers == []
+    assert client.params["grant_type"] == "client_credentials"
+    refute client.params["client_id"]
+    refute client.params["client_secret"]
+
+    assert client.params["client_assertion_type"] ==
+             "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+
+    assert client.params["client_assertion"]
   end
 end

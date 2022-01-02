@@ -44,4 +44,53 @@ defmodule OAuth2.Strategy.PasswordTest do
       Password.get_token(client, [], [])
     end
   end
+
+  test "get_token: auth_scheme defaults to 'auth_header'", %{client: client} do
+    client =
+      client
+      |> put_param(:username, "scrogson")
+      |> put_param(:password, "password")
+      |> Password.get_token([], [])
+
+    base64 = Base.encode64(client.client_id <> ":" <> client.client_secret)
+    assert client.headers == [{"authorization", "Basic #{base64}"}]
+    assert client.params["grant_type"] == "password"
+    refute client.params["client_id"]
+    refute client.params["client_secret"]
+    refute client.params["client_assertion_type"]
+    refute client.params["client_assertion"]
+  end
+
+  test "get_token: with auth_scheme set to 'request_body'", %{client: client} do
+    client =
+      client
+      |> put_param(:username, "scrogson")
+      |> put_param(:password, "password")
+      |> Password.get_token([auth_scheme: "request_body"], [])
+
+    assert client.headers == []
+    assert client.params["grant_type"] == "password"
+    assert client.params["client_id"] == client.client_id
+    assert client.params["client_secret"] == client.client_secret
+    refute client.params["client_assertion_type"]
+    refute client.params["client_assertion"]
+  end
+
+  test "get_token: with auth_scheme set to 'client_secret_jwt'", %{client: client} do
+    client =
+      client
+      |> put_param(:username, "scrogson")
+      |> put_param(:password, "password")
+      |> Password.get_token([auth_scheme: "client_secret_jwt"], [])
+
+    assert client.headers == []
+    assert client.params["grant_type"] == "password"
+    refute client.params["client_id"]
+    refute client.params["client_secret"]
+
+    assert client.params["client_assertion_type"] ==
+             "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+
+    assert client.params["client_assertion"]
+  end
 end

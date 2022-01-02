@@ -369,26 +369,26 @@ defmodule OAuth2.Client do
   """
   @spec auth_scheme(t, binary) :: t
   def auth_scheme(client, scheme) when scheme in ["auth_header", "client_secret_basic"],
-    do: client_secret_basic(client)
+    do: basic_auth(client)
 
   def auth_scheme(client, scheme) when scheme in ["request_body", "client_secret_post"],
-    do: client_secret_post(client)
+    do: request_body(client)
 
   def auth_scheme(client, "client_secret_jwt"), do: client_secret_jwt(client)
 
   @doc """
   Adds `authorization` header for basic auth.
   """
-  @spec client_secret_basic(t) :: t
-  def client_secret_basic(%OAuth2.Client{client_id: id, client_secret: secret} = client) do
+  @spec basic_auth(t) :: t
+  def basic_auth(%OAuth2.Client{client_id: id, client_secret: secret} = client) do
     put_header(client, "authorization", "Basic " <> Base.encode64(id <> ":" <> secret))
   end
 
   @doc """
   Adds client credentials to params.
   """
-  @spec client_secret_post(t) :: t
-  def client_secret_post(client) do
+  @spec request_body(t) :: t
+  def request_body(client) do
     client
     |> put_param(:client_id, client.client_id)
     |> put_param(:client_secret, client.client_secret)
