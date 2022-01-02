@@ -76,6 +76,53 @@ defmodule OAuth2.Strategy.AuthCodeTest do
     assert token.access_token == access_token
   end
 
+  test "get_token: with auth_scheme set to 'client_secret_jwt'", %{client: client, server: server} do
+    code = "abc1234"
+    access_token = "access-token-1234"
+
+    Bypass.expect(server, fn conn ->
+      assert conn.method == "POST"
+      assert conn.request_path == "/oauth/token"
+      assert get_req_header(conn, "content-type") == ["application/x-www-form-urlencoded"]
+      assert get_req_header(conn, "authorization") == []
+
+      {:ok, body, conn} = read_body(conn)
+      body = URI.decode_query(body)
+
+      assert body["grant_type"] == "authorization_code"
+      assert body["code"] == code
+      assert body["client_id"] == client.client_id
+      refute body["client_secret"]
+      assert body["redirect_uri"] == client.redirect_uri
+
+      assert body["client_assertion_type"] ==
+               "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+
+      assert body["client_assertion"]
+
+      assert {true, encoded_payload, _} =
+               JOSE.JWS.verify_strict(
+                 client.client_secret |> JOSE.JWK.from_oct(),
+                 ["HS256"],
+                 body["client_assertion"]
+               )
+
+      payload = encoded_payload |> Jason.decode!()
+      assert payload["iss"] == client.client_id
+      assert payload["sub"] == client.client_id
+      assert payload["aud"] == client.site <> client.token_url
+      assert payload["exp"] > OAuth2.Util.unix_now()
+      assert payload["exp"] == payload["iat"] + 600
+
+      send_resp(conn, 200, ~s({"access_token":"#{access_token}"}))
+    end)
+
+    assert {:ok, %Client{token: token}} =
+             Client.get_token(client, code: code, auth_scheme: "client_secret_jwt")
+
+    assert token.access_token == access_token
+  end
+
   test "get_token throws and error if there is no 'code' param" do
     assert_raise OAuth2.Error, ~r/Missing required key/, fn ->
       AuthCode.get_token(build_client(), [], [])

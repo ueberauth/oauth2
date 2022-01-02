@@ -47,6 +47,7 @@ defmodule OAuth2.Client do
   @type token :: AccessToken.t() | nil
   @type token_method :: :post | :get | atom
   @type token_url :: binary
+  @type client_secret_jwt_expires_in :: integer
 
   @type t :: %Client{
           authorize_url: authorize_url,
@@ -62,7 +63,8 @@ defmodule OAuth2.Client do
           strategy: strategy,
           token: token,
           token_method: token_method,
-          token_url: token_url
+          token_url: token_url,
+          client_secret_jwt_expires_in: client_secret_jwt_expires_in
         }
 
   defstruct authorize_url: "/oauth/authorize",
@@ -78,7 +80,8 @@ defmodule OAuth2.Client do
             strategy: OAuth2.Strategy.AuthCode,
             token: nil,
             token_method: :post,
-            token_url: "/oauth/token"
+            token_url: "/oauth/token",
+            client_secret_jwt_expires_in: 600
 
   @doc """
   Builds a new `OAuth2.Client` struct using the `opts` provided.
@@ -360,27 +363,47 @@ defmodule OAuth2.Client do
 
   @doc """
   Add authentication context by auth_scheme param
+
+  The auth_scheme parameter is compatible with "auth_header" and "request_body", but also refers to the OIDC specification.
+  ref. https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
   """
   @spec auth_scheme(t, binary) :: t
-  def auth_scheme(client, "auth_header"), do: basic_auth(client)
-  def auth_scheme(client, "request_body"), do: request_body(client)
+  def auth_scheme(client, scheme) when scheme in ["auth_header", "client_secret_basic"],
+    do: client_secret_basic(client)
+
+  def auth_scheme(client, scheme) when scheme in ["request_body", "client_secret_post"],
+    do: client_secret_post(client)
+
+  def auth_scheme(client, "client_secret_jwt"), do: client_secret_jwt(client)
 
   @doc """
   Adds `authorization` header for basic auth.
   """
-  @spec basic_auth(t) :: t
-  def basic_auth(%OAuth2.Client{client_id: id, client_secret: secret} = client) do
+  @spec client_secret_basic(t) :: t
+  def client_secret_basic(%OAuth2.Client{client_id: id, client_secret: secret} = client) do
     put_header(client, "authorization", "Basic " <> Base.encode64(id <> ":" <> secret))
   end
 
   @doc """
   Adds client credentials to params.
   """
-  @spec request_body(t) :: t
-  def request_body(client) do
+  @spec client_secret_post(t) :: t
+  def client_secret_post(client) do
     client
     |> put_param(:client_id, client.client_id)
     |> put_param(:client_secret, client.client_secret)
+  end
+
+  @doc """
+  Adds client assertion to params
+
+  ref. https://datatracker.ietf.org/doc/html/rfc7523#section-2.2
+  """
+  @spec client_secret_jwt(t) :: t
+  def client_secret_jwt(client) do
+    client
+    |> put_param(:client_assertion_type, "urn:ietf:params:oauth:client-assertion-type:jwt-bearer")
+    |> put_param(:client_assertion, client_assertion(client))
   end
 
   @doc """
@@ -504,4 +527,23 @@ defmodule OAuth2.Client do
     do: client.site <> endpoint
 
   defp endpoint(_client, endpoint), do: endpoint
+
+  defp client_assertion(client) do
+    now = OAuth2.Util.unix_now()
+
+    payload = %{
+      "iss" => client.client_id,
+      "sub" => client.client_id,
+      "aud" => to_url(client, :token_url) |> elem(1),
+      "jti" => :crypto.strong_rand_bytes(16) |> Base.hex_encode32(padding: false, case: :lower),
+      "exp" => now + client.client_secret_jwt_expires_in,
+      "iat" => now
+    }
+
+    client.client_secret
+    |> JOSE.JWK.from_oct()
+    |> JOSE.JWT.sign(%{"alg" => "HS256"}, payload)
+    |> JOSE.JWS.compact()
+    |> elem(1)
+  end
 end
