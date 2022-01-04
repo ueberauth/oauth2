@@ -21,12 +21,19 @@ defmodule OAuth2.Mixfile do
         "coveralls.detail": :test,
         "coveralls.html": :test,
         docs: :dev
-      ]
+      ],
+      dialyzer: dialyzer()
     ]
   end
 
   def application do
     [applications: [:logger, :hackney]]
+  end
+
+  defp dialyzer do
+    [
+      plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
+    ]
   end
 
   defp deps do
@@ -37,12 +44,12 @@ defmodule OAuth2.Mixfile do
       {:jason, "~> 1.0", only: [:dev, :test]},
       {:bypass, "~> 0.9", only: :test},
       {:plug_cowboy, "~> 1.0", only: :test},
-      {:excoveralls, "~> 0.9", only: :test},
-      {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false},
 
-      # Docs dependencies
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
+      # Tools
+      {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, ">= 0.0.0", only: [:dev], runtime: false},
+      {:ex_doc, ">= 0.0.0", only: [:dev], runtime: false},
+      {:excoveralls, ">= 0.0.0", only: [:test], runtime: false}
     ]
   end
 
