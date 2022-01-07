@@ -1,0 +1,14 @@
+name: cd
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  hex-publish:
+    uses: straw-hat-team/github-actions-workflows/.github/workflows/elixir-hex-publish.yml@v1.0.0
+    with:
+      elixir-version: '1.11'
+      otp-version: '22.3'
+    secrets:
+      HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
