@@ -15,14 +15,6 @@ An Elixir [OAuth](https://en.wikipedia.org/wiki/OAuth) 2.0 Client Library.
 ```elixir
 # mix.exs
 
-def application do
-  # Add the application to your list of applications.
-  # This will ensure that it will be included in a release.
-  [
-    applications: [:logger, :oauth2]
-  ]
-end
-
 defp deps do
   # Add the dependency
   [
