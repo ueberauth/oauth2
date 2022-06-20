@@ -478,8 +478,11 @@ defmodule OAuth2.Client do
     |> to_url(:token_url)
   end
 
-  defp token_post_header(%Client{token_method: :post} = client),
-    do: put_header(client, "content-type", "application/x-www-form-urlencoded")
+  defp token_post_header(%Client{token_method: :post} = client) do
+    client
+    |> put_header("content-type", "application/x-www-form-urlencoded")
+    |> put_header("accept", "application/json")
+  end
 
   defp token_post_header(%Client{} = client), do: client
 

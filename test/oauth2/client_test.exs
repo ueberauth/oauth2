@@ -39,16 +39,15 @@ defmodule OAuth2.ClientTest do
   test "get_token, get_token!", %{client: client, server: server} do
     bypass(server, "POST", "/oauth/token", fn conn ->
       assert conn.query_string == ""
+      assert get_req_header(conn, "accept") == ["application/json"]
+
       send_resp(conn, 200, ~s({"access_token":"test1234"}))
     end)
 
-    assert {:ok, client} =
-             Client.get_token(client, [code: "code1234"], [{"accept", "application/json"}])
-
+    assert {:ok, client} = Client.get_token(client, code: "code1234")
     assert client.token.access_token == "test1234"
 
-    assert %Client{} =
-             Client.get_token!(client, [code: "code1234"], [{"accept", "application/json"}])
+    assert %Client{} = Client.get_token!(client, code: "code1234")
   end
 
   test "get_token, get_token! when `:token_method` is `:get`", %{client: client, server: server} do
@@ -56,6 +55,7 @@ defmodule OAuth2.ClientTest do
 
     bypass(server, "GET", "/oauth/token", fn conn ->
       refute conn.query_string == ""
+      assert get_req_header(conn, "accept") == ["application/json"]
       assert conn.query_params["code"] == "code1234"
       assert conn.query_params["redirect_uri"]
       send_resp(conn, 200, ~s({"access_token":"test1234","token_type":"bearer"}))
@@ -69,19 +69,19 @@ defmodule OAuth2.ClientTest do
 
   test "get_token, get_token! when response error", %{client: client, server: server} do
     code = [code: "code1234"]
-    headers = [{"accept", "application/json"}]
 
     bypass(server, "POST", "/oauth/token", fn conn ->
       assert conn.query_string == ""
+      assert get_req_header(conn, "accept") == ["application/json"]
       send_resp(conn, 500, ~s({"error":"missing_client_id"}))
     end)
 
-    assert {:error, error} = Client.get_token(client, code, headers)
+    assert {:error, error} = Client.get_token(client, code)
     assert %Response{body: body, status_code: 500} = error
     assert body == %{"error" => "missing_client_id"}
 
     assert_raise OAuth2.Error, ~r/Body/, fn ->
-      Client.get_token!(client, code, headers)
+      Client.get_token!(client, code)
     end
   end
 
@@ -112,11 +112,11 @@ defmodule OAuth2.ClientTest do
 
     token = client.token
     client = %{client | token: %{token | refresh_token: "abcdefg"}}
-    assert {:ok, client_a} = Client.refresh_token(client, [], [{"accept", "application/json"}])
+    assert {:ok, client_a} = Client.refresh_token(client, [])
     assert client_a.token.access_token == "new-access-token"
     assert client_a.token.refresh_token == "new-refresh-token"
 
-    assert client_b = Client.refresh_token!(client, [], [{"accept", "application/json"}])
+    assert client_b = Client.refresh_token!(client, [])
     assert client_b.token.access_token == "new-access-token"
     assert client_b.token.refresh_token == "new-refresh-token"
   end
@@ -138,7 +138,7 @@ defmodule OAuth2.ClientTest do
 
     token = client.token
     client = %{client | token: %{token | refresh_token: "old-refresh-token"}}
-    assert {:ok, client} = Client.refresh_token(client, [], [{"accept", "application/json"}])
+    assert {:ok, client} = Client.refresh_token(client, [])
     assert client.token.access_token == "new-access-token"
     assert client.token.refresh_token == "old-refresh-token"
   end

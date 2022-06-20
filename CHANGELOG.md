@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.1 (2022-06-20)
+
+### Bug fixes
+
+- Fix incorrect Accept header when requesting token
+
 ## v2.0.0 (2019-07-15)
 
 ### Bug fixes (possibly backwards incompatible)
