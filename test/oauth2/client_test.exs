@@ -200,9 +200,6 @@ defmodule OAuth2.ClientTest do
 
     {:ok, ref} = Client.get(client, "/api/user/1")
 
-    assert_receive {:hackney_response, ^ref, {:status, 200, "OK"}}
-    assert_receive {:hackney_response, ^ref, {:headers, headers}}
-    assert {_, "8000"} = List.keyfind(headers, "content-length", 0)
     resp_body = stream(ref)
     assert resp_body == body
   end

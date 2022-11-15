@@ -27,7 +27,7 @@ defmodule OAuth2.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :hackney]]
+    [extra_applications: [:logger]]
   end
 
   defp dialyzer do
@@ -38,9 +38,10 @@ defmodule OAuth2.Mixfile do
 
   defp deps do
     [
-      {:hackney, "~> 1.13"},
+      {:tesla, "~> 1.4"},
 
       # Test dependencies
+      {:hackney, "~> 1.17", only: [:dev, :test]},
       {:jason, "~> 1.0", only: [:dev, :test]},
       {:bypass, "~> 0.9", only: :test},
       {:plug_cowboy, "~> 1.0", only: :test},
