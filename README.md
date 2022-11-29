@@ -19,7 +19,7 @@ defp deps do
   # Add the dependency
   [
     {:oauth2, "~> 2.0"},
-    {:hackney, "~> 2.0"} # depending on what tesla adapter you use
+    {:hackney, "~> 1.18"} # depending on what tesla adapter you use
   ]
 end
 ```

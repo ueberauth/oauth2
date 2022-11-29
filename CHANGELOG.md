@@ -1,5 +1,37 @@
 # Changelog
 
+## v3.0.0 (2022-11-29)
+
+### Improvements
+
+- Now you can have a lot more control over your http client, including
+  selecting what client you are using from the adapters available for
+  [Tesla](https://github.com/elixir-tesla/tesla).
+  You can also easily add logging and tracing with middleware.
+
+### Backward Incompatible Changes
+
+- No longer directly using hackney it's still possible to use it through a
+  Tesla adapter. To keep all your tweaks working correctly you'll need to
+  add these settings:
+
+  In mix.exs
+    ```elixir
+    # mix.exs
+    defp deps do
+      # Add the dependency
+      [
+        {:oauth2, "~> 2.0"},
+        {:hackney, "~> 1.18"} # This is the new line you need to add
+      ]
+    end
+    ```
+
+  In config:
+    ```elixir
+    config :oauth2, adapter: Tesla.Adapter.Hackney
+    ```
+
 ## v2.0.1 (2022-06-20)
 
 ### Bug fixes
