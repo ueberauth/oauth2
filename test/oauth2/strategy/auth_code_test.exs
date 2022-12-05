@@ -48,7 +48,7 @@ defmodule OAuth2.Strategy.AuthCodeTest do
     assert token.access_token == access_token
   end
 
-  test "get_token: with auth_scheme set to 'request_body'", %{client: client, server: server} do
+  test "get_token: with auth_method set to 'request_body'", %{client: client, server: server} do
     code = "abc1234"
     access_token = "access-token-1234"
 
@@ -71,12 +71,12 @@ defmodule OAuth2.Strategy.AuthCodeTest do
     end)
 
     assert {:ok, %Client{token: token}} =
-             Client.get_token(client, code: code, auth_scheme: "request_body")
+             Client.get_token(client, code: code, auth_method: "request_body")
 
     assert token.access_token == access_token
   end
 
-  test "get_token: with auth_scheme set to 'client_secret_jwt'", %{client: client, server: server} do
+  test "get_token: with auth_method set to 'client_secret_jwt'", %{client: client, server: server} do
     code = "abc1234"
     access_token = "access-token-1234"
 
@@ -118,7 +118,7 @@ defmodule OAuth2.Strategy.AuthCodeTest do
     end)
 
     assert {:ok, %Client{token: token}} =
-             Client.get_token(client, code: code, auth_scheme: "client_secret_jwt")
+             Client.get_token(client, code: code, auth_method: "client_secret_jwt")
 
     assert token.access_token == access_token
   end

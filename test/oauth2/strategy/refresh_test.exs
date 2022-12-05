@@ -29,9 +29,11 @@ defmodule OAuth2.Strategy.RefreshTest do
     end
   end
 
-  test "get_token: with auth_scheme set to 'request_body'" do
+  test "get_token: with auth_method set to 'request_body'" do
     client = build_client()
-    client = Refresh.get_token(client, [refresh_token: "refresh-token", auth_scheme: "request_body"], [])
+
+    client =
+      Refresh.get_token(client, [refresh_token: "refresh-token", auth_method: "request_body"], [])
 
     assert client.headers == []
     assert client.params["grant_type"] == "refresh_token"
@@ -41,9 +43,15 @@ defmodule OAuth2.Strategy.RefreshTest do
     refute client.params["client_assertion"]
   end
 
-  test "get_token: with auth_scheme set to 'client_secret_jwt'" do
+  test "get_token: with auth_method set to 'client_secret_jwt'" do
     client = build_client()
-    client = Refresh.get_token(client, [refresh_token: "refresh-token", auth_scheme: "client_secret_jwt"], [])
+
+    client =
+      Refresh.get_token(
+        client,
+        [refresh_token: "refresh-token", auth_method: "client_secret_jwt"],
+        []
+      )
 
     assert client.headers == []
     assert client.params["grant_type"] == "refresh_token"
@@ -55,5 +63,4 @@ defmodule OAuth2.Strategy.RefreshTest do
 
     assert client.params["client_assertion"]
   end
-
 end

@@ -30,11 +30,11 @@ defmodule OAuth2.Strategy.ClientCredentials do
   """
   @impl true
   def get_token(client, params, headers) do
-    {auth_scheme, params} = Keyword.pop(params, :auth_scheme, "auth_header")
+    {auth_method, params} = Keyword.pop(params, :auth_method, "auth_header")
 
     client
     |> put_param(:grant_type, "client_credentials")
-    |> auth_scheme(auth_scheme)
+    |> auth_method(auth_method)
     |> merge_params(params)
     |> put_headers(headers)
   end

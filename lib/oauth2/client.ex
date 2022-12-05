@@ -362,19 +362,19 @@ defmodule OAuth2.Client do
   end
 
   @doc """
-  Add authentication context by auth_scheme param
+  Add authentication context by auth_method param
 
-  The auth_scheme parameter is compatible with "auth_header" and "request_body", but also refers to the OIDC specification.
+  The auth_method parameter is compatible with "auth_header" and "request_body", but also refers to the OIDC specification.
   ref. https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
   """
-  @spec auth_scheme(t, binary) :: t
+  @spec auth_method(t, binary) :: t
   def auth_method(client, scheme) when scheme in ["auth_header", "client_secret_basic"],
     do: basic_auth(client)
 
-  def auth_scheme(client, scheme) when scheme in ["request_body", "client_secret_post"],
+  def auth_method(client, scheme) when scheme in ["request_body", "client_secret_post"],
     do: request_body(client)
 
-  def auth_scheme(client, "client_secret_jwt"), do: client_secret_jwt(client)
+  def auth_method(client, "client_secret_jwt"), do: client_secret_jwt(client)
 
   @doc """
   Adds `authorization` header for basic auth.

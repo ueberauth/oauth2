@@ -45,7 +45,7 @@ defmodule OAuth2.Strategy.PasswordTest do
     end
   end
 
-  test "get_token: auth_scheme defaults to 'auth_header'", %{client: client} do
+  test "get_token: auth_method defaults to 'auth_header'", %{client: client} do
     client =
       client
       |> put_param(:username, "scrogson")
@@ -61,12 +61,12 @@ defmodule OAuth2.Strategy.PasswordTest do
     refute client.params["client_assertion"]
   end
 
-  test "get_token: with auth_scheme set to 'request_body'", %{client: client} do
+  test "get_token: with auth_method set to 'request_body'", %{client: client} do
     client =
       client
       |> put_param(:username, "scrogson")
       |> put_param(:password, "password")
-      |> Password.get_token([auth_scheme: "request_body"], [])
+      |> Password.get_token([auth_method: "request_body"], [])
 
     assert client.headers == []
     assert client.params["grant_type"] == "password"
@@ -76,12 +76,12 @@ defmodule OAuth2.Strategy.PasswordTest do
     refute client.params["client_assertion"]
   end
 
-  test "get_token: with auth_scheme set to 'client_secret_jwt'", %{client: client} do
+  test "get_token: with auth_method set to 'client_secret_jwt'", %{client: client} do
     client =
       client
       |> put_param(:username, "scrogson")
       |> put_param(:password, "password")
-      |> Password.get_token([auth_scheme: "client_secret_jwt"], [])
+      |> Password.get_token([auth_method: "client_secret_jwt"], [])
 
     assert client.headers == []
     assert client.params["grant_type"] == "password"
