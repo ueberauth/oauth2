@@ -368,7 +368,7 @@ defmodule OAuth2.Client do
   ref. https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
   """
   @spec auth_scheme(t, binary) :: t
-  def auth_scheme(client, scheme) when scheme in ["auth_header", "client_secret_basic"],
+  def auth_method(client, scheme) when scheme in ["auth_header", "client_secret_basic"],
     do: basic_auth(client)
 
   def auth_scheme(client, scheme) when scheme in ["request_body", "client_secret_post"],
