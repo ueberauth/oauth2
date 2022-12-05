@@ -50,13 +50,15 @@ defmodule OAuth2.Strategy.AuthCode do
       raise OAuth2.Error, reason: "Missing required key `code` for `#{inspect(__MODULE__)}`"
     end
 
+    {auth_method, params} = Keyword.pop(params, :auth_method, "auth_header")
+
     client
     |> put_param(:code, code)
     |> put_param(:grant_type, "authorization_code")
     |> put_param(:client_id, client.client_id)
     |> put_param(:redirect_uri, client.redirect_uri)
     |> merge_params(params)
-    |> basic_auth()
+    |> auth_method(auth_method)
     |> put_headers(headers)
   end
 end

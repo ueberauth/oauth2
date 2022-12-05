@@ -44,11 +44,13 @@ defmodule OAuth2.Strategy.Refresh do
         reason: "Missing required key `refresh_token` for `#{inspect(__MODULE__)}`"
     end
 
+    {auth_method, params} = Keyword.pop(params, :auth_method, "auth_header")
+
     client
     |> put_param(:refresh_token, token)
     |> put_param(:grant_type, "refresh_token")
     |> merge_params(params)
-    |> basic_auth()
+    |> auth_method(auth_method)
     |> put_headers(headers)
   end
 end

@@ -28,4 +28,39 @@ defmodule OAuth2.Strategy.RefreshTest do
       Refresh.get_token(build_client(), [], [])
     end
   end
+
+  test "get_token: with auth_method set to 'request_body'" do
+    client = build_client()
+
+    client =
+      Refresh.get_token(client, [refresh_token: "refresh-token", auth_method: "request_body"], [])
+
+    assert client.headers == []
+    assert client.params["grant_type"] == "refresh_token"
+    assert client.params["client_id"] == client.client_id
+    assert client.params["client_secret"] == client.client_secret
+    refute client.params["client_assertion_type"]
+    refute client.params["client_assertion"]
+  end
+
+  test "get_token: with auth_method set to 'client_secret_jwt'" do
+    client = build_client()
+
+    client =
+      Refresh.get_token(
+        client,
+        [refresh_token: "refresh-token", auth_method: "client_secret_jwt"],
+        []
+      )
+
+    assert client.headers == []
+    assert client.params["grant_type"] == "refresh_token"
+    refute client.params["client_id"]
+    refute client.params["client_secret"]
+
+    assert client.params["client_assertion_type"] ==
+             "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+
+    assert client.params["client_assertion"]
+  end
 end

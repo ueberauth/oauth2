@@ -43,12 +43,14 @@ defmodule OAuth2.Strategy.Password do
         reason: "Missing required keys `username` and `password` for #{inspect(__MODULE__)}"
     end
 
+    {auth_method, params} = Keyword.pop(params, :auth_method, "auth_header")
+
     client
     |> put_param(:username, username)
     |> put_param(:password, password)
     |> put_param(:grant_type, "password")
     |> merge_params(params)
-    |> basic_auth()
+    |> auth_method(auth_method)
     |> put_headers(headers)
   end
 end
