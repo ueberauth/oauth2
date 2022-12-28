@@ -38,7 +38,7 @@ defmodule OAuth2.Mixfile do
 
   defp deps do
     [
-      {:tesla, "~> 1.4"},
+      {:tesla, "~> 1.5"},
 
       # Test dependencies
       {:hackney, "~> 1.17", only: [:dev, :test]},
