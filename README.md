@@ -18,7 +18,8 @@ An Elixir [OAuth](https://en.wikipedia.org/wiki/OAuth) 2.0 Client Library.
 defp deps do
   # Add the dependency
   [
-    {:oauth2, "~> 2.0"}
+    {:oauth2, "~> 2.0"},
+    {:hackney, "~> 1.18"} # depending on what tesla adapter you use
   ]
 end
 ```
@@ -46,6 +47,26 @@ end
 
 Please see the documentation for [OAuth2.Serializer](https://hexdocs.pm/oauth2/OAuth2.Serializer.html)
 for more details.
+
+## Configure a http client
+
+The http client library used is [tesla](https://github.com/elixir-tesla/tesla), the default adapter is
+Httpc, since it comes out of the box with every Erlang instance but you can easily change it to something
+better.
+You can configure another adaptor like this:
+
+```elixir
+config :oauth2, adapter: Tesla.Adapter.Mint
+```
+
+You can also add your own tesla middleware:
+
+```elixir
+config :oauth2, middleware: [
+  Tesla.Middleware.Retry,
+  {Tesla.Middleware.Fuse, name: :example}
+]
+```
 
 ## Debug mode
 

@@ -14,13 +14,14 @@ defmodule OAuth2.Request do
   @spec request(atom, Client.t(), binary, body, Client.headers(), Keyword.t()) ::
           {:ok, Response.t()} | {:ok, reference} | {:error, Response.t()} | {:error, Error.t()}
   def request(method, %Client{} = client, url, body, headers, opts) do
-    url = client |> process_url(url) |> process_params(opts[:params])
+    url = process_url(client, url)
     headers = req_headers(client, headers) |> normalize_headers() |> Enum.uniq()
     content_type = content_type(headers)
     serializer = Client.get_serializer(client, content_type)
     body = encode_request_body(body, content_type, serializer)
     headers = process_request_headers(headers, content_type)
     req_opts = Keyword.merge(client.request_opts, opts)
+    params = opts[:params] || %{}
 
     if Application.get_env(:oauth2, :debug) do
       Logger.debug("""
@@ -33,15 +34,19 @@ defmodule OAuth2.Request do
       """)
     end
 
-    case :hackney.request(method, url, headers, body, req_opts) do
-      {:ok, ref} when is_reference(ref) ->
-        {:ok, ref}
-
-      {:ok, status, headers, ref} when is_reference(ref) ->
-        process_body(client, status, headers, ref)
-
-      {:ok, status, headers, body} when is_binary(body) ->
+    case Tesla.request(http_client(),
+           method: method,
+           url: url,
+           query: params,
+           headers: headers,
+           body: body,
+           opts: [adapter: req_opts]
+         ) do
+      {:ok, %{status: status, headers: headers, body: body}} when is_binary(body) ->
         process_body(client, status, headers, body)
+
+      {:ok, %{body: ref}} when is_reference(ref) ->
+        {:ok, ref}
 
       {:error, reason} ->
         {:error, %Error{reason: reason}}
@@ -80,21 +85,19 @@ defmodule OAuth2.Request do
     end
   end
 
+  defp http_client do
+    adapter = Application.get_env(:oauth2, :adapter, Tesla.Adapter.Httpc)
+
+    middleware = Application.get_env(:oauth2, :middleware, [])
+
+    Tesla.client(middleware, adapter)
+  end
+
   defp process_url(client, url) do
     case String.downcase(url) do
       <<"http://"::utf8, _::binary>> -> url
       <<"https://"::utf8, _::binary>> -> url
       _ -> client.site <> url
-    end
-  end
-
-  defp process_body(client, status, headers, ref) when is_reference(ref) do
-    case :hackney.body(ref) do
-      {:ok, body} ->
-        process_body(client, status, headers, body)
-
-      {:error, reason} ->
-        {:error, %Error{reason: reason}}
     end
   end
 
@@ -109,12 +112,6 @@ defmodule OAuth2.Request do
         {:error, resp}
     end
   end
-
-  defp process_params(url, nil),
-    do: url
-
-  defp process_params(url, params),
-    do: url <> "?" <> URI.encode_query(params)
 
   defp req_headers(%Client{token: nil} = client, headers),
     do: headers ++ client.headers
