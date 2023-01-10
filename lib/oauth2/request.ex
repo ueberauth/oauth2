@@ -42,7 +42,8 @@ defmodule OAuth2.Request do
            body: body,
            opts: [adapter: req_opts]
          ) do
-      {:ok, %{status: status, headers: headers, body: body}} when is_binary(body) ->
+      {:ok, %{status: status, headers: headers, body: body}}
+      when is_binary(body) or is_nil(body) ->
         process_body(client, status, headers, body)
 
       {:ok, %{body: ref}} when is_reference(ref) ->
@@ -101,7 +102,7 @@ defmodule OAuth2.Request do
     end
   end
 
-  defp process_body(client, status, headers, body) when is_binary(body) do
+  defp process_body(client, status, headers, body) when is_binary(body) or is_nil(body) do
     resp = Response.new(client, status, headers, body)
 
     case status do
