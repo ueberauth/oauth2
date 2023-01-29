@@ -27,8 +27,8 @@ defmodule OAuth2.Strategy.AuthCode do
   use OAuth2.Strategy
 
   @doc """
-  The authorization URL endpoint of the provider.
-  params additional query parameters for the URL
+  Configures the authorization URL endpoint of the provider with additional 
+  query parameters.
   """
   @impl true
   def authorize_url(client, params) do
