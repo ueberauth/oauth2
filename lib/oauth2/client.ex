@@ -318,7 +318,7 @@ defmodule OAuth2.Client do
   """
   @spec refresh_token(t, params, headers, Keyword.t()) ::
           {:ok, Client.t()} | {:error, Response.t()} | {:error, Error.t()}
-  def refresh_token(token, params \\ [], headers \\ [], opts \\ [])
+  def refresh_token(client, params \\ [], headers \\ [], opts \\ [])
 
   def refresh_token(%Client{token: %{refresh_token: nil}}, _params, _headers, _opts) do
     {:error, %Error{reason: "Refresh token not available."}}
