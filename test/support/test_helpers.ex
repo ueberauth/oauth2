@@ -90,7 +90,8 @@ defmodule OAuth2.TestHelpers do
       client_id: get_config(:client_id),
       client_secret: get_config(:client_secret),
       redirect_uri: get_config(:redirect_uri),
-      request_opts: get_config(:request_opts)
+      request_opts: get_config(:request_opts),
+      http_client: Tesla
     ]
   end
 

@@ -19,7 +19,9 @@ defp deps do
   # Add the dependency
   [
     {:oauth2, "~> 2.0"},
-    {:hackney, "~> 1.18"} # depending on what tesla adapter you use
+    # depending on what adapter you use
+    {:tesla, "~> 1.8"},
+    {:hackney, "~> 1.18"}
   ]
 end
 ```
@@ -50,23 +52,36 @@ for more details.
 
 ## Configure a http client
 
-The http client library used is [tesla](https://github.com/elixir-tesla/tesla), the default adapter is
-Httpc, since it comes out of the box with every Erlang instance but you can easily change it to something
-better.
-You can configure another adaptor like this:
+Before you start making requests you need to configure a HTTP client. This is a
+module that implements `m:OAuth2.HttpClient` behaviour. The simplest way to get
+one is to use `m:Tesla` library with hackney adapter.
+
+To do so you need to first make sure you have them in your dependencies:
 
 ```elixir
-config :oauth2, adapter: Tesla.Adapter.Mint
+defp deps do
+  [
+    ...
+    {:tesla, "~> 1.8"},
+    {:hackney, "~> 1.18"}
+  ]
+end
 ```
 
-You can also add your own tesla middleware:
+Then you can configure `OAuth2` to use Tesla as an http client:
 
 ```elixir
-config :oauth2, middleware: [
-  Tesla.Middleware.Retry,
-  {Tesla.Middleware.Fuse, name: :example}
-]
+config :oauth2, http_client: Tesla
 ```
+
+And tell Tesla to use hackney for adapter:
+
+```elixir
+config: :tesla, adapter: Tesla.Adapter.Hackney
+```
+
+If you don't want to use Tesla, you can always create a module implementing a
+custom implementation of `m:OAuth2.HttpClient`
 
 ## Debug mode
 

@@ -34,7 +34,7 @@ defmodule OAuth2.Request do
       """)
     end
 
-    case Tesla.request(http_client(),
+    case http_fn(client).(
            method: method,
            url: url,
            query: params,
@@ -85,12 +85,18 @@ defmodule OAuth2.Request do
     end
   end
 
-  defp http_client do
-    adapter = Application.get_env(:oauth2, :adapter, Tesla.Adapter.Httpc)
+  defp http_fn(client) do
+    http_client =
+      client.http_client || Application.get_env(:oauth2, :http_client) ||
+        raise "Please provide :http_client through OAuth2.Client options or global configuration"
 
-    middleware = Application.get_env(:oauth2, :middleware, [])
+    case http_client do
+      {client, module} ->
+        fn opts -> module.request(client, opts) end
 
-    Tesla.client(middleware, adapter)
+      module ->
+        fn opts -> module.request(opts) end
+    end
   end
 
   defp process_url(client, url) do

@@ -8,9 +8,8 @@ config :oauth2,
   # second commit sha
   client_secret: "f715d64092fe81c396ac383e97f8a7eca40e7c89",
   redirect_uri: "http://example.com/auth/callback",
-  request_opts: [],
-  middleware: []
+  request_opts: []
 
 if Mix.env() == :test do
-  config :oauth2, adapter: Tesla.Adapter.Hackney
+  config :tesla, adapter: Tesla.Adapter.Hackney
 end

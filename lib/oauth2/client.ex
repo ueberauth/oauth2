@@ -47,6 +47,7 @@ defmodule OAuth2.Client do
   @type token :: AccessToken.t() | nil
   @type token_method :: :post | :get | atom
   @type token_url :: binary
+  @type http_client :: atom | {any(), module}
 
   @type t :: %Client{
           authorize_url: authorize_url,
@@ -62,7 +63,8 @@ defmodule OAuth2.Client do
           strategy: strategy,
           token: token,
           token_method: token_method,
-          token_url: token_url
+          token_url: token_url,
+          http_client: http_client
         }
 
   defstruct authorize_url: "/oauth/authorize",
@@ -78,7 +80,8 @@ defmodule OAuth2.Client do
             strategy: OAuth2.Strategy.AuthCode,
             token: nil,
             token_method: :post,
-            token_url: "/oauth/token"
+            token_url: "/oauth/token",
+            http_client: nil
 
   @doc """
   Builds a new `OAuth2.Client` struct using the `opts` provided.
@@ -104,6 +107,9 @@ defmodule OAuth2.Client do
     Defaults to `:post`
   * `token_url` - absolute or relative URL path to the token endpoint.
     Defaults to `"/oauth/token"`
+  * `http_client` - a module that implements the `OAuth2.HttpClient` behaviour
+    or a tuple `{term, ClientModule}`. The tuple form is particularly useful when
+    you want to use a tesla client with the request.
 
   ## Example
 
@@ -123,6 +129,16 @@ defmodule OAuth2.Client do
       token: %OAuth2.AccessToken{access_token: "123", expires_at: nil,
       other_params: %{}, refresh_token: nil, token_type: "Bearer"},
       token_method: :post, token_url: "/oauth/token"}
+
+      iex> tesla_client = Tesla.client([], Tesla.Adapter.Hackney)
+      iex> OAuth2.Client.new(token: "123", http_client: {tesla_client, Tesla})
+      %OAuth2.Client{authorize_url: "/oauth/authorize", client_id: "",
+      client_secret: "", headers: [], params: %{}, redirect_uri: "", ref: nil,
+      request_opts: [], serializers: %{}, site: "", strategy: OAuth2.Strategy.AuthCode,
+      token: %OAuth2.AccessToken{access_token: "123", refresh_token: nil, expires_at: nil,
+      token_type: "Bearer", other_params: %{}}, token_method: :post, token_url: "/oauth/token",
+      http_client: {%Tesla.Client{fun: nil, pre: [], post: [],
+      adapter: {Tesla.Adapter.Hackney, :call, [[]]}}, Tesla}}
 
   [hackney documentation]: https://github.com/benoitc/hackney/blob/master/doc/hackney.md#request5
   """
