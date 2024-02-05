@@ -1,6 +1,6 @@
 # OAuth2 (Client)
 
-[![Build Status](https://travis-ci.org/scrogson/oauth2.svg?branch=master)](https://travis-ci.org/scrogson/oauth2)
+[![Build Status](https://github.com/ueberauth/oauth2/actions/workflows/ci.yml/badge.svg)](https://github.com/ueberauth/oauth2/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/scrogson/oauth2/badge.svg?branch=master&service=github)](https://coveralls.io/github/scrogson/oauth2?branch=master)
 [![Module Version](https://img.shields.io/hexpm/v/oauth2.svg)](https://hex.pm/packages/oauth2)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/oauth2/)
