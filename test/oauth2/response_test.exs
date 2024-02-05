@@ -24,6 +24,11 @@ defmodule OAuth2.ResponseTest do
     assert response.body == "hello"
   end
 
+  test "nil body converts to empty string" do
+    response = Response.new(%OAuth2.Client{}, 204, [], nil)
+    assert response.body == ""
+  end
+
   test "always parse body by serializer if it exists" do
     client = OAuth2.Client.put_serializer(%OAuth2.Client{}, "text/plain", Jason)
     response = Response.new(client, 200, [{"content-type", "text/plain"}], ~S({"hello": "world"}))
