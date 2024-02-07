@@ -43,6 +43,22 @@ defmodule OAuth2.AccessTokenTest do
     assert token.other_params == %{"expires" => "123"}
   end
 
+  test "new with 'expires_at' param" do
+    response =
+      Response.new(
+        %Client{},
+        200,
+        [{"content-type", "application/x-www-form-urlencoded"}],
+        "access_token=abc123&expires_at=123"
+      )
+
+    token = AccessToken.new(response.body)
+    assert token.access_token == "abc123"
+    assert token.expires_at == 123
+    assert token.token_type == "Bearer"
+    assert token.other_params == %{}
+  end
+
   test "new from text/plain content-type" do
     response =
       Response.new(
