@@ -46,7 +46,7 @@ defmodule OAuth2.Strategy.AuthCode do
   def get_token(client, params, headers) do
     {code, params} = Keyword.pop(params, :code, client.params["code"])
 
-    unless code do
+    if !code do
       raise OAuth2.Error, reason: "Missing required key `code` for `#{inspect(__MODULE__)}`"
     end
 
