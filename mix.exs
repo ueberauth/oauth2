@@ -2,7 +2,7 @@ defmodule OAuth2.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/scrogson/oauth2"
-  @version "2.1.0"
+  @version "2.1.1"
 
   def project do
     [
