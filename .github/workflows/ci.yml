@@ -10,7 +10,4 @@ on:
 
 jobs:
   qa:
-    uses: straw-hat-team/github-actions-workflows/.github/workflows/elixir-quality-assurance.yml@v1.6.3
-    with:
-      elixir-version: '1.14'
-      otp-version: '24.3'
+    uses: straw-hat-team/github-actions-workflows/.github/workflows/elixir-quality-assurance.yml@v1.8.0

@@ -1,6 +1,6 @@
 defmodule OAuth2.ClientTest do
   use ExUnit.Case, async: true
-  use Plug.Test
+  import Plug.Conn
   doctest OAuth2.Client
 
   import OAuth2.Client
@@ -292,7 +292,7 @@ defmodule OAuth2.ClientTest do
 
   test "DELETE", %{server: server, client_with_token: client} do
     bypass(server, "DELETE", "/api/posts/1", [token: client.token], fn conn ->
-      json(conn, 204, "")
+      Plug.Conn.send_resp(conn, 204, "")
     end)
 
     {:ok, result} = Client.delete(client, "/api/posts/1")

@@ -16,13 +16,18 @@ defmodule OAuth2.Mixfile do
       docs: docs(),
       elixirc_paths: elixirc_paths(Mix.env()),
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [
+      dialyzer: dialyzer()
+    ]
+  end
+
+  def cli do
+    [
+      preferred_envs: [
         coveralls: :test,
         "coveralls.detail": :test,
         "coveralls.html": :test,
         docs: :dev
-      ],
-      dialyzer: dialyzer()
+      ]
     ]
   end
 
@@ -41,10 +46,10 @@ defmodule OAuth2.Mixfile do
       {:tesla, "~> 1.18"},
 
       # Test dependencies
-      {:hackney, "~> 1.17", only: [:dev, :test]},
-      {:jason, "~> 1.0", only: [:dev, :test]},
-      {:bypass, "~> 0.9", only: :test},
-      {:plug_cowboy, "~> 1.0", only: :test},
+      {:hackney, "~> 4.1", only: [:dev, :test]},
+      {:jason, "~> 1.4", only: [:dev, :test]},
+      {:bypass, "~> 2.1", only: :test},
+      {:plug_cowboy, "~> 2.8", only: :test},
 
       # Tools
       {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
