@@ -46,7 +46,7 @@ defmodule OAuth2.Mixfile do
       {:tesla, "~> 1.18"},
 
       # Test dependencies
-      {:hackney, "~> 1.25", only: [:dev, :test]},
+      {:hackney, "~> 4.1", only: [:dev, :test]},
       {:jason, "~> 1.4", only: [:dev, :test]},
       {:bypass, "~> 2.1", only: :test},
       {:plug_cowboy, "~> 2.8", only: :test},

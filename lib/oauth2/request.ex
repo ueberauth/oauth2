@@ -45,7 +45,7 @@ defmodule OAuth2.Request do
       {:ok, %{status: status, headers: headers, body: body}} when is_binary(body) ->
         process_body(client, status, headers, body)
 
-      {:ok, %{body: ref}} when is_reference(ref) ->
+      {:ok, %{body: ref}} when is_reference(ref) or is_pid(ref) ->
         {:ok, ref}
 
       {:error, reason} ->
