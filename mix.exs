@@ -46,10 +46,10 @@ defmodule OAuth2.Mixfile do
       {:tesla, "~> 1.18"},
 
       # Test dependencies
-      {:hackney, "~> 1.17", only: [:dev, :test]},
-      {:jason, "~> 1.0", only: [:dev, :test]},
-      {:bypass, "~> 0.9", only: :test},
-      {:plug_cowboy, "~> 1.0", only: :test},
+      {:hackney, "~> 1.25", only: [:dev, :test]},
+      {:jason, "~> 1.4", only: [:dev, :test]},
+      {:bypass, "~> 2.1", only: :test},
+      {:plug_cowboy, "~> 2.8", only: :test},
 
       # Tools
       {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
