@@ -7,8 +7,5 @@ on:
 jobs:
   hex-publish:
     uses: straw-hat-team/github-actions-workflows/.github/workflows/elixir-hex-publish.yml@v1.8.0
-    with:
-      elixir-version: '1.19.5'
-      otp-version: '28.5'
     secrets:
       HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
